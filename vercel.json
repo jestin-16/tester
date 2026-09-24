@@ -234,6 +234,34 @@
       "destination": "/files/quick.txt"
     },
     {
+      "source": "/s",
+      "destination": "/files/sureshot.txt"
+    },
+    {
+      "source": "/sure",
+      "destination": "/files/sureshot.txt"
+    },
+    {
+      "source": "/sureshot",
+      "destination": "/files/sureshot.txt"
+    },
+    {
+      "source": "/s1",
+      "destination": "/files/record_eda.txt"
+    },
+    {
+      "source": "/s2",
+      "destination": "/files/knn_scratch.txt"
+    },
+    {
+      "source": "/s3",
+      "destination": "/files/feedback_nb.txt"
+    },
+    {
+      "source": "/nb",
+      "destination": "/files/feedback_nb.txt"
+    },
+    {
       "source": "/q",
       "destination": "/api/groq"
     },

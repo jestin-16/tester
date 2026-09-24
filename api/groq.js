@@ -488,6 +488,8 @@ cls
 echo ================================================================================
 echo            DATA SCIENCE LAB -- QUESTIONS & ANSWERS (EXAM REVISION)
 echo ================================================================================
+echo  [S]  ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)
+echo --------------------------------------------------------------------------------
 echo  [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
 echo  [2]  CO1 Q2: Employee Performance Report ^& Best Department (30 Emps)
 echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
@@ -506,8 +508,10 @@ echo  [A]  Ask AI Custom Question
 echo  [0]  Exit
 echo ================================================================================
 set "choice="
-set /p "choice=Enter option [0-14, or A]: "
+set /p "choice=Enter option [0-14, S, or A]: "
 
+if /i "%choice%"=="s" goto sureshot
+if /i "%choice%"=="sure" goto sureshot
 if "%choice%"=="1" goto q1
 if "%choice%"=="2" goto q2
 if "%choice%"=="3" goto q3
@@ -525,6 +529,13 @@ if "%choice%"=="14" goto q14
 if /i "%choice%"=="a" goto ai
 if "%choice%"=="0" goto :eof
 echo Invalid selection. Please try again.
+pause
+goto menu
+
+:sureshot
+cls
+curl.exe -s ${baseUrl}/s
+echo.
 pause
 goto menu
 
@@ -651,6 +662,8 @@ function Show-Menu {
     Write-Host "================================================================================" -ForegroundColor Cyan
     Write-Host "                   DATA SCIENCE LAB -- SELECT A QUESTION                        " -ForegroundColor Green
     Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host " [S]  ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)" -ForegroundColor Yellow
+    Write-Host "--------------------------------------------------------------------------------" -ForegroundColor DarkGray
     Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)"
     Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department (30 Emps)"
     Write-Host " [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
@@ -671,6 +684,8 @@ function Show-Menu {
 }
 
 $routes = @{
+    "s"  = "/s";  "sure" = "/s"; "sureshot" = "/s"
+    "s1" = "/s1"; "s2"   = "/s2"; "s3" = "/s3"
     "1"  = "/1";  "2"  = "/2";  "3"  = "/3";  "4"  = "/4"
     "5"  = "/5";  "6"  = "/6";  "7"  = "/7";  "8"  = "/8"
     "9"  = "/9";  "10" = "/10"; "11" = "/11"; "12" = "/12"
@@ -679,7 +694,7 @@ $routes = @{
 
 while ($true) {
     Show-Menu
-    $choice = (Read-Host "Enter option [0-14, or A]").Trim()
+    $choice = (Read-Host "Enter option [0-14, S, or A]").Trim()
     if ($choice -in @("0", "exit", "q")) { break }
     
     if ($choice -in @("a", "ai")) {
@@ -697,9 +712,9 @@ while ($true) {
         continue
     }
     
-    if ($routes.ContainsKey($choice)) {
+    if ($routes.ContainsKey($choice.ToLower())) {
         Clear-Host
-        $url = "$BaseUrl$($routes[$choice])"
+        $url = "$BaseUrl$($routes[$choice.ToLower()])"
         try {
             $txt = (New-Object Net.WebClient).DownloadString($url)
             Write-Host $txt
@@ -708,7 +723,7 @@ while ($true) {
         }
         Read-Host "\`nPress Enter to return to menu..."
     } else {
-        Write-Host "Invalid option. Please choose 0 to 14." -ForegroundColor Yellow
+        Write-Host "Invalid option. Please choose 0 to 14, or S." -ForegroundColor Yellow
         Start-Sleep -Seconds 1
     }
 }
@@ -726,6 +741,7 @@ echo ===========================================================================
 echo                    DATA SCIENCE LAB -- MAIN PORTAL
 echo ================================================================================
 echo.
+echo  [S] ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)
 echo  [1] Chat with AI Assistant (Interactive Terminal)
 echo  [2] Show Questions ^& Answers (CO1, k-NN, Bayes, Decision Trees, EDA)
 echo.
@@ -733,13 +749,14 @@ echo  [0] Exit
 echo.
 echo ================================================================================
 set "main_choice="
-set /p "main_choice=Enter choice [1 or 2]: "
+set /p "main_choice=Enter choice [1, 2, S, or 0]: "
 
+if /i "%main_choice%"=="s" ( cls & curl.exe -s ${baseUrl}/s & echo. & pause & goto main_menu )
 if "%main_choice%"=="1" goto chat_section
 if "%main_choice%"=="2" goto qa_section
 if "%main_choice%"=="0" goto :eof
 
-echo Invalid selection. Please enter 1, 2, or 0.
+echo Invalid selection. Please enter 1, 2, S, or 0.
 timeout /t 2 >nul 2>&1
 goto main_menu
 
@@ -774,6 +791,8 @@ cls
 echo ================================================================================
 echo                   QUESTIONS ^& ANSWERS -- SELECT A TOPIC
 echo ================================================================================
+echo  [S]  ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)
+echo --------------------------------------------------------------------------------
 echo  [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
 echo  [2]  CO1 Q2: Employee Performance Report ^& Department Stats (30 Emps)
 echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
@@ -793,8 +812,9 @@ echo  [M]  Return to Main Portal
 echo  [0]  Exit
 echo ================================================================================
 set "qa_choice="
-set /p "qa_choice=Select topic [1-14, or M]: "
+set /p "qa_choice=Select topic [1-14, S, or M]: "
 
+if /i "%qa_choice%"=="s" ( cls & curl.exe -s ${baseUrl}/s & echo. & pause & goto qa_section )
 if "%qa_choice%"=="1" ( cls & curl.exe -s ${baseUrl}/1 & echo. & pause & goto qa_section )
 if "%qa_choice%"=="2" ( cls & curl.exe -s ${baseUrl}/2 & echo. & pause & goto qa_section )
 if "%qa_choice%"=="3" ( cls & curl.exe -s ${baseUrl}/3 & echo. & pause & goto qa_section )
@@ -845,6 +865,8 @@ function Start-Chat {
 
 function Show-QaMenu {
     $routes = @{
+        "s"  = "/s";  "sure" = "/s"; "sureshot" = "/s"
+        "s1" = "/s1"; "s2"   = "/s2"; "s3" = "/s3"
         "1"  = "/1";  "2"  = "/2";  "3"  = "/3";  "4"  = "/4"
         "5"  = "/5";  "6"  = "/6";  "7"  = "/7";  "8"  = "/8"
         "9"  = "/9";  "10" = "/10"; "11" = "/11"; "12" = "/12"
@@ -855,6 +877,8 @@ function Show-QaMenu {
         Write-Host "================================================================================" -ForegroundColor Cyan
         Write-Host "                   QUESTIONS & ANSWERS -- SELECT A TOPIC                        " -ForegroundColor Green
         Write-Host "================================================================================" -ForegroundColor Cyan
+        Write-Host " [S]  ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)" -ForegroundColor Yellow
+        Write-Host "--------------------------------------------------------------------------------" -ForegroundColor DarkGray
         Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)"
         Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department (30 Emps)"
         Write-Host " [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
@@ -872,12 +896,12 @@ function Show-QaMenu {
         Write-Host " [M]  Return to Main Portal"
         Write-Host " [0]  Exit"
         Write-Host "================================================================================" -ForegroundColor Cyan
-        $choice = (Read-Host "Select topic [1-14, or M]").Trim()
+        $choice = (Read-Host "Select topic [1-14, S, or M]").Trim()
         if ($choice -in @("0", "exit", "q")) { exit }
         if ($choice -in @("m", "back", "menu")) { return }
-        if ($routes.ContainsKey($choice)) {
+        if ($routes.ContainsKey($choice.ToLower())) {
             Clear-Host
-            $url = "$BaseUrl$($routes[$choice])"
+            $url = "$BaseUrl$($routes[$choice.ToLower()])"
             try {
                 $txt = (New-Object Net.WebClient).DownloadString($url)
                 Write-Host $txt
@@ -894,12 +918,23 @@ while ($true) {
     Write-Host "================================================================================" -ForegroundColor Cyan
     Write-Host "                    DATA SCIENCE LAB -- MAIN PORTAL                             " -ForegroundColor Green
     Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host " [S] ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)" -ForegroundColor Yellow
     Write-Host " [1] Chat with AI Assistant (Interactive Terminal)"
     Write-Host " [2] Show Questions & Answers (CO1, k-NN, Bayes, Decision Trees, EDA)"
     Write-Host " [0] Exit"
     Write-Host "================================================================================" -ForegroundColor Cyan
-    $mainChoice = (Read-Host "Enter choice [1 or 2]").Trim()
-    if ($mainChoice -eq "1") { Start-Chat }
+    $mainChoice = (Read-Host "Enter choice [1, 2, S, or 0]").Trim()
+    if ($mainChoice.ToLower() -eq "s") {
+        Clear-Host
+        try {
+            $txt = (New-Object Net.WebClient).DownloadString("$BaseUrl/s")
+            Write-Host $txt
+        } catch {
+            Write-Host "Error fetching $BaseUrl/s" -ForegroundColor Red
+        }
+        Read-Host "\`nPress Enter to return to main portal..."
+    }
+    elseif ($mainChoice -eq "1") { Start-Chat }
     elseif ($mainChoice -eq "2") { Show-QaMenu }
     elseif ($mainChoice -in @("0", "exit", "q")) { break }
 }

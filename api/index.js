@@ -16,6 +16,16 @@ module.exports = (req, res) => {
                     DATA SCIENCE LAB -- COMMAND PORTAL
 ================================================================================
 
+  [★] CONFIRMED SURE-SHOT LAB EXAM QUESTIONS:
+      >> All 3 Questions in 1 File:
+         In CMD:        curl.exe -s ${baseUrl}/s
+         In PowerShell: irm ${baseUrl}/s
+
+      >> Direct Single Questions:
+         * ${baseUrl}/s1  (or /eda)      -> Q1: Exploratory Data Visualization
+         * ${baseUrl}/s2  (or /knn)      -> Q2: k-NN Classification From Scratch
+         * ${baseUrl}/s3  (or /nb)       -> Q2: Multinomial Naive Bayes with Laplace
+
   [A] CHAT WITH AI ASSISTANT:
       >> In CMD:        curl.exe -s ${baseUrl}/c > c.bat && c
       >> In PowerShell: irm ${baseUrl}/j | iex
