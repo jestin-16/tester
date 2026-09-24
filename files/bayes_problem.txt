@@ -1,0 +1,51 @@
+================================================================================
+BAYES THEOREM PROBLEM: CLINICAL LIVER DISEASE & ALCOHOLISM
+================================================================================
+Problem Statement:
+Consider a set of patients coming for treatment in a certain clinic.
+Let A denote the event that a "Patient has liver disease".
+Let B denote the event that a "Patient is an alcoholic".
+
+Given Data:
+- P(A)   = 0.10  (10% of patients entering clinic have liver disease)
+- P(B)   = 0.05  (5% of patients are alcoholics)
+- P(B|A) = 0.07  (Among patients with liver disease, 7% are alcoholics)
+
+Question:
+Given that a patient is an alcoholic, what is the probability that he will
+have liver disease? Find P(A|B).
+================================================================================
+
+MATHEMATICAL DERIVATION:
+------------------------
+Bayes' Theorem Formula:
+           P(B|A) * P(A)
+P(A|B) = -----------------
+               P(B)
+
+Substitute the given values:
+           0.07 * 0.10
+P(A|B) = ---------------
+              0.05
+
+           0.007
+P(A|B) = ---------
+           0.05
+
+P(A|B) = 0.14 = 14.0%
+
+Answer:
+The probability that an alcoholic patient has liver disease is 14% (0.14).
+
+--------------------------------------------------------------------------------
+PYTHON VERIFICATION CODE:
+--------------------------------------------------------------------------------
+def bayes_theorem(p_a, p_b, p_b_given_a):
+    return (p_b_given_a * p_a) / p_b
+
+P_A = 0.10        # Prior: Patient has liver disease
+P_B = 0.05        # Prior: Patient is alcoholic
+P_B_given_A = 0.07 # Likelihood: Alcoholic given liver disease
+
+P_A_given_B = bayes_theorem(P_A, P_B, P_B_given_A)
+print(f"P(Liver Disease | Alcoholic) = {P_A_given_B:.4f} ({P_A_given_B * 100:.1f}%)")

@@ -1,0 +1,110 @@
+================================================================================
+MULTINOMIAL NAIVE BAYES TEXT CLASSIFICATION WITH LAPLACE SMOOTHING
+Problem: Student Feedback Classification (Positive vs Negative)
+================================================================================
+
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+
+# 1. Create feedback dataset (20 messages)
+feedback_data = {
+    "message": [
+        "The professor explained the machine learning concepts very clearly",
+        "Excellent practical lab sessions and very helpful teaching assistants",
+        "Worst course structure and terribly disorganized lab instructions",
+        "I really enjoyed the hands on coding assignments and data projects",
+        "The instructor was completely unresponsive and rude to students",
+        "Brilliant lecture delivery with great practical demonstrations",
+        "Extremely slow pace and outdated course content and syllabus",
+        "Loved the interactive coding quizzes and helpful visual explanations",
+        "Terrible experience the sound quality was poor and confusing",
+        "Outstanding guidance and supportive faculty throughout the semester",
+        "The lab exercises were broken and buggy with zero assistance",
+        "Great course highly recommended for beginners in data science",
+        "Dull monotonous lectures and boring presentation slides",
+        "Very clear explanations and well structured learning modules",
+        "Horrible grading system and unfair mark deductions",
+        "Inspiring teacher with immense knowledge and patience",
+        "Waste of valuable time and completely irrelevant exercises",
+        "Fantastic coverage of algorithms and real world applications",
+        "Poorly managed labs and broken software environment",
+        "Superb support and wonderful hands-on laboratory environment"
+    ],
+    "label": [
+        "Positive", "Positive", "Negative", "Positive", "Negative",
+        "Positive", "Negative", "Positive", "Negative", "Positive",
+        "Negative", "Positive", "Negative", "Positive", "Negative",
+        "Positive", "Negative", "Positive", "Negative", "Positive"
+    ]
+}
+
+df = pd.DataFrame(feedback_data)
+print("=== Feedback Dataset (First 5 records) ===")
+print(df.head())
+print("\nClass Distribution:\n", df["label"].value_counts())
+
+# 2. Vectorize text into Bag-of-Words numerical features
+vectorizer = CountVectorizer(stop_words="english")
+X = vectorizer.fit_transform(df["message"])
+y = df["label"]
+vocabulary = vectorizer.get_feature_names_out()
+vocab_size = len(vocabulary)
+print(f"\nVocabulary Size (V): {vocab_size} unique words")
+
+# 3. Train-Test Split (80:20)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Train Model WITHOUT Laplace Smoothing (alpha near 0)
+model_no_laplace = MultinomialNB(alpha=1e-9)
+model_no_laplace.fit(X_train, y_train)
+
+# 5. Train Model WITH Laplace Smoothing (alpha = 1)
+model_laplace = MultinomialNB(alpha=1.0)
+model_laplace.fit(X_train, y_train)
+
+# 6. Test Predictions Comparison
+preds_no_laplace = model_no_laplace.predict(X_test)
+preds_laplace = model_laplace.predict(X_test)
+
+comparison_df = pd.DataFrame({
+    "Test_Message": [df["message"].iloc[i] for i in y_test.index],
+    "True_Label": y_test.values,
+    "Pred_No_Laplace (alpha=1e-9)": preds_no_laplace,
+    "Pred_With_Laplace (alpha=1)": preds_laplace
+})
+print("\n=== Test Predictions Comparison ===")
+print(comparison_df.to_string(index=False))
+
+# 7. Unseen Word Probability Demonstration
+# Formula: P(w | C) = (Count(w, C) + 1) / (N_C + V)
+unseen_word = "exceptional"  # word not in training vocabulary
+print(f"\n=== Unseen Word Analysis: '{unseen_word}' ===")
+print(f"Without Laplace: P('{unseen_word}' | Class) = 0 / N_C = 0.0 (Nullifies entire probability score!)")
+print(f"With Laplace:    P('{unseen_word}' | Class) = (0 + 1) / (Total_Words_In_Class + {vocab_size}) > 0")
+
+# 8. Interactive Prediction Helper
+def predict_feedback(new_msg):
+    vec = vectorizer.transform([new_msg])
+    pred = model_laplace.predict(vec)[0]
+    probs = model_laplace.predict_proba(vec)[0]
+    classes = model_laplace.classes_
+    prob_dict = {cls: f"{prob:.4f}" for cls, prob in zip(classes, probs)}
+    return pred, prob_dict
+
+sample_test = "The teacher explained difficult topics with outstanding clarity"
+pred_label, prob_dict = predict_feedback(sample_test)
+print(f"\n=== Sample New Feedback Prediction ===")
+print(f"Message: '{sample_test}'")
+print(f"Predicted Class: {pred_label}")
+print(f"Class Probabilities: {prob_dict}")
+
+# 9. Explanation of Zero-Probability Problem
+print("\n=== How Laplace Smoothing Prevents the Zero-Probability Problem ===")
+print("When a test message contains a word that was never seen in a given class during training,")
+print("its frequency count is 0, so P(word | Class) = 0.")
+print("Because Naive Bayes multiplies all feature probabilities together, a single zero probability")
+print("causes the entire product to become 0, completely ignoring all other informative words.")
+print("Laplace smoothing adds +1 to every word count and +V to the total class word count,")
+print("ensuring every word has a valid, non-zero probability.")

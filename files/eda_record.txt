@@ -1,0 +1,125 @@
+================================================================================
+RECORD QUESTION: EXPLORATORY DATA ANALYSIS (EDA) & DASHBOARD
+Missing values, Distributions, Heatmap, Pair plot, Box plots, Count plots,
+Scatter plots, 5 Key Observations, and 6-Plot Dashboard.
+================================================================================
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Load real-world style dataset (Housing / Employee / Student records)
+df = sns.load_dataset("tips")   # Built-in real dataset with 244 records
+print("=== Dataset Head ===")
+print(df.head())
+print("\n=== Dataset Info ===")
+print(df.info())
+
+# 2. Missing Value Analysis
+missing_counts = df.isnull().sum()
+missing_percent = (missing_counts / len(df)) * 100
+missing_df = pd.DataFrame({"Missing Count": missing_counts, "Percentage (%)": missing_percent})
+print("\n=== Missing Value Analysis ===\n", missing_df)
+
+# 3. Descriptive Statistics
+print("\n=== Descriptive Statistics ===\n", df.describe())
+
+# 4. Generate All Required Visualizations
+# A. Distribution Plot
+plt.figure(figsize=(6, 4))
+sns.histplot(df["total_bill"], kde=True, color="royalblue")
+plt.title("Distribution of Total Bill")
+plt.savefig("distribution_plot.png")
+plt.close()
+
+# B. Count Plot for Categorical variables
+plt.figure(figsize=(6, 4))
+sns.countplot(x="day", data=df, palette="Set2")
+plt.title("Customer Count by Day")
+plt.savefig("count_plot.png")
+plt.close()
+
+# C. Scatter Plot for Important Feature Relationships
+plt.figure(figsize=(6, 4))
+sns.scatterplot(x="total_bill", y="tip", hue="sex", style="time", data=df, alpha=0.8)
+plt.title("Total Bill vs Tip")
+plt.savefig("scatter_plot.png")
+plt.close()
+
+# D. Box Plot for Outlier Detection
+plt.figure(figsize=(6, 4))
+sns.boxplot(x="day", y="total_bill", data=df, palette="Pastel1")
+plt.title("Total Bill Outliers Across Days")
+plt.savefig("box_plot.png")
+plt.close()
+
+# E. Correlation Heatmap
+plt.figure(figsize=(6, 4))
+num_df = df.select_dtypes(include="number")
+sns.heatmap(num_df.corr(), annot=True, cmap="mako", fmt=".2f")
+plt.title("Correlation Matrix Heatmap")
+plt.savefig("correlation_heatmap.png")
+plt.close()
+
+# F. Pair Plot
+pair_grid = sns.pairplot(df, hue="sex", palette="coolwarm")
+pair_grid.savefig("pair_plot.png")
+plt.close()
+
+# ------------------------------------------------------------------------------
+# 5. SIX-PLOT UNIFIED DASHBOARD
+# ------------------------------------------------------------------------------
+fig, axes = plt.subplots(3, 2, figsize=(14, 12))
+fig.suptitle("Exploratory Data Analysis Dashboard", fontsize=16, fontweight="bold")
+
+# Plot 1: Line Chart
+axes[0, 0].plot(df["total_bill"].iloc[:30].values, marker="o", color="blue", linewidth=1.5)
+axes[0, 0].set_title("1. Bill Trend (First 30 Customers)")
+axes[0, 0].set_xlabel("Customer Index")
+axes[0, 0].set_ylabel("Total Bill ($)")
+axes[0, 0].grid(True)
+
+# Plot 2: Bar Chart
+day_avg = df.groupby("day", observed=False)["total_bill"].mean()
+axes[0, 1].bar(day_avg.index, day_avg.values, color="coral")
+axes[0, 1].set_title("2. Average Bill by Day")
+axes[0, 1].set_ylabel("Average Bill ($)")
+
+# Plot 3: Histogram
+sns.histplot(df["total_bill"], kde=True, ax=axes[1, 0], color="purple")
+axes[1, 0].set_title("3. Total Bill Distribution")
+
+# Plot 4: Scatter Plot
+axes[1, 1].scatter(df["total_bill"], df["tip"], c=df["size"], cmap="viridis", alpha=0.7)
+axes[1, 1].set_title("4. Bill vs Tip (Color by Party Size)")
+axes[1, 1].set_xlabel("Total Bill ($)")
+axes[1, 1].set_ylabel("Tip ($)")
+
+# Plot 5: Box Plot
+sns.boxplot(x="time", y="total_bill", data=df, ax=axes[2, 0], palette="Accent")
+axes[2, 0].set_title("5. Outliers: Lunch vs Dinner")
+
+# Plot 6: Heatmap
+sns.heatmap(num_df.corr(), annot=True, cmap="coolwarm", ax=axes[2, 1])
+axes[2, 1].set_title("6. Feature Correlations")
+
+plt.tight_layout()
+plt.savefig("eda_dashboard.png", dpi=300)
+plt.show()
+print("[+] Dashboard successfully saved to 'eda_dashboard.png'.")
+
+# ------------------------------------------------------------------------------
+# 6. FIVE KEY OBSERVATIONS FROM VISUALIZATIONS
+# ------------------------------------------------------------------------------
+observations = [
+    "1. Positive Correlation: Total bill and tip have a strong positive linear correlation (r ≈ 0.68). As the total bill increases, customers leave higher tips.",
+    "2. Right-Skewed Distribution: The total bill histogram is right-skewed with the highest density concentrated between $12 and $22.",
+    "3. Outlier Detection: The box plot reveals high-value outliers on Saturday and Sunday where total bills exceed $40 to $50.",
+    "4. Peak Day Activity: The count plot shows that Saturday and Sunday experience significantly higher customer traffic than Thursdays and Fridays.",
+    "5. Meal Timing Variance: Dinner bills exhibit a higher median and larger spread compared to lunch bills, with all top outliers occurring during dinner service."
+]
+
+print("\n=== FIVE KEY OBSERVATIONS ===")
+for obs in observations:
+    print(obs)

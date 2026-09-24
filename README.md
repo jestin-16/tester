@@ -9,17 +9,23 @@ A modern, fast CLI and web interface for **Groq** and **xAI (Grok)**, deployable
 View exam-focused code and notes directly inside any terminal:
 
 ```cmd
-# Full Revision Sheet (All 12 Topics)
+# Master Solutions & Index:
 curl.exe -s https://tester-red-two.vercel.app/ds
 
-# Quick 10-Minute Summary Table
+# Quick 10-Minute Summary Table:
 curl.exe -s https://tester-red-two.vercel.app/quick
 
-# Topic-Specific Sheets:
-curl.exe -s https://tester-red-two.vercel.app/knn     # k-NN from scratch & distance metrics
-curl.exe -s https://tester-red-two.vercel.app/tree    # Decision Tree entropy & information gain
-curl.exe -s https://tester-red-two.vercel.app/bayes   # Bayes theorem & Laplace smoothing
-curl.exe -s https://tester-red-two.vercel.app/eda     # Pandas, Matplotlib, Seaborn, Heatmap
+# Individual Question Answers:
+curl.exe -s https://tester-red-two.vercel.app/q1       # CO1 Q1: Student Dataset Stats
+curl.exe -s https://tester-red-two.vercel.app/q2       # CO1 Q2: Employee Performance Report
+curl.exe -s https://tester-red-two.vercel.app/q3       # CO1 Q3: 30-Record Pandas Workflow
+curl.exe -s https://tester-red-two.vercel.app/viz      # Q4: All 13 Visualization Exercises
+curl.exe -s https://tester-red-two.vercel.app/knn      # k-NN From Scratch (Cardiovascular Pipeline)
+curl.exe -s https://tester-red-two.vercel.app/bayes    # Bayes Theorem (Clinical Liver Disease)
+curl.exe -s https://tester-red-two.vercel.app/weather  # Weather Prediction (Laplace Naive Bayes)
+curl.exe -s https://tester-red-two.vercel.app/feedback # Feedback Text Multinomial Naive Bayes
+curl.exe -s https://tester-red-two.vercel.app/tree     # Decision Tree (Bank Loan C5.0 Algorithm)
+curl.exe -s https://tester-red-two.vercel.app/eda      # Record: EDA & 6-Plot Dashboard
 ```
 
 ---

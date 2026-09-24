@@ -1,6 +1,18 @@
 ================================================================================
-DATA SCIENCE LAB -- IMPORTANT TOPICS ONLY
-Exam-focused quick revision sheet.
+DATA SCIENCE LAB -- COMPLETE EXAM QUESTIONS & CODE REPOSITORY
+================================================================================
+INDEX OF QUESTIONS & DIRECT CURL ENDPOINTS:
+- CO1 Q1: Student Dataset Stats            -> curl.exe -s https://tester-red-two.vercel.app/q1
+- CO1 Q2: Employee Performance Report      -> curl.exe -s https://tester-red-two.vercel.app/q2
+- CO1 Q3: 30-Record Pandas Workflow        -> curl.exe -s https://tester-red-two.vercel.app/q3
+- Q4: All 13 Visualization Exercises       -> curl.exe -s https://tester-red-two.vercel.app/viz
+- Record: EDA & 6-Plot Dashboard           -> curl.exe -s https://tester-red-two.vercel.app/eda
+- k-NN From Scratch (Cardiovascular Risk)  -> curl.exe -s https://tester-red-two.vercel.app/knn
+- Bayes Theorem (Clinical Liver Disease)   -> curl.exe -s https://tester-red-two.vercel.app/bayes
+- Weather Prediction (Laplace Naive Bayes) -> curl.exe -s https://tester-red-two.vercel.app/weather
+- Feedback Text Multinomial Naive Bayes    -> curl.exe -s https://tester-red-two.vercel.app/feedback
+- Decision Tree (Bank Loan C5.0 Algorithm) -> curl.exe -s https://tester-red-two.vercel.app/tree
+- 10-Minute Final Revision Summary Table   -> curl.exe -s https://tester-red-two.vercel.app/quick
 ================================================================================
 
 --------------------------------------------------------------------------------

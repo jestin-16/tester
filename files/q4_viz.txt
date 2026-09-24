@@ -1,0 +1,171 @@
+================================================================================
+Q4: DATA VISUALIZATION USING PYTHON (EXERCISES 1 TO 13)
+Matplotlib, Seaborn, and Pandas Visualization Patterns
+================================================================================
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# ------------------------------------------------------------------------------
+# EXERCISE 1: Introduction to Matplotlib (Multiple Line Graphs)
+# ------------------------------------------------------------------------------
+students = [f"S{i}" for i in range(1, 11)]
+maths_marks = [78, 85, 92, 65, 88, 72, 95, 81, 69, 90]
+science_marks = [82, 79, 89, 70, 91, 68, 94, 85, 74, 92]
+
+plt.figure(figsize=(8, 4))
+plt.plot(students, maths_marks, color="blue", marker="o", linestyle="-", label="Maths")
+plt.plot(students, science_marks, color="green", marker="s", linestyle="--", label="Science")
+plt.title("Student Marks in Maths & Science")
+plt.xlabel("Students")
+plt.ylabel("Marks")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+# ------------------------------------------------------------------------------
+# EXERCISE 2: Line Plot Customization & Alternate Month Ticks
+# ------------------------------------------------------------------------------
+months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+sales = [120, 135, 150, 140, 165, 180, 190, 210, 195, 220, 240, 260]
+
+plt.figure(figsize=(8, 4))
+plt.plot(months, sales, color="crimson", linestyle="-.", marker="D", linewidth=2)
+plt.xticks(ticks=range(0, 12, 2), labels=months[0::2])  # Alternate months
+plt.title("Monthly Sales Growth")
+plt.xlabel("Month")
+plt.ylabel("Sales ($k)")
+plt.savefig("monthly_sales.png")
+plt.show()
+
+# ------------------------------------------------------------------------------
+# EXERCISE 3: Bar Chart (Vertical, Horizontal, Grouped with Labels)
+# ------------------------------------------------------------------------------
+depts = ["CSE", "ECE", "MECH", "CIVIL", "IT"]
+boys = [45, 30, 55, 40, 35]
+girls = [50, 25, 15, 20, 45]
+
+x = np.arange(len(depts))
+width = 0.35
+
+fig, ax = plt.subplots(figsize=(8, 4))
+bar1 = ax.bar(x - width/2, boys, width, label="Boys", color="skyblue")
+bar2 = ax.bar(x + width/2, girls, width, label="Girls", color="salmon")
+
+# Add data labels
+ax.bar_label(bar1, padding=3)
+ax.bar_label(bar2, padding=3)
+
+ax.set_xticks(x)
+ax.set_xticklabels(depts)
+ax.set_title("Department-wise Gender Comparison")
+ax.legend()
+plt.show()
+
+# Horizontal bar: plt.barh(depts, total_students)
+
+# ------------------------------------------------------------------------------
+# EXERCISE 4: Histogram & Distribution Check
+# ------------------------------------------------------------------------------
+np.random.seed(42)
+marks_100 = np.random.normal(loc=70, scale=12, size=100)
+
+plt.figure(figsize=(7, 4))
+plt.hist(marks_100, bins=10, color="teal", edgecolor="black")
+plt.title("Distribution of Marks (Approximately Normal)")
+plt.xlabel("Marks Range")
+plt.ylabel("Frequency")
+plt.show()
+
+# ------------------------------------------------------------------------------
+# EXERCISE 5: Pie Chart (Explode, Autopct, Custom Colors)
+# ------------------------------------------------------------------------------
+brands = ["Apple", "Samsung", "Xiaomi", "Vivo", "Others"]
+shares = [28, 24, 18, 14, 16]
+colors = ["#ff9999", "#66b3ff", "#99ff99", "#ffcc99", "#c2c2f0"]
+
+plt.figure(figsize=(6, 6))
+plt.pie(shares, labels=brands, autopct="%1.1f%%", explode=[0.1, 0, 0, 0, 0], colors=colors, startangle=140)
+plt.title("Smartphone Market Share")
+plt.show()
+
+# ------------------------------------------------------------------------------
+# EXERCISE 6: Scatter Plot (Height vs Weight with BMI & Alpha)
+# ------------------------------------------------------------------------------
+heights = np.random.normal(165, 8, 30)
+weights = np.random.normal(65, 10, 30)
+bmi = weights / ((heights / 100) ** 2)
+
+plt.figure(figsize=(7, 4))
+scatter = plt.scatter(heights, weights, s=bmi*15, c=bmi, cmap="viridis", alpha=0.7)
+plt.colorbar(scatter, label="BMI")
+plt.title("Height vs Weight (Size & Color by BMI)")
+plt.xlabel("Height (cm)")
+plt.ylabel("Weight (kg)")
+plt.show()
+
+# ------------------------------------------------------------------------------
+# EXERCISE 7: Box Plot Comparison & Outliers
+# ------------------------------------------------------------------------------
+class_A = np.random.normal(75, 10, 40)
+class_B = np.random.normal(68, 18, 40)  # Larger spread + outliers
+
+plt.figure(figsize=(6, 4))
+plt.boxplot([class_A, class_B], labels=["Class A", "Class B"])
+plt.title("Class Marks Comparison (Box Plot)")
+plt.ylabel("Marks")
+plt.show()
+
+# Concepts:
+# Median: middle line (50th percentile)
+# Quartiles: box bottom is Q1 (25th%), top is Q3 (75th%)
+# Whiskers: extend to 1.5 * IQR
+# Outliers: points plotted outside the whiskers
+
+# ------------------------------------------------------------------------------
+# EXERCISE 8: Seaborn Visualizations Comparison
+# ------------------------------------------------------------------------------
+df_sample = sns.load_dataset("tips")
+
+# 1. Count Plot:   sns.countplot(x="day", data=df_sample)
+# 2. Bar Plot:     sns.barplot(x="day", y="total_bill", data=df_sample)
+# 3. Box Plot:     sns.boxplot(x="day", y="total_bill", data=df_sample)
+# 4. Violin Plot:  sns.violinplot(x="day", y="total_bill", data=df_sample)
+# 5. Strip Plot:   sns.stripplot(x="day", y="total_bill", data=df_sample, jitter=True)
+
+# ------------------------------------------------------------------------------
+# EXERCISE 9: Correlation Heatmap with Highest Pair Identification
+# ------------------------------------------------------------------------------
+df_iris = sns.load_dataset("iris")
+numeric_iris = df_iris.select_dtypes(include="number")
+corr_matrix = numeric_iris.corr()
+
+plt.figure(figsize=(6, 5))
+sns.heatmap(corr_matrix, annot=True, cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.show()
+
+# Find highest pair (excluding self-correlation = 1)
+pairs = corr_matrix.abs().unstack()
+pairs = pairs[pairs < 1.0]
+print("Highest correlation pair:", pairs.idxmax(), "with r =", pairs.max())
+
+# ------------------------------------------------------------------------------
+# EXERCISE 10: Pair Plot
+# ------------------------------------------------------------------------------
+sns.pairplot(df_iris, hue="species")
+plt.show()
+# Observation: Petal length and petal width separate Setosa completely from Versicolor and Virginica.
+
+# ------------------------------------------------------------------------------
+# EXERCISE 11: Subplots (2x2 Matrix)
+# ------------------------------------------------------------------------------
+fig, ax = plt.subplots(2, 2, figsize=(10, 7))
+ax[0, 0].plot(months[:6], sales[:6]);                ax[0, 0].set_title("Line Plot")
+ax[0, 1].bar(depts, boys);                           ax[0, 1].set_title("Bar Chart")
+ax[1, 0].scatter(heights, weights, color="purple");  ax[1, 0].set_title("Scatter Plot")
+ax[1, 1].hist(marks_100, bins=8, color="orange");    ax[1, 1].set_title("Histogram")
+plt.tight_layout()
+plt.show()

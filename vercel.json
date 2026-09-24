@@ -36,20 +36,44 @@
       "destination": "/files/ds.txt"
     },
     {
+      "source": "/q1",
+      "destination": "/files/co1_q1.txt"
+    },
+    {
+      "source": "/q2",
+      "destination": "/files/co1_q2.txt"
+    },
+    {
+      "source": "/q3",
+      "destination": "/files/co1_q3.txt"
+    },
+    {
+      "source": "/viz",
+      "destination": "/files/q4_viz.txt"
+    },
+    {
       "source": "/knn",
-      "destination": "/files/knn.txt"
+      "destination": "/files/knn_scratch.txt"
     },
     {
       "source": "/tree",
-      "destination": "/files/tree.txt"
+      "destination": "/files/decision_tree.txt"
     },
     {
       "source": "/bayes",
-      "destination": "/files/bayes.txt"
+      "destination": "/files/bayes_problem.txt"
+    },
+    {
+      "source": "/weather",
+      "destination": "/files/weather_laplace.txt"
+    },
+    {
+      "source": "/feedback",
+      "destination": "/files/feedback_nb.txt"
     },
     {
       "source": "/eda",
-      "destination": "/files/eda.txt"
+      "destination": "/files/eda_record.txt"
     },
     {
       "source": "/quick",

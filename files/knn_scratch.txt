@@ -1,0 +1,205 @@
+================================================================================
+k-NEAREST NEIGHBOURS (k-NN) PIPELINE ENTIRELY FROM SCRATCH
+Problem: Predict Cardiovascular Disease (High Risk vs Low Risk)
+No sklearn KNeighborsClassifier used. Pure NumPy, Pandas, Math.
+================================================================================
+
+import numpy as np
+import pandas as pd
+
+# ------------------------------------------------------------------------------
+# STEP 0: Create Sample Healthcare Dataset for Cardiovascular Disease Risk
+# ------------------------------------------------------------------------------
+np.random.seed(42)
+n = 60
+
+data = {
+    "Age": np.random.randint(30, 80, size=n),
+    "Gender": np.random.choice(["Male", "Female"], size=n),
+    "Height": np.random.normal(168, 10, size=n).round(1),
+    "Weight": np.random.normal(70, 15, size=n).round(1),
+    "BloodPressure": np.random.randint(90, 180, size=n),
+    "Glucose": np.random.randint(70, 200, size=n),
+    "Cholesterol": np.random.randint(150, 320, size=n),
+    "Smoking": np.random.choice(["Yes", "No"], size=n),
+    "Alcohol": np.random.choice(["Yes", "No"], size=n),
+    "ExerciseLevel": np.random.choice(["Low", "Medium", "High"], size=n),
+    "FamilyHistory": np.random.choice(["Yes", "No"], size=n),
+    "HeartRate": np.random.randint(60, 110, size=n),
+    "RiskClass": np.random.choice(["High Risk", "Low Risk"], size=n)
+}
+# Calculate BMI: Weight (kg) / (Height (m))^2
+data["BMI"] = (data["Weight"] / ((data["Height"] / 100) ** 2)).round(1)
+
+df = pd.DataFrame(data)
+
+# Inject missing values for demonstration
+df.loc[3, "Glucose"] = np.nan
+df.loc[8, "Smoking"] = None
+
+# ==============================================================================
+# PART A: DATA PREPARATION & PREPROCESSING
+# ==============================================================================
+print("=== PART A: Data Exploration & Preprocessing ===")
+print("Shape:", df.shape)
+print("Data Types:\n", df.dtypes)
+print("Missing Values:\n", df.isnull().sum())
+
+# 1. Compare Mean vs Median Imputation for numerical columns
+glucose_mean = df["Glucose"].fillna(df["Glucose"].mean())
+glucose_median = df["Glucose"].fillna(df["Glucose"].median())
+print(f"Mean Imputation Value: {df['Glucose'].mean():.2f}")
+print(f"Median Imputation Value: {df['Glucose'].median():.2f}")
+df["Glucose"] = glucose_median  # Median is robust to outliers
+
+# 2. Impute Categorical missing values with Mode
+df["Smoking"] = df["Smoking"].fillna(df["Smoking"].mode()[0])
+
+# 3. Detect Outliers using IQR method and remove extreme outliers
+def remove_iqr_outliers(df, column):
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    return df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
+
+for col in ["BloodPressure", "Cholesterol", "BMI"]:
+    df = remove_iqr_outliers(df, col)
+
+# 4. Categorical Encoding (Label Encoding from scratch)
+binary_maps = {"Male": 1, "Female": 0, "Yes": 1, "No": 0}
+df["Gender"] = df["Gender"].map(binary_maps)
+df["Smoking"] = df["Smoking"].map(binary_maps)
+df["Alcohol"] = df["Alcohol"].map(binary_maps)
+df["FamilyHistory"] = df["FamilyHistory"].map(binary_maps)
+df["ExerciseLevel"] = df["ExerciseLevel"].map({"Low": 0, "Medium": 1, "High": 2})
+df["RiskClass"] = df["RiskClass"].map({"Low Risk": 0, "High Risk": 1})
+
+# Feature / Target split
+feature_cols = ["Age", "Gender", "BMI", "BloodPressure", "Glucose", "Cholesterol", "Smoking", "Alcohol", "ExerciseLevel", "FamilyHistory", "HeartRate"]
+X = df[feature_cols].values
+y = df["RiskClass"].values
+
+# 5. Normalization comparison: Min-Max vs Z-Score Standardization
+def min_max_scale(X):
+    return (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
+
+def z_score_scale(X):
+    return (X - X.mean(axis=0)) / (X.std(axis=0) + 1e-8)
+
+X_minmax = min_max_scale(X)
+X_zscore = z_score_scale(X)
+
+# Use Min-Max scaled features
+X_norm = X_minmax
+
+# Train / Test split (80:20) from scratch
+train_size = int(0.8 * len(X_norm))
+X_train, X_test = X_norm[:train_size], X_norm[train_size:]
+y_train, y_test = y[:train_size], y[train_size:]
+
+# ==============================================================================
+# PART B: 5 DISTANCE FUNCTIONS IMPLEMENTED FROM SCRATCH
+# ==============================================================================
+def euclidean_distance(a, b):
+    return np.sqrt(np.sum((a - b) ** 2))
+
+def manhattan_distance(a, b):
+    return np.sum(np.abs(a - b))
+
+def minkowski_distance(a, b, p=3):
+    return np.sum(np.abs(a - b) ** p) ** (1 / p)
+
+def cosine_distance(a, b):
+    dot = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    if norm_a == 0 or norm_b == 0:
+        return 1.0
+    return 1.0 - (dot / (norm_a * norm_b))
+
+def chebyshev_distance(a, b):
+    return np.max(np.abs(a - b))
+
+print("\n=== PART B: Distances for 1st Test Sample to First 3 Training Samples ===")
+for i in range(3):
+    d_euc = euclidean_distance(X_test[0], X_train[i])
+    d_man = manhattan_distance(X_test[0], X_train[i])
+    d_mink = minkowski_distance(X_test[0], X_train[i], p=3)
+    d_cos = cosine_distance(X_test[0], X_train[i])
+    d_cheb = chebyshev_distance(X_test[0], X_train[i])
+    print(f"Train Sample {i}: Euc={d_euc:.3f}, Man={d_man:.3f}, Mink={d_mink:.3f}, Cos={d_cos:.3f}, Cheb={d_cheb:.3f}")
+
+# ==============================================================================
+# PART C: BUILD k-NN CLASSIFIER FROM SCRATCH (UNWEIGHTED)
+# ==============================================================================
+def knn_predict_single(X_train, y_train, test_point, k=5, dist_func=euclidean_distance):
+    # 1. Compute distances to all training points
+    distances = []
+    for i in range(len(X_train)):
+        d = dist_func(test_point, X_train[i])
+        distances.append((d, y_train[i]))
+    
+    # 2. Sort by distance ascending
+    distances.sort(key=lambda x: x[0])
+    
+    # 3. Select k nearest neighbours
+    k_nearest = distances[:k]
+    k_labels = [label for _, label in k_nearest]
+    
+    # 4. Majority voting
+    return max(set(k_labels), key=k_labels.count)
+
+def knn_predict(X_train, y_train, X_test, k=5, dist_func=euclidean_distance):
+    return [knn_predict_single(X_train, y_train, pt, k, dist_func) for pt in X_test]
+
+# ==============================================================================
+# PART D: WEIGHTED k-NN CLASSIFIER (Weight = 1 / (Distance + epsilon))
+# ==============================================================================
+def weighted_knn_predict_single(X_train, y_train, test_point, k=5, eps=0.0001, dist_func=euclidean_distance):
+    distances = []
+    for i in range(len(X_train)):
+        d = dist_func(test_point, X_train[i])
+        distances.append((d, y_train[i]))
+    
+    distances.sort(key=lambda x: x[0])
+    k_nearest = distances[:k]
+    
+    # Weighted voting: accumulate weight for each class
+    class_weights = {}
+    for d, label in k_nearest:
+        w = 1.0 / (d + eps)
+        class_weights[label] = class_weights.get(label, 0.0) + w
+    
+    # Return class with highest cumulative weight
+    return max(class_weights, key=class_weights.get)
+
+def weighted_knn_predict(X_train, y_train, X_test, k=5, dist_func=euclidean_distance):
+    return [weighted_knn_predict_single(X_train, y_train, pt, k, dist_func=dist_func) for pt in X_test]
+
+# Accuracy helper
+def calc_accuracy(y_true, y_pred):
+    return np.mean(np.array(y_true) == np.array(y_pred)) * 100
+
+# ==============================================================================
+# PART E: CHOOSING THE BEST k (Evaluate k = 1, 3, 5, 7, 9, 11, 13, 15, 17, 19)
+# ==============================================================================
+print("\n=== PART E: Evaluation of k Values (Standard vs Weighted k-NN) ===")
+k_values = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+
+results = []
+for k in k_values:
+    preds_standard = knn_predict(X_train, y_train, X_test, k=k)
+    acc_standard = calc_accuracy(y_test, preds_standard)
+    
+    preds_weighted = weighted_knn_predict(X_train, y_train, X_test, k=k)
+    acc_weighted = calc_accuracy(y_test, preds_weighted)
+    
+    results.append({"k": k, "Standard_Accuracy (%)": acc_standard, "Weighted_Accuracy (%)": acc_weighted})
+
+results_df = pd.DataFrame(results)
+print(results_df.to_string(index=False))
+
+best_k = results_df.loc[results_df["Weighted_Accuracy (%)"].idxmax()]["k"]
+print(f"\nBest k value: {int(best_k)}")

@@ -1,0 +1,141 @@
+================================================================================
+DECISION TREE CLASSIFICATION (C5.0 / ID3 PRINCIPLES) FROM SCRATCH
+Problem: Bank Loan Eligibility Prediction (Eligible vs Not Eligible)
+Attributes: Income, Employment, Credit_Rating, Existing_Loan
+Target: Loan_Eligibility
+================================================================================
+
+import math
+import pandas as pd
+
+# 1. Create dataset with 15 customer records
+data = {
+    "Income":        ["High", "High", "High", "Medium", "Medium", "Medium", "Low", "Low", "Low", "High", "Medium", "Low", "High", "Medium", "Low"],
+    "Employment":    ["Permanent", "Permanent", "Temporary", "Permanent", "Temporary", "Unemployed", "Permanent", "Temporary", "Unemployed", "Permanent", "Unemployed", "Permanent", "Temporary", "Permanent", "Unemployed"],
+    "Credit_Rating": ["Good", "Good", "Poor", "Good", "Average", "Poor", "Good", "Average", "Poor", "Average", "Good", "Poor", "Good", "Average", "Good"],
+    "Existing_Loan": ["No", "Yes", "No", "No", "Yes", "Yes", "No", "No", "Yes", "Yes", "No", "Yes", "No", "No", "No"],
+    "Loan_Eligibility": ["Eligible", "Eligible", "Not Eligible", "Eligible", "Eligible", "Not Eligible", "Eligible", "Not Eligible", "Not Eligible", "Eligible", "Not Eligible", "Not Eligible", "Eligible", "Eligible", "Not Eligible"]
+}
+
+df = pd.DataFrame(data)
+print("=== Bank Loan Customer Dataset (15 Records) ===")
+print(df.to_string())
+
+features = ["Income", "Employment", "Credit_Rating", "Existing_Loan"]
+target = "Loan_Eligibility"
+
+# 2. Entropy Formula: Entropy(S) = -SUM(p_i * log2(p_i))
+def entropy(series):
+    counts = series.value_counts()
+    total = len(series)
+    if total == 0:
+        return 0
+    ent = 0.0
+    for count in counts:
+        p = count / total
+        if p > 0:
+            ent -= p * math.log2(p)
+    return ent
+
+total_entropy = entropy(df[target])
+print(f"\nInitial Dataset Target Entropy: {total_entropy:.4f}")
+
+# 3. Information Gain Formula: Gain(S, A) = Entropy(S) - SUM((|S_v|/|S|) * Entropy(S_v))
+def information_gain(df, attribute, target):
+    parent_entropy = entropy(df[target])
+    total_len = len(df)
+    weighted_entropy = 0.0
+    
+    for val in df[attribute].unique():
+        subset = df[df[attribute] == val]
+        weighted_entropy += (len(subset) / total_len) * entropy(subset[target])
+        
+    return parent_entropy - weighted_entropy
+
+print("\n=== Information Gain for Each Input Attribute ===")
+gain_values = {}
+for feat in features:
+    gain = information_gain(df, feat, target)
+    gain_values[feat] = gain
+    print(f"   Gain(S, {feat:<14}) = {gain:.4f}")
+
+best_feature = max(gain_values, key=gain_values.get)
+print(f"\n[+] Attribute with Highest Information Gain: '{best_feature}' (Best Split / Root Node)")
+
+# 4. Recursive Decision Tree Builder using Divide-and-Conquer
+def build_tree(df, features, target):
+    # Base Case 1: All instances belong to same class
+    if len(df[target].unique()) == 1:
+        return df[target].iloc[0]
+    
+    # Base Case 2: No more features left to split, return majority class
+    if len(features) == 0:
+        return df[target].mode()[0]
+    
+    # Choose feature with highest information gain
+    gains = {feat: information_gain(df, feat, target) for feat in features}
+    best_feat = max(gains, key=gains.get)
+    
+    tree = {best_feat: {}}
+    remaining_features = [f for f in features if f != best_feat]
+    
+    for val in df[best_feat].unique():
+        subset = df[df[best_feat] == val]
+        tree[best_feat][val] = build_tree(subset, remaining_features, target)
+        
+    return tree
+
+decision_tree = build_tree(df, features, target)
+
+# 5. Display Generated Decision Tree Structure
+print("\n=== Generated Decision Tree Structure ===")
+import pprint
+pprint.pprint(decision_tree)
+
+# 6. Extract IF-THEN Decision Rules
+print("\n=== IF-THEN Decision Rules ===")
+def print_rules(tree, current_rule=""):
+    if not isinstance(tree, dict):
+        print(f"IF {current_rule} THEN Loan_Eligibility = {tree}")
+        return
+    for feature, branches in tree.items():
+        for branch_val, subtree in branches.items():
+            clause = f"({feature} == '{branch_val}')"
+            new_rule = f"{current_rule} AND {clause}" if current_rule else clause
+            print_rules(subtree, new_rule)
+
+print_rules(decision_tree)
+
+# 7. Predict for a New Customer
+def predict_customer(tree, sample):
+    if not isinstance(tree, dict):
+        return tree
+    feature = list(tree.keys())[0]
+    val = sample.get(feature)
+    if val in tree[feature]:
+        return predict_customer(tree[feature][val], sample)
+    else:
+        return "Not Eligible (Default fallback)"
+
+# Test customer
+new_customer = {
+    "Income": "High",
+    "Employment": "Permanent",
+    "Credit_Rating": "Good",
+    "Existing_Loan": "No"
+}
+pred = predict_customer(decision_tree, new_customer)
+print(f"\n=== Prediction for New Customer ===")
+print(f"Customer Details: {new_customer}")
+print(f"Predicted Loan Status: {pred}")
+
+# 8. Key Theoretical Concepts
+print("\n=== Key Concepts & Definitions ===")
+print("- Divide-and-Conquer: The problem is divided into smaller subsets based on the best attribute")
+print("  until each subset is pure (all instances belong to the same class) or stops.")
+print("- Root Node: First and most influential split ('Employment' or 'Income').")
+print("- Internal Nodes: Decision points testing intermediate attribute values.")
+print("- Branches: The distinct paths connecting attribute values.")
+print("- Leaf Nodes: The terminal outcomes (Eligible or Not Eligible).")
+print("- Importance of Best Split: Selecting the highest Information Gain minimizes tree depth")
+print("  and maximizes purity with the fewest necessary questions.")

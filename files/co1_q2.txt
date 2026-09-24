@@ -1,0 +1,71 @@
+================================================================================
+CO1 - Q2: EMPLOYEE PERFORMANCE STATISTICAL ANALYSIS & DEPARTMENT REPORT
+================================================================================
+Problem:
+Load Employee Performance Dataset (30 employees: ID, Name, Department, Experience,
+5 evaluation criteria).
+Perform: Mean, Median, Mode, Max, Min, Sum, Average, Std, Variance.
+Prepare department-wise performance report and identify the best-performing department.
+================================================================================
+
+import numpy as np
+import pandas as pd
+
+np.random.seed(101)
+criteria = ["Quality", "Productivity", "Teamwork", "Innovation", "Punctuality"]
+departments = ["IT", "HR", "Sales", "Finance", "Marketing"]
+
+data = {
+    "EmpID": [f"EMP{i:03d}" for i in range(1, 31)],
+    "Name": [f"Employee_{i}" for i in range(1, 31)],
+    "Department": np.random.choice(departments, size=30),
+    "Experience": np.random.randint(1, 15, size=30)
+}
+
+# Performance scores on scale of 1 to 100
+for c in criteria:
+    data[c] = np.random.randint(50, 100, size=30)
+
+df = pd.DataFrame(data)
+print("=== Employee Dataset (First 5 records) ===")
+print(df.head())
+
+# 1. Criteria-wise Statistical Analysis
+print("\n=== Criteria-wise Statistical Summary ===")
+stats_df = pd.DataFrame({
+    "Mean": df[criteria].mean(),
+    "Median": df[criteria].median(),
+    "Mode": df[criteria].mode().iloc[0],
+    "Maximum": df[criteria].max(),
+    "Minimum": df[criteria].min(),
+    "Sum": df[criteria].sum(),
+    "Average": df[criteria].mean(),
+    "Std Dev": df[criteria].std(),
+    "Variance": df[criteria].var()
+})
+print(stats_df)
+
+# 2. Overall Score per Employee
+df["Total_Score"] = df[criteria].sum(axis=1)
+df["Average_Score"] = df[criteria].mean(axis=1)
+
+# 3. Department-wise Performance Evaluation Report
+dept_report = df.groupby("Department").agg(
+    Employee_Count=("EmpID", "count"),
+    Avg_Experience=("Experience", "mean"),
+    Avg_Performance=("Average_Score", "mean"),
+    Min_Performance=("Average_Score", "min"),
+    Max_Performance=("Average_Score", "max"),
+    Performance_Std=("Average_Score", "std"),
+    Performance_Var=("Average_Score", "var")
+).reset_index()
+
+print("\n=== Department-wise Performance Evaluation Report ===")
+print(dept_report.to_string(index=False))
+
+# 4. Identify the Best-Performing Department
+best_dept = dept_report.loc[dept_report["Avg_Performance"].idxmax()]
+print("\n=== BEST PERFORMING DEPARTMENT ===")
+print(f"Department: {best_dept['Department']}")
+print(f"Average Performance Score: {best_dept['Avg_Performance']:.2f} / 100")
+print(f"Total Employees: {best_dept['Employee_Count']}")

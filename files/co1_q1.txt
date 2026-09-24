@@ -1,0 +1,75 @@
+================================================================================
+CO1 - Q1: STUDENT DATASET STATISTICAL ANALYSIS
+================================================================================
+Problem:
+Load a student dataset of 25 students (Student ID, Name, Marks in 5 subjects).
+Perform statistical analysis: Mean, Median, Mode, Max, Min, Sum per subject,
+Average & Total per student, overall Class Average, and Performance Evaluation.
+================================================================================
+
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+# 1. Create dataset with 25 students and 5 subjects
+np.random.seed(42)
+subjects = ["Maths", "Physics", "Chemistry", "English", "CS"]
+data = {
+    "StudentID": [f"STU{i:03d}" for i in range(1, 26)],
+    "Name": [
+        "Aarav", "Aditi", "Bhavya", "Chetan", "Divya", "Esha", "Farhan",
+        "Gaurav", "Harini", "Ishaan", "Jaya", "Karan", "Lavanya", "Manish",
+        "Neha", "Omkar", "Pooja", "Rahul", "Sneha", "Tarun", "Usha",
+        "Varun", "Vidya", "Yash", "Zoya"
+    ]
+}
+
+# Generate marks between 40 and 100
+for sub in subjects:
+    data[sub] = np.random.randint(45, 99, size=25)
+
+df = pd.DataFrame(data)
+print("=== Student Dataset (First 5 records) ===")
+print(df.head())
+
+# 2. Subject-wise Statistics: Mean, Median, Mode, Max, Min, Sum
+print("\n=== Subject-wise Statistical Analysis ===")
+sub_stats = pd.DataFrame({
+    "Mean": df[subjects].mean(),
+    "Median": df[subjects].median(),
+    "Mode": df[subjects].mode().iloc[0],
+    "Maximum": df[subjects].max(),
+    "Minimum": df[subjects].min(),
+    "Sum": df[subjects].sum()
+})
+print(sub_stats)
+
+# 3. Student-wise Total and Average marks
+df["Total_Marks"] = df[subjects].sum(axis=1)
+df["Average_Marks"] = df[subjects].mean(axis=1)
+
+print("\n=== Student Marks Summary (First 5 records) ===")
+print(df[["StudentID", "Name", "Total_Marks", "Average_Marks"]].head())
+
+# 4. Overall Class Average
+class_avg = df["Average_Marks"].mean()
+print(f"\nOverall Class Average: {class_avg:.2f}")
+
+# 5. Class Performance Evaluation
+def evaluate_performance(avg):
+    if avg >= 85:
+        return "Distinction (Outstanding)"
+    elif avg >= 70:
+        return "First Class (Good)"
+    elif avg >= 50:
+        return "Second Class (Average)"
+    else:
+        return "Needs Improvement"
+
+df["Performance"] = df["Average_Marks"].apply(evaluate_performance)
+
+print("\n=== Class Performance Evaluation Distribution ===")
+print(df["Performance"].value_counts())
+
+print("\n=== Top 3 Students ===")
+print(df.sort_values(by="Total_Marks", ascending=False)[["StudentID", "Name", "Total_Marks", "Average_Marks", "Performance"]].head(3))
