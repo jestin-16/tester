@@ -348,8 +348,221 @@ if /i "%user_msg%"=="q" goto :eof
 echo.
 curl.exe -s -d "%user_msg%" ${baseUrl}/q
 echo.
-echo.
 goto chat_loop
+`;
+}
+
+function generateMenuScript(baseUrl) {
+  return `@echo off
+setlocal EnableDelayedExpansion
+title Data Science Lab Helper
+
+:menu
+cls
+echo ================================================================================
+echo                   DATA SCIENCE LAB -- SELECT A QUESTION
+echo ================================================================================
+echo  [1]  CO1 Q1: Student Dataset Statistical Analysis
+echo  [2]  CO1 Q2: Employee Performance Report ^& Best Department
+echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
+echo  [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)
+echo  [5]  k-NN Classification From Scratch (All Distance Metrics ^& Predict)
+echo  [6]  Bayes Theorem (Clinical Liver Disease Calculation)
+echo  [7]  Weather Prediction (Laplace Smoothing ^& Naive Bayes)
+echo  [8]  Student Feedback Text Multinomial Naive Bayes
+echo  [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
+echo  [10] Record: EDA, 5 Observations ^& 6-Plot Dashboard
+echo  [11] Final 10-Minute Quick Revision Table
+echo  [12] Ask AI Custom Question
+echo  [0]  Exit
+echo ================================================================================
+set "choice="
+set /p "choice=Enter option [0-12]: "
+
+if "%choice%"=="1" goto q1
+if "%choice%"=="2" goto q2
+if "%choice%"=="3" goto q3
+if "%choice%"=="4" goto viz
+if "%choice%"=="5" goto knn
+if "%choice%"=="6" goto bayes
+if "%choice%"=="7" goto weather
+if "%choice%"=="8" goto feedback
+if "%choice%"=="9" goto tree
+if "%choice%"=="10" goto eda
+if "%choice%"=="11" goto quick
+if "%choice%"=="12" goto ai
+if "%choice%"=="0" goto :eof
+echo Invalid selection. Please try again.
+pause
+goto menu
+
+:q1
+cls
+curl.exe -s ${baseUrl}/q1
+echo.
+pause
+goto menu
+
+:q2
+cls
+curl.exe -s ${baseUrl}/q2
+echo.
+pause
+goto menu
+
+:q3
+cls
+curl.exe -s ${baseUrl}/q3
+echo.
+pause
+goto menu
+
+:viz
+cls
+curl.exe -s ${baseUrl}/viz
+echo.
+pause
+goto menu
+
+:knn
+cls
+curl.exe -s ${baseUrl}/knn
+echo.
+pause
+goto menu
+
+:bayes
+cls
+curl.exe -s ${baseUrl}/bayes
+echo.
+pause
+goto menu
+
+:weather
+cls
+curl.exe -s ${baseUrl}/weather
+echo.
+pause
+goto menu
+
+:feedback
+cls
+curl.exe -s ${baseUrl}/feedback
+echo.
+pause
+goto menu
+
+:tree
+cls
+curl.exe -s ${baseUrl}/tree
+echo.
+pause
+goto menu
+
+:eda
+cls
+curl.exe -s ${baseUrl}/eda
+echo.
+pause
+goto menu
+
+:quick
+cls
+curl.exe -s ${baseUrl}/quick
+echo.
+pause
+goto menu
+
+:ai
+cls
+echo Type your question below (or press Enter without text to return to menu):
+set "user_q="
+set /p "user_q=Question: "
+if not defined user_q goto menu
+echo.
+echo Thinking...
+curl.exe -s -d "%user_q%" ${baseUrl}/q
+echo.
+echo.
+pause
+goto menu
+`;
+}
+
+function generatePowerShellMenu(baseUrl) {
+  return `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$BaseUrl = "${baseUrl}".TrimEnd('/')
+
+function Show-Menu {
+    Clear-Host
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "                   DATA SCIENCE LAB -- SELECT A QUESTION                        " -ForegroundColor Green
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis"
+    Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department"
+    Write-Host " [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
+    Write-Host " [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)"
+    Write-Host " [5]  k-NN Classification From Scratch (All Distance Metrics & Predict)"
+    Write-Host " [6]  Bayes Theorem (Clinical Liver Disease Calculation)"
+    Write-Host " [7]  Weather Prediction (Laplace Smoothing & Naive Bayes)"
+    Write-Host " [8]  Student Feedback Text Multinomial Naive Bayes"
+    Write-Host " [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
+    Write-Host " [10] Record: EDA, 5 Observations & 6-Plot Dashboard"
+    Write-Host " [11] Final 10-Minute Quick Revision Table"
+    Write-Host " [12] Ask AI Custom Question"
+    Write-Host " [0]  Exit"
+    Write-Host "================================================================================" -ForegroundColor Cyan
+}
+
+$routes = @{
+    "1"  = "/q1"
+    "2"  = "/q2"
+    "3"  = "/q3"
+    "4"  = "/viz"
+    "5"  = "/knn"
+    "6"  = "/bayes"
+    "7"  = "/weather"
+    "8"  = "/feedback"
+    "9"  = "/tree"
+    "10" = "/eda"
+    "11" = "/quick"
+}
+
+while ($true) {
+    Show-Menu
+    $choice = (Read-Host "Enter option [0-12]").Trim()
+    if ($choice -in @("0", "exit", "q")) { break }
+    
+    if ($choice -eq "12") {
+        Clear-Host
+        $q = (Read-Host "Enter your question (or press Enter to return)").Trim()
+        if ([string]::IsNullOrWhiteSpace($q)) { continue }
+        Write-Host "\`nThinking..." -ForegroundColor DarkGray
+        try {
+            $ans = Invoke-RestMethod -Uri "$BaseUrl/q" -Method Post -Body $q
+            Write-Host "\`nAI Answer:\`n$ans" -ForegroundColor Cyan
+        } catch {
+            Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+        }
+        Read-Host "\`nPress Enter to continue..."
+        continue
+    }
+    
+    if ($routes.ContainsKey($choice)) {
+        Clear-Host
+        $url = "$BaseUrl$($routes[$choice])"
+        try {
+            $txt = (New-Object Net.WebClient).DownloadString($url)
+            Write-Host $txt
+        } catch {
+            Write-Host "Error fetching $url" -ForegroundColor Red
+        }
+        Read-Host "\`nPress Enter to return to menu..."
+    } else {
+        Write-Host "Invalid option. Please choose 0 to 12." -ForegroundColor Yellow
+        Start-Sleep -Seconds 1
+    }
+}
 `;
 }
 
@@ -434,6 +647,15 @@ module.exports = async (req, res) => {
       format === "ps1" ||
       userAgent.includes("powershell") ||
       userAgent.includes("pwsh");
+
+    if (action === "menu" || format === "menu") {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "no-store");
+      if (isPowerShell) {
+        return res.status(200).send(generatePowerShellMenu(baseUrl));
+      }
+      return res.status(200).send(generateMenuScript(baseUrl));
+    }
 
     if (isPowerShell) {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
