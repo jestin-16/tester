@@ -73,7 +73,10 @@ function getProvider(apiKey) {
 async function callChat(apiKey, messages, model, vercelUrl) {
   // If no local API key, fallback to query hosted Vercel endpoint
   if (!apiKey && vercelUrl) {
-    const selectedModel = model || process.env.GROQ_MODEL || "openai/gpt-oss-20b";
+    const selectedModel =
+      model && model !== "remote" && model !== "auto" && model !== "auto (optimal)"
+        ? model
+        : process.env.GROQ_MODEL || null;
     const res = await fetch(`${vercelUrl.replace(/\/$/, "")}/api/groq`, {
       method: "POST",
       headers: {
@@ -222,8 +225,8 @@ async function main() {
     }
   }
 
-  const provider = apiKey ? getProvider(apiKey) : { name: "Vercel Proxy", defaultModel: "remote" };
-  let currentModel = provider.defaultModel;
+  const provider = apiKey ? getProvider(apiKey) : { name: "Vercel Proxy", defaultModel: "auto (optimal)" };
+  let currentModel = apiKey ? provider.defaultModel : "auto";
 
   console.log(`${colors.cyan}=========================================${colors.reset}`);
   console.log(`${colors.green}${colors.bold}          AI Terminal Chat               ${colors.reset}`);

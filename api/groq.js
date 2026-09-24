@@ -48,9 +48,128 @@ function getProvider(apiKey) {
   };
 }
 
+function extractUserPromptText(payload) {
+  if (typeof payload === "string") return payload;
+  if (!payload || typeof payload !== "object") return "";
+  if (payload.message && typeof payload.message === "string") return payload.message;
+  if (payload.q && typeof payload.q === "string") return payload.q;
+  if (Array.isArray(payload.messages)) {
+    const userMsg = [...payload.messages].reverse().find((m) => m && m.role === "user");
+    if (userMsg && typeof userMsg.content === "string") return userMsg.content;
+  }
+  if (Array.isArray(payload)) {
+    const userMsg = [...payload].reverse().find((m) => m && m.role === "user");
+    if (userMsg && typeof userMsg.content === "string") return userMsg.content;
+  }
+  return "";
+}
+
+function selectOptimalModel(promptText, requestedModel = null) {
+  if (
+    requestedModel &&
+    typeof requestedModel === "string" &&
+    requestedModel.trim() &&
+    requestedModel.trim().toLowerCase() !== "auto" &&
+    requestedModel.trim().toLowerCase() !== "default"
+  ) {
+    return requestedModel.trim();
+  }
+  if (!promptText || typeof promptText !== "string") {
+    return "openai/gpt-oss-20b";
+  }
+
+  const lower = promptText.toLowerCase();
+
+  // Category 1: Coding, Python, Pandas, Matplotlib, Data Science implementation
+  // Route to Qwen 27B (specialized coder & technical reasoning)
+  const isCoding =
+    lower.includes("code") ||
+    lower.includes("python") ||
+    lower.includes("def ") ||
+    lower.includes("import ") ||
+    lower.includes("pandas") ||
+    lower.includes("numpy") ||
+    lower.includes("dataframe") ||
+    lower.includes("matplotlib") ||
+    lower.includes("seaborn") ||
+    lower.includes("plt.") ||
+    lower.includes("sns.") ||
+    lower.includes("script") ||
+    lower.includes("program") ||
+    lower.includes("function") ||
+    lower.includes("syntax") ||
+    lower.includes("class ") ||
+    lower.includes("knn") ||
+    lower.includes("loop") ||
+    lower.includes("array") ||
+    lower.includes("bug") ||
+    lower.includes("error") ||
+    lower.includes("implement") ||
+    lower.includes("write a") ||
+    lower.includes("scikit") ||
+    lower.includes("sklearn") ||
+    lower.includes("plot") ||
+    lower.includes("graph") ||
+    lower.includes("chart") ||
+    lower.includes("fillna") ||
+    lower.includes("dropna") ||
+    lower.includes("groupby");
+
+  // Category 2: Math, Probability, Bayes, Derivation, Deep Theory, Decision Trees
+  // Route to GPT-OSS 120B (powerhouse 120-billion parameter model for deep reasoning)
+  const isDeepReasoning =
+    lower.includes("calculate") ||
+    lower.includes("bayes") ||
+    lower.includes("probability") ||
+    lower.includes("formula") ||
+    lower.includes("entropy") ||
+    lower.includes("information gain") ||
+    lower.includes("laplace") ||
+    lower.includes("smoothing") ||
+    lower.includes("derive") ||
+    lower.includes("derivation") ||
+    lower.includes("math") ||
+    lower.includes("explain in detail") ||
+    lower.includes("step by step") ||
+    lower.includes("why ") ||
+    lower.includes("compare ") ||
+    lower.includes("difference between") ||
+    lower.includes("decision tree") ||
+    lower.includes("theorem") ||
+    lower.includes("solve") ||
+    lower.includes("posterior") ||
+    lower.includes("prior") ||
+    lower.includes("likelihood") ||
+    promptText.length > 250;
+
+  if (isCoding) {
+    return "qwen/qwen3.8-27b";
+  }
+
+  if (isDeepReasoning) {
+    return "openai/gpt-oss-120b";
+  }
+
+  // Category 3: Quick queries, short questions, fast responses
+  // Route to GPT-OSS 20B (ultra-fast lightweight response)
+  return "openai/gpt-oss-20b";
+}
+
 async function callGroq(apiKey, payload) {
   const provider = getProvider(apiKey);
-  let model = payload.model || provider.defaultModel;
+  const promptText = extractUserPromptText(payload);
+  const requestedModel =
+    typeof payload === "object" && payload !== null ? payload.model : null;
+  const optimalModel = selectOptimalModel(promptText, requestedModel);
+
+  // Cascading fallback chain: optimal model -> 20B -> 27B -> 120B -> provider default
+  const candidateModels = [
+    optimalModel,
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.8-27b",
+    "openai/gpt-oss-120b",
+    provider.defaultModel
+  ].filter((m, i, arr) => m && arr.indexOf(m) === i);
 
   let messages = [];
   const payloadMessages = payload.messages || payload;
@@ -60,7 +179,7 @@ async function callGroq(apiKey, payload) {
       messages.push({
         role: "system",
         content:
-          "You are a helpful AI assistant running inside a terminal CLI. Keep responses clear, concise, and terminal-friendly."
+          "You are an expert AI Data Science tutor running in a terminal CLI. Keep responses clear, concise, highly accurate, and terminal-friendly."
       });
     }
     messages.push(...payloadMessages);
@@ -69,51 +188,58 @@ async function callGroq(apiKey, payload) {
       {
         role: "system",
         content:
-          "You are a helpful AI assistant running inside a terminal CLI. Keep responses clear, concise, and terminal-friendly."
+          "You are an expert AI Data Science tutor running in a terminal CLI. Keep responses clear, concise, highly accurate, and terminal-friendly."
       },
       {
         role: "user",
-        content: typeof payloadMessages === "string" ? payloadMessages : JSON.stringify(payloadMessages)
+        content:
+          typeof payloadMessages === "string"
+            ? payloadMessages
+            : typeof payloadMessages === "object" && payloadMessages.message
+            ? payloadMessages.message
+            : JSON.stringify(payloadMessages)
       }
     ];
   }
 
-  const makeRequest = async (modelToUse) => {
-    return await fetch(`${provider.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: modelToUse,
-        messages
-      })
-    });
-  };
+  let lastError = null;
 
-  let response = await makeRequest(model);
-  let data = await response.json();
+  for (const modelToTry of candidateModels) {
+    try {
+      const response = await fetch(`${provider.baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: modelToTry,
+          messages
+        })
+      });
 
-  // If model is not available or account does not have access, fallback to openai/gpt-oss-20b
-  if (!response.ok && data.error?.message?.includes("does not exist or you do not have access") && model !== "openai/gpt-oss-20b") {
-    model = "openai/gpt-oss-20b";
-    response = await makeRequest(model);
-    data = await response.json();
+      const data = await response.json();
+
+      if (response.ok && data.choices?.[0]?.message?.content) {
+        return {
+          content: data.choices[0].message.content,
+          model: modelToTry,
+          toString() {
+            return this.content;
+          }
+        };
+      }
+
+      const errMsg = data.error?.message || response.statusText;
+      console.warn(`Model ${modelToTry} returned error: ${errMsg}. Trying next model...`);
+      lastError = errMsg;
+    } catch (err) {
+      console.warn(`Model ${modelToTry} fetch exception: ${err.message}. Trying next model...`);
+      lastError = err.message;
+    }
   }
 
-  if (!response.ok) {
-    console.error(`${provider.name} API error:`, data);
-    const errorMsg =
-      data.error?.message ||
-      (typeof data.error === "string" ? data.error : null) ||
-      `${provider.name} API request failed`;
-    throw new Error(errorMsg);
-  }
-
-  return (
-    data.choices?.[0]?.message?.content || "No response received."
-  );
+  throw new Error(lastError || "All AI models failed to respond.");
 }
 
 async function parseRequestBody(req) {
@@ -825,9 +951,10 @@ module.exports = async (req, res) => {
         return res.status(500).send("Error: GROQ_API_KEY is not configured in Vercel environment variables.\n");
       }
       try {
-        const answer = await callGroq(apiKey, queryMessage);
+        const result = await callGroq(apiKey, queryMessage);
         res.setHeader("Content-Type", "text/plain; charset=utf-8");
-        return res.status(200).send(answer + "\n");
+        res.setHeader("X-AI-Model", result.model || "auto");
+        return res.status(200).send(result.content + "\n");
       } catch (err) {
         return res.status(500).send(`Error: ${err.message}\n`);
       }
@@ -917,14 +1044,15 @@ module.exports = async (req, res) => {
         return res.status(400).send("Error: Message is required.\n");
       }
 
-      const answer = await callGroq(apiKey, payload);
+      const result = await callGroq(apiKey, payload);
+      res.setHeader("X-AI-Model", result.model || "auto");
 
       if (wantsJson) {
-        return res.status(200).json({ response: answer });
+        return res.status(200).json({ response: result.content, model: result.model });
       }
 
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
-      return res.status(200).send(answer);
+      return res.status(200).send(result.content);
     } catch (err) {
       console.error("API error:", err);
       if (wantsJson) {
