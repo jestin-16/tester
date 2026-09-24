@@ -2,8 +2,11 @@ const fs = require("fs");
 const path = require("path");
 
 function getApiKey() {
-  if (process.env.GROQ_API_KEY) {
-    return process.env.GROQ_API_KEY;
+  if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim()) {
+    return process.env.GROQ_API_KEY.trim();
+  }
+  if (process.env.XAI_API_KEY && process.env.XAI_API_KEY.trim()) {
+    return process.env.XAI_API_KEY.trim();
   }
 
   // Local .env fallback for development/testing
@@ -11,10 +14,13 @@ function getApiKey() {
     const envPath = path.join(process.cwd(), ".env");
     if (fs.existsSync(envPath)) {
       const content = fs.readFileSync(envPath, "utf8");
-      for (const line of content.split("\n")) {
-        const [k, ...rest] = line.split("=");
-        if (k && k.trim() === "GROQ_API_KEY") {
-          return rest.join("=").trim();
+      for (const line of content.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) continue;
+        const [k, ...rest] = trimmed.split("=");
+        if (k && (k.trim() === "GROQ_API_KEY" || k.trim() === "XAI_API_KEY")) {
+          const val = rest.join("=").trim().replace(/^["']|["']$/g, "");
+          if (val) return val;
         }
       }
     }
@@ -23,17 +29,33 @@ function getApiKey() {
   return null;
 }
 
+function getProvider(apiKey) {
+  if (apiKey && apiKey.startsWith("xai-")) {
+    return {
+      name: "xAI Grok",
+      baseUrl: "https://api.x.ai/v1",
+      defaultModel: process.env.GROQ_MODEL || process.env.XAI_MODEL || "grok-2-latest",
+      modelsUrl: "https://api.x.ai/v1/models",
+      filterModel: (id) => !id.includes("embedding") && !id.includes("vision")
+    };
+  }
+  return {
+    name: "Groq",
+    baseUrl: "https://api.groq.com/openai/v1",
+    defaultModel: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+    modelsUrl: "https://api.groq.com/openai/v1/models",
+    filterModel: (id) => !id.includes("whisper")
+  };
+}
+
 async function callGroq(apiKey, payload) {
-  // Use the requested model, or fallback to a very stable common model
-  const model = payload.model || process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+  const provider = getProvider(apiKey);
+  const model = payload.model || provider.defaultModel;
 
   let messages = [];
-  
-  // payload.messages is used in the interactive mode
   const payloadMessages = payload.messages || payload;
 
   if (Array.isArray(payloadMessages)) {
-    // If it's an array, it's a chat history
     if (payloadMessages.length > 0 && payloadMessages[0].role !== "system") {
       messages.push({
         role: "system",
@@ -43,7 +65,6 @@ async function callGroq(apiKey, payload) {
     }
     messages.push(...payloadMessages);
   } else {
-    // Single message
     messages = [
       {
         role: "system",
@@ -57,26 +78,26 @@ async function callGroq(apiKey, payload) {
     ];
   }
 
-  const response = await fetch(
-    "https://api.groq.com/openai/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model,
-        messages
-      })
-    }
-  );
+  const response = await fetch(`${provider.baseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model,
+      messages
+    })
+  });
 
   const data = await response.json();
 
   if (!response.ok) {
-    console.error("Groq API error:", data);
-    const errorMsg = data.error?.message || "Groq API request failed";
+    console.error(`${provider.name} API error:`, data);
+    const errorMsg =
+      data.error?.message ||
+      (typeof data.error === "string" ? data.error : null) ||
+      `${provider.name} API request failed`;
     throw new Error(errorMsg);
   }
 
@@ -141,22 +162,19 @@ async function parseRequestBody(req) {
 }
 
 function generateCliScript(baseUrl) {
-  const systemPrompt = "You are a world-class, elite AI coding agent. When asked to write code, YOU MUST ONLY PROVIDE THE RAW CODE. DO NOT provide explanations. DO NOT provide step-by-step breakdowns. DO NOT wrap the code in markdown blocks. Just return the raw code directly. If asked a non-coding question, answer as concisely as possible with zero conversational filler.";
+  const systemPrompt =
+    "You are a helpful AI assistant running in a terminal CLI. Keep responses concise, clear, and terminal-friendly.";
 
   return `#!/usr/bin/env bash
 # ==============================================================================
-# Groq CLI
-# ──────────────────────────────────────────────────
+# AI CLI (Bash)
 # Quick Start:
-#   Interactive mode:  curl -sL ${baseUrl}/groq | bash
-#   Ask question:      curl -sL "${baseUrl}/groq?q=your+question"
-#                      curl -sL -d "your question" ${baseUrl}/groq
+#   Interactive:   curl -sL ${baseUrl}/groq | bash
+#   Ask question:  curl -sL "${baseUrl}/groq?q=your+question"
 # ==============================================================================
 
 set -e
-
 BASE_URL="${baseUrl}"
-SYSTEM_PROMPT="${systemPrompt.replace(/"/g, '\\"')}"
 
 # If arguments were passed directly to script
 if [ $# -gt 0 ]; then
@@ -170,151 +188,127 @@ fi
 
 # Ensure jq is installed
 if ! command -v jq &> /dev/null; then
-    echo "Error: 'jq' is not installed."
-    echo "Please install it to use interactive mode (e.g., sudo apt install jq)."
-    exit 1
+    echo "Warning: 'jq' is not installed. Entering direct chat mode."
+    while true; do
+      read -r -p "You: " user_input
+      [ -z "$user_input" ] && continue
+      [ "$user_input" = "exit" ] && break
+      curl -sS -X POST "$BASE_URL/api/groq" -H "Content-Type: text/plain" -d "$user_input"
+      echo ""
+    done
+    exit 0
 fi
 
-# Fetch available models via Vercel
+# Fetch models
 echo "Fetching available models..."
-models_json=$(curl -sS "$BASE_URL/api/groq?action=models")
-model_list=$(echo "$models_json" | jq -r '.[]' 2>/dev/null)
+models_json=$(curl -sS "$BASE_URL/api/groq?action=models" 2>/dev/null || echo "[]")
+model_list=$(echo "$models_json" | jq -r '.[]' 2>/dev/null || echo "")
 
-if [ -z "$model_list" ]; then
-    echo "Error: Could not fetch models."
-    exit 1
-fi
-
-echo "Please select a model to use:"
-if [ -e /dev/tty ]; then
+if [ -n "$model_list" ] && [ -e /dev/tty ]; then
+  echo "Please select a model:"
   select MODEL in $model_list; do
-      if [ -n "$MODEL" ]; then
-          break
-      else
-          echo "Invalid selection. Please try again."
-      fi
+    [ -n "$MODEL" ] && break
   done < /dev/tty
-else
-  # Non-interactive fallback, pick the first one
-  for m in $model_list; do
-      MODEL=$m
-      break
-  done
 fi
 
-# Print Header
-echo "● Groq CLI"
-echo "────────────────────────────────────────"
-echo "Connected to Groq via Vercel. (Model: $MODEL)"
+echo "========================================="
+echo "           AI Terminal Chat              "
+echo "========================================="
+echo "Connected via $BASE_URL (Model: \${MODEL:-default})"
 echo "Type your question and press Enter. (Type 'exit' to quit)"
 echo ""
 
-# Helper to read input from terminal even when piped to bash
-get_user_input() {
-  local prompt="$1"
-  if [ -e /dev/tty ]; then
-    if ! read -r -p "$prompt" REPLY < /dev/tty; then return 1; fi
-    # If the user pasted a multi-line block, the extra lines are already buffered.
-    # 'read -t 0' checks if there is more data available immediately without blocking.
-    while read -t 0 < /dev/tty; do
-      read -r NEXT_LINE < /dev/tty
-      REPLY="$REPLY"$'\\n'"$NEXT_LINE"
-    done
-  elif [ -t 0 ]; then
-    if ! read -r -p "$prompt" REPLY; then return 1; fi
-    while read -t 0; do
-      read -r NEXT_LINE
-      REPLY="$REPLY"$'\\n'"$NEXT_LINE"
-    done
-  else
-    return 1
-  fi
-}
-
-messages=$(jq -n --arg sp "$SYSTEM_PROMPT" '[{"role": "system", "content": $sp}]')
+messages='[{"role":"system","content":"You are a helpful AI terminal assistant."}]'
 
 while true; do
-  if ! get_user_input "You: "; then
-    echo ""
-    break
-  fi
-
-  # Trim leading and trailing whitespace
-  user_input=$(echo "$REPLY" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-
-  if [ -z "$user_input" ]; then
-    continue
-  fi
-
+  read -r -p "You: " user_input
+  [ -z "$user_input" ] && continue
   if [ "$user_input" = "exit" ] || [ "$user_input" = "quit" ] || [ "$user_input" = "q" ]; then
     echo "Goodbye!"
     break
   fi
-
-  if [ "$user_input" = "/clear" ] || [ "$user_input" = "/reset" ]; then
-    messages=$(jq -n --arg sp "$SYSTEM_PROMPT" '[{"role": "system", "content": $sp}]')
-    echo "Chat history cleared! Started a fresh conversation."
+  if [ "$user_input" = "/clear" ]; then
+    messages='[{"role":"system","content":"You are a helpful AI terminal assistant."}]'
+    echo "Chat cleared!"
     continue
   fi
 
-  if [ "$user_input" = "/editor" ]; then
-    echo "[Editor Mode] Type your multi-line message. Type '/send' on a new line to submit."
-    editor_input=""
-    while true; do
-      if [ -e /dev/tty ]; then
-        read -r NEXT_LINE < /dev/tty
-      else
-        read -r NEXT_LINE
-      fi
-      
-      trimmed_line=$(echo "$NEXT_LINE" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-      if [ "$trimmed_line" = "/send" ]; then
-        break
-      fi
-      
-      if [ -z "$editor_input" ]; then
-        editor_input="$NEXT_LINE"
-      else
-        editor_input="$editor_input"$'\\n'"$NEXT_LINE"
-      fi
-    done
-    user_input="$editor_input"
-    
-    if [ -z "$user_input" ]; then
-      echo "Empty message, cancelling..."
-      continue
-    fi
-  fi
+  escaped=$(echo -n "$user_input" | jq -R -s -c '.')
+  messages=$(echo "$messages" | jq ". + [{\\"role\\":\\"user\\",\\"content\\":$escaped}]")
+  payload=$(jq -n --argjson msgs "$messages" --arg model "\${MODEL:-}" '{model: (if $model=="" then null else $model end), messages: $msgs}')
 
-  # Append user message to history
-  escaped_input=$(echo -n "$user_input" | jq -R -s -c '.')
-  messages=$(echo "$messages" | jq ". + [{\\"role\\": \\"user\\", \\"content\\": $escaped_input}]")
+  printf "Thinking..."
+  response=$(curl -sS -X POST "$BASE_URL/api/groq" -H "Content-Type: application/json" -d "$payload")
+  printf "\\r           \\r"
 
-  # Construct payload including the selected model
-  payload=$(jq -n --argjson msgs "$messages" --arg model "$MODEL" '{model: $model, messages: $msgs}')
-
-  printf "Groq: thinking..."
-  response=$(curl -sS -X POST "$BASE_URL/api/groq" \\
-    -H "Content-Type: application/json" \\
-    -d "$payload")
-
-  # Erase the thinking line
-  printf "\\r                  \\r"
-  
-  echo "Groq: $response"
+  echo "AI: $response"
   echo ""
-
-  # Append assistant response to history
-  escaped_response=$(echo -n "$response" | jq -R -s -c '.')
-  messages=$(echo "$messages" | jq ". + [{\\"role\\": \\"assistant\\", \\"content\\": $escaped_response}]")
-
+  escaped_res=$(echo -n "$response" | jq -R -s -c '.')
+  messages=$(echo "$messages" | jq ". + [{\\"role\\":\\"assistant\\",\\"content\\":$escaped_res}]")
 done
+`;
+}
+
+function generatePowerShellScript(baseUrl) {
+  return `# ==============================================================================
+# AI Terminal CLI for Windows PowerShell
+# Usage:
+#   irm ${baseUrl}/groq | iex
+# ==============================================================================
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$BaseUrl = "${baseUrl}".TrimEnd('/')
+
+Write-Host ""
+Write-Host "=========================================" -ForegroundColor Cyan
+Write-Host "           AI Terminal Chat              " -ForegroundColor Green
+Write-Host "=========================================" -ForegroundColor Cyan
+Write-Host "Connected via: $BaseUrl" -ForegroundColor DarkGray
+Write-Host "Commands: exit, /clear, /reset" -ForegroundColor DarkGray
+Write-Host ""
+
+$history = @()
+
+while ($true) {
+    Write-Host "You: " -ForegroundColor Green -NoNewline
+    $userInput = Read-Host
+    if ([string]::IsNullOrWhiteSpace($userInput)) { continue }
+
+    if ($userInput -in @("exit", "quit", "q")) {
+        Write-Host "Goodbye!" -ForegroundColor Yellow
+        break
+    }
+    if ($userInput -in @("/clear", "/reset")) {
+        $history = @()
+        Write-Host "Chat history cleared!" -ForegroundColor Yellow
+        continue
+    }
+
+    $history += @{ role = "user"; content = $userInput }
+    $payloadObj = @{ messages = $history }
+    $payloadJson = $payloadObj | ConvertTo-Json -Depth 5 -Compress
+
+    Write-Host "AI is thinking..." -ForegroundColor DarkGray -NoNewline
+
+    try {
+        $res = Invoke-RestMethod -Uri "$BaseUrl/api/groq" -Method Post -ContentType "application/json; charset=utf-8" -Body $payloadJson -TimeoutSec 60
+        Write-Host "\`r                   \`r" -NoNewline
+        $reply = if ($res.response) { $res.response } else { "$res" }
+        Write-Host "AI: " -ForegroundColor Cyan -NoNewline
+        Write-Host $reply
+        Write-Host ""
+        $history += @{ role = "assistant"; content = $reply }
+    } catch {
+        Write-Host "\`r                   \`r" -NoNewline
+        Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+        if ($history.Count -gt 0) { $history = $history[0..($history.Count - 2)] }
+    }
+}
 `;
 }
 
 module.exports = async (req, res) => {
   const protocol = req.headers["x-forwarded-proto"] || "https";
-  const host = req.headers.host || "updates-opal.vercel.app";
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "updates-opal.vercel.app";
   const baseUrl = `${protocol}://${host}`;
 
   const accept = (req.headers["accept"] || "").toLowerCase();
@@ -322,7 +316,9 @@ module.exports = async (req, res) => {
   const isBrowser =
     accept.includes("text/html") &&
     !userAgent.includes("curl") &&
-    !userAgent.includes("wget");
+    !userAgent.includes("wget") &&
+    !userAgent.includes("powershell") &&
+    !userAgent.includes("pwsh");
 
   const wantsJson = accept.includes("application/json");
 
@@ -335,27 +331,29 @@ module.exports = async (req, res) => {
       parsedUrl = { searchParams: new Map() };
     }
 
-    const action = parsedUrl.searchParams.get ? parsedUrl.searchParams.get("action") : req.query?.action;
+    const action = parsedUrl.searchParams.get
+      ? parsedUrl.searchParams.get("action")
+      : req.query?.action;
 
-    // Route: Fetch models proxy
+    // Route: Fetch models
     if (action === "models") {
       const apiKey = getApiKey();
       if (!apiKey) {
-        return res.status(500).json({ error: "API key missing" });
+        return res.status(500).json({ error: "GROQ_API_KEY is not configured in Vercel environment variables" });
       }
+      const provider = getProvider(apiKey);
       try {
-        const resModels = await fetch("https://api.groq.com/openai/v1/models", {
+        const resModels = await fetch(provider.modelsUrl, {
           headers: { Authorization: `Bearer ${apiKey}` }
         });
         const data = await resModels.json();
-        // Filter out whisper and sort
         const models = (data.data || [])
-          .filter(m => !m.id.includes('whisper'))
-          .map(m => m.id)
+          .map((m) => m.id)
+          .filter(provider.filterModel)
           .sort();
         return res.status(200).json(models);
       } catch (err) {
-        return res.status(500).json({ error: "Failed to fetch models" });
+        return res.status(500).json({ error: `Failed to fetch models from ${provider.name}` });
       }
     }
 
@@ -369,7 +367,7 @@ module.exports = async (req, res) => {
     if (queryMessage && typeof queryMessage === "string") {
       const apiKey = getApiKey();
       if (!apiKey) {
-        return res.status(500).send("Error: GROQ_API_KEY is not configured.\n");
+        return res.status(500).send("Error: GROQ_API_KEY is not configured in Vercel environment variables.\n");
       }
       try {
         const answer = await callGroq(apiKey, queryMessage);
@@ -380,8 +378,24 @@ module.exports = async (req, res) => {
       }
     }
 
+    // PowerShell script check: format=ps1 or PowerShell User-Agent
+    const format =
+      req.query?.format ||
+      (parsedUrl.searchParams.get ? parsedUrl.searchParams.get("format") : null);
+
+    const isPowerShell =
+      format === "ps1" ||
+      userAgent.includes("powershell") ||
+      userAgent.includes("pwsh");
+
+    if (isPowerShell) {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "no-store");
+      return res.status(200).send(generatePowerShellScript(baseUrl));
+    }
+
     // Web browser: serve interactive HTML terminal
-    if (isBrowser) {
+    if (isBrowser && format !== "sh" && format !== "bash") {
       try {
         let htmlPath = path.join(process.cwd(), "ui", "index.html");
         if (!fs.existsSync(htmlPath)) {
@@ -407,10 +421,11 @@ module.exports = async (req, res) => {
   if (req.method === "POST") {
     const apiKey = getApiKey();
     if (!apiKey) {
+      const errMsg = "Error: GROQ_API_KEY is not configured in Vercel environment variables.";
       if (wantsJson) {
-        return res.status(500).json({ error: "GROQ_API_KEY is not configured" });
+        return res.status(500).json({ error: errMsg });
       }
-      return res.status(500).send("Error: GROQ_API_KEY is not configured.\n");
+      return res.status(500).send(errMsg + "\n");
     }
 
     try {
@@ -432,7 +447,7 @@ module.exports = async (req, res) => {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       return res.status(200).send(answer);
     } catch (err) {
-      console.error("Groq error:", err);
+      console.error("API error:", err);
       if (wantsJson) {
         return res.status(500).json({
           error: err.message || "Internal server error"

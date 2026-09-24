@@ -1,58 +1,82 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# ==============================================================================
+# Cross-Platform AI Chat (Groq & xAI Grok)
+# ==============================================================================
 
-# Ensure GROQ_API_KEY is set
-if [ -z "$GROQ_API_KEY" ]; then
-  # Try to load from .env file if it exists
+# Ensure GROQ_API_KEY or XAI_API_KEY is set
+if [ -z "$GROQ_API_KEY" ] && [ -z "$XAI_API_KEY" ]; then
   if [ -f .env ]; then
-    # Source the .env file while exporting its variables
     set -a
-    source .env
+    source .env 2>/dev/null || true
     set +a
   fi
-  
-  if [ -z "$GROQ_API_KEY" ]; then
-    echo "Error: GROQ_API_KEY environment variable is not set."
-    echo "Please set it in your .env file or run: export GROQ_API_KEY='your_api_key'"
-    exit 1
-  fi
 fi
 
-# Ensure jq is installed (needed for JSON parsing in bash)
+API_KEY="${GROQ_API_KEY:-$XAI_API_KEY}"
+
+if [ -z "$API_KEY" ]; then
+  echo "Error: GROQ_API_KEY environment variable is not set."
+  echo "Please set it in your .env file or run: export GROQ_API_KEY='your_api_key'"
+  exit 1
+fi
+
+# Detect provider
+if [[ "$API_KEY" == xai-* ]]; then
+  PROVIDER="xAI Grok"
+  BASE_URL="https://api.x.ai/v1"
+  DEFAULT_MODEL="grok-2-latest"
+else
+  PROVIDER="Groq"
+  BASE_URL="https://api.groq.com/openai/v1"
+  DEFAULT_MODEL="llama-3.3-70b-versatile"
+fi
+
+# Check for jq
 if ! command -v jq &> /dev/null; then
-    echo "Error: 'jq' is not installed. Please install it to run this script (e.g., sudo apt install jq)."
-    exit 1
+  echo "Note: 'jq' is not installed. Running in simple mode."
+  echo "========================================="
+  echo "     $PROVIDER Interactive Chat          "
+  echo "========================================="
+  while true; do
+    read -r -p "You: " user_input
+    [ -z "$user_input" ] && continue
+    [[ "$user_input" == "exit" || "$user_input" == "quit" ]] && break
+    
+    # Send simple request
+    payload="{\"model\":\"$DEFAULT_MODEL\",\"messages\":[{\"role\":\"user\",\"content\":\"$user_input\"}]}"
+    curl -s -X POST "$BASE_URL/chat/completions" \
+      -H "Authorization: Bearer $API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "$payload"
+    echo ""
+  done
+  exit 0
 fi
 
-# Fetch available models dynamically based on your API key
-echo "Fetching available models..."
-models_json=$(curl -s -X GET "https://api.groq.com/openai/v1/models" -H "Authorization: Bearer $GROQ_API_KEY")
-model_list=$(echo "$models_json" | jq -r '.data[].id' 2>/dev/null | grep -v 'whisper')
+# Fetch models dynamically
+echo "Fetching available models for $PROVIDER..."
+models_json=$(curl -s -X GET "$BASE_URL/models" -H "Authorization: Bearer $API_KEY")
+model_list=$(echo "$models_json" | jq -r '.data[].id' 2>/dev/null | grep -v -E 'whisper|embedding')
 
-if [ -z "$model_list" ]; then
-    echo "Error: Could not fetch models from Groq API. Please check your API key."
-    exit 1
+MODEL="$DEFAULT_MODEL"
+if [ -n "$model_list" ]; then
+  echo "Select a model (press Enter for default: $DEFAULT_MODEL):"
+  select M in $model_list; do
+    [ -n "$M" ] && MODEL="$M"
+    break
+  done
 fi
 
-echo "Please select a model to use:"
-select MODEL in $model_list; do
-    if [ -n "$MODEL" ]; then
-        break
-    else
-        echo "Invalid selection. Please try again."
-    fi
-done
-
-# Initialize chat history with a system message
 messages='[{"role": "system", "content": "You are a helpful assistant."}]'
 
 echo "========================================="
-echo "        Groq Interactive Chat           "
+echo "        $PROVIDER Interactive Chat       "
 echo "        Model: $MODEL "
 echo " (Type 'exit' or 'quit' to end the chat) "
 echo "========================================="
 
 while true; do
-  echo -n -e "\n\033[1;32mYou:\033[0m "
+  echo -n -e "\nYou: "
   read -r user_input
   
   if [[ "$user_input" == "exit" || "$user_input" == "quit" ]]; then
@@ -64,39 +88,26 @@ while true; do
     continue
   fi
   
-  # Append user message to history
   escaped_input=$(echo "$user_input" | jq -R -s -c '.[0:-1]')
   messages=$(echo "$messages" | jq ". + [{\"role\": \"user\", \"content\": $escaped_input}]")
-  
-  # Construct payload
   payload=$(jq -n --argjson msgs "$messages" --arg model "$MODEL" '{model: $model, messages: $msgs}')
   
-  # Call Groq API
-  response=$(curl -s -X POST "https://api.groq.com/openai/v1/chat/completions" \
-       -H "Authorization: Bearer $GROQ_API_KEY" \
+  response=$(curl -s -X POST "$BASE_URL/chat/completions" \
+       -H "Authorization: Bearer $API_KEY" \
        -H "Content-Type: application/json" \
        -d "$payload")
   
-  # Extract response content
   assistant_message=$(echo "$response" | jq -r '.choices[0].message.content // empty')
   
   if [[ -z "$assistant_message" || "$assistant_message" == "null" ]]; then
-    error_msg=$(echo "$response" | jq -r '.error.message // empty')
-    echo -e "\033[1;31mError:\033[0m Failed to get a valid response from Groq."
-    if [[ -n "$error_msg" ]]; then
-        echo -e "\033[1;31mDetails:\033[0m $error_msg"
-    else
-        echo "Raw Response: $response"
-    fi
-    # Remove the last user message from history to allow retry
+    error_msg=$(echo "$response" | jq -r '.error.message // .error // empty')
+    echo "Error: Failed to get response."
+    [ -n "$error_msg" ] && echo "Details: $error_msg"
     messages=$(echo "$messages" | jq 'del(.[-1])')
     continue
   fi
   
-  echo -e "\n\033[1;36mGroq:\033[0m $assistant_message"
-  
-  # Append assistant response to history
+  echo -e "\n$PROVIDER: $assistant_message"
   escaped_response=$(echo "$assistant_message" | jq -R -s -c '.[0:-1]')
   messages=$(echo "$messages" | jq ". + [{\"role\": \"assistant\", \"content\": $escaped_response}]")
-  
 done
