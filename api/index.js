@@ -17,40 +17,34 @@ module.exports = (req, res) => {
 ================================================================================
 
   [A] CHAT WITH AI ASSISTANT:
-      >> Interactive Terminal Chat:
-         curl.exe -s ${baseUrl}/c > c.bat && c
+      >> In CMD:        curl.exe -s ${baseUrl}/c > c.bat && c
+      >> In PowerShell: irm ${baseUrl}/p | iex
+      >> Ask Directly:  curl.exe -s -d "What is Bayes Theorem?" ${baseUrl}/q
 
-      >> Ask single question directly:
-         curl.exe -s -d "What is Bayes Theorem?" ${baseUrl}/q
-
-
-  [B] SHOW QUESTIONS & ANSWERS ONLY (Dedicated Q&A Menu):
-      >> Launch in CMD:
-         curl.exe -s ${baseUrl}/exam > r.bat && r
-
-      >> Or view all Q&A text directly:
-         curl.exe -s ${baseUrl}/all
-
+  [B] SHOW QUESTIONS & ANSWERS ONLY (Dedicated Interactive Menu):
+      >> In CMD:        curl.exe -s ${baseUrl}/exam > r.bat && r
+      >> In PowerShell: irm ${baseUrl}/exam | iex
+      >> Direct Text:   irm ${baseUrl}/all
 
   [C] ALL-IN-ONE PORTAL (Both Chat + Q&A in 1 Tool):
-      >> Launch in CMD:
-         curl.exe -s ${baseUrl}/run > r.bat && r
+      >> In CMD:        curl.exe -s ${baseUrl}/run > r.bat && r
+      >> In PowerShell: irm ${baseUrl}/run | iex
 
 ================================================================================
- DIRECT QUESTION & ANSWER NUMBERS (View with: curl.exe -s ${baseUrl}/<num>):
+ VIEW DIRECT QUESTIONS (Use: curl.exe -s ${baseUrl}/<num>  OR  irm ${baseUrl}/<num>):
 ================================================================================
-   * curl.exe -s ${baseUrl}/1   -> CO1 Q1: Student Dataset Stats (25 Students)
-   * curl.exe -s ${baseUrl}/2   -> CO1 Q2: Employee Performance & Best Dept
-   * curl.exe -s ${baseUrl}/3   -> CO1 Q3: 30-Record Pandas Workflow (Impute, Rank)
-   * curl.exe -s ${baseUrl}/4   -> Q4: All 13 Visualizations (Matplotlib & Seaborn)
-   * curl.exe -s ${baseUrl}/5   -> k-NN Classifier From Scratch (All 5 Metrics)
-   * curl.exe -s ${baseUrl}/6   -> Bayes Theorem (Clinical Liver Disease Problem)
-   * curl.exe -s ${baseUrl}/7   -> Weather Prediction (Naive Bayes & Laplace)
-   * curl.exe -s ${baseUrl}/8   -> Student Feedback Text Multinomial Naive Bayes
-   * curl.exe -s ${baseUrl}/9   -> Decision Tree C5.0 (Loan Eligibility Rules)
-   * curl.exe -s ${baseUrl}/10  -> Record EDA, 5 Observations & 6-Plot Dashboard
-   * curl.exe -s ${baseUrl}/11  -> 10-Minute Quick Summary Table
-   * curl.exe -s ${baseUrl}/12  -> Master Revision Sheet (Complete All-in-One)
+   * ${baseUrl}/1   -> CO1 Q1: Student Dataset Stats (25 Students)
+   * ${baseUrl}/2   -> CO1 Q2: Employee Performance & Best Dept
+   * ${baseUrl}/3   -> CO1 Q3: 30-Record Pandas Workflow (Impute, Rank)
+   * ${baseUrl}/4   -> Q4: All 13 Visualizations (Matplotlib & Seaborn)
+   * ${baseUrl}/5   -> k-NN Classifier From Scratch (All 5 Metrics)
+   * ${baseUrl}/6   -> Bayes Theorem (Clinical Liver Disease Problem)
+   * ${baseUrl}/7   -> Weather Prediction (Naive Bayes & Laplace)
+   * ${baseUrl}/8   -> Student Feedback Text Multinomial Naive Bayes
+   * ${baseUrl}/9   -> Decision Tree C5.0 (Loan Eligibility Rules)
+   * ${baseUrl}/10  -> Record EDA, 5 Observations & 6-Plot Dashboard
+   * ${baseUrl}/11  -> 10-Minute Quick Summary Table
+   * ${baseUrl}/12  -> Master Revision Sheet (Complete All-in-One: /all)
 ================================================================================
 `;
 
