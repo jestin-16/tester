@@ -42,15 +42,15 @@ function getProvider(apiKey) {
   return {
     name: "Groq",
     baseUrl: "https://api.groq.com/openai/v1",
-    defaultModel: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+    defaultModel: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
     modelsUrl: "https://api.groq.com/openai/v1/models",
-    filterModel: (id) => !id.includes("whisper")
+    filterModel: (id) => !id.includes("whisper") && !id.includes("guard")
   };
 }
 
 async function callGroq(apiKey, payload) {
   const provider = getProvider(apiKey);
-  const model = payload.model || provider.defaultModel;
+  let model = payload.model || provider.defaultModel;
 
   let messages = [];
   const payloadMessages = payload.messages || payload;
@@ -78,19 +78,29 @@ async function callGroq(apiKey, payload) {
     ];
   }
 
-  const response = await fetch(`${provider.baseUrl}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model,
-      messages
-    })
-  });
+  const makeRequest = async (modelToUse) => {
+    return await fetch(`${provider.baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: modelToUse,
+        messages
+      })
+    });
+  };
 
-  const data = await response.json();
+  let response = await makeRequest(model);
+  let data = await response.json();
+
+  // If model is not available or account does not have access, fallback to openai/gpt-oss-20b
+  if (!response.ok && data.error?.message?.includes("does not exist or you do not have access") && model !== "openai/gpt-oss-20b") {
+    model = "openai/gpt-oss-20b";
+    response = await makeRequest(model);
+    data = await response.json();
+  }
 
   if (!response.ok) {
     console.error(`${provider.name} API error:`, data);

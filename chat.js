@@ -65,7 +65,7 @@ function getProvider(apiKey) {
   return {
     name: "Groq",
     baseUrl: "https://api.groq.com/openai/v1",
-    defaultModel: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+    defaultModel: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
     modelsUrl: "https://api.groq.com/openai/v1/models"
   };
 }
@@ -73,16 +73,27 @@ function getProvider(apiKey) {
 async function callChat(apiKey, messages, model, vercelUrl) {
   // If no local API key, fallback to query hosted Vercel endpoint
   if (!apiKey && vercelUrl) {
+    const selectedModel = model || process.env.GROQ_MODEL || "openai/gpt-oss-20b";
     const res = await fetch(`${vercelUrl.replace(/\/$/, "")}/api/groq`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages, model })
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({ messages, model: selectedModel })
     });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || "Vercel endpoint request failed");
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (_) {
+      if (!res.ok) throw new Error(text || "Vercel endpoint request failed");
+      return text;
     }
-    return data.response;
+    if (!res.ok) {
+      throw new Error(data.error || text || "Vercel endpoint request failed");
+    }
+    return data.response || text;
   }
 
   const provider = getProvider(apiKey);
@@ -118,7 +129,7 @@ async function fetchModels(apiKey) {
     const data = await res.json();
     return (data.data || [])
       .map((m) => m.id)
-      .filter((id) => !id.includes("whisper") && !id.includes("embedding"))
+      .filter((id) => !id.includes("whisper") && !id.includes("embedding") && !id.includes("guard"))
       .sort();
   } catch (_) {
     return [];
@@ -127,7 +138,7 @@ async function fetchModels(apiKey) {
 
 async function main() {
   let apiKey = loadApiKey();
-  let vercelUrl = process.env.VERCEL_URL || "";
+  let vercelUrl = process.env.VERCEL_URL || "https://tester-red-two.vercel.app";
 
   // Check for --url flag
   let filteredArgs = [];
