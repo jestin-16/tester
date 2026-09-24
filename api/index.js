@@ -2,6 +2,11 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = (req, res) => {
+  if (req.method === "POST" || req.query?.q) {
+    const groqHandler = require("./groq");
+    return groqHandler(req, res);
+  }
+
   const filesDirectory = path.join(process.cwd(), "files");
 
   try {

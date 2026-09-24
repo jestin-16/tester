@@ -52,6 +52,18 @@
       "destination": "/api/groq?q=:query*"
     },
     {
+      "source": "/ask/:query*",
+      "destination": "/api/groq?q=:query*"
+    },
+    {
+      "source": "/ai/:query*",
+      "destination": "/api/groq?q=:query*"
+    },
+    {
+      "source": "/q/:query*",
+      "destination": "/api/groq?q=:query*"
+    },
+    {
       "source": "/:file",
       "destination": "/files/:file"
     }
