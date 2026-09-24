@@ -22,6 +22,18 @@
       "destination": "/api/groq"
     },
     {
+      "source": "/exam",
+      "destination": "/api/groq?action=exam"
+    },
+    {
+      "source": "/qa",
+      "destination": "/api/groq?action=qa"
+    },
+    {
+      "source": "/all",
+      "destination": "/files/ds.txt"
+    },
+    {
       "source": "/run",
       "destination": "/api/groq?action=run"
     },

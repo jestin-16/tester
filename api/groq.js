@@ -360,9 +360,9 @@ title Data Science Lab Helper
 :menu
 cls
 echo ================================================================================
-echo                   DATA SCIENCE LAB -- SELECT A QUESTION
+echo            DATA SCIENCE LAB -- QUESTIONS & ANSWERS (EXAM REVISION)
 echo ================================================================================
-echo  [1]  CO1 Q1: Student Dataset Statistical Analysis
+echo  [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
 echo  [2]  CO1 Q2: Employee Performance Report ^& Best Department
 echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
 echo  [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)
@@ -373,11 +373,12 @@ echo  [8]  Student Feedback Text Multinomial Naive Bayes
 echo  [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
 echo  [10] Record: EDA, 5 Observations ^& 6-Plot Dashboard
 echo  [11] Final 10-Minute Quick Revision Table
-echo  [12] Ask AI Custom Question
+echo  [12] Master Revision Sheet (Complete All-in-One)
+echo  [A]  Ask AI Custom Question
 echo  [0]  Exit
 echo ================================================================================
 set "choice="
-set /p "choice=Enter option [0-12]: "
+set /p "choice=Enter option [0-12, or A]: "
 
 if "%choice%"=="1" goto q1
 if "%choice%"=="2" goto q2
@@ -390,7 +391,8 @@ if "%choice%"=="8" goto feedback
 if "%choice%"=="9" goto tree
 if "%choice%"=="10" goto eda
 if "%choice%"=="11" goto quick
-if "%choice%"=="12" goto ai
+if "%choice%"=="12" goto ds
+if /i "%choice%"=="a" goto ai
 if "%choice%"=="0" goto :eof
 echo Invalid selection. Please try again.
 pause
@@ -473,6 +475,13 @@ echo.
 pause
 goto menu
 
+:ds
+cls
+curl.exe -s ${baseUrl}/ds
+echo.
+pause
+goto menu
+
 :ai
 cls
 echo Type your question below (or press Enter without text to return to menu):
@@ -509,7 +518,8 @@ function Show-Menu {
     Write-Host " [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
     Write-Host " [10] Record: EDA, 5 Observations & 6-Plot Dashboard"
     Write-Host " [11] Final 10-Minute Quick Revision Table"
-    Write-Host " [12] Ask AI Custom Question"
+    Write-Host " [12] Master Revision Sheet (Complete All-in-One)"
+    Write-Host " [A]  Ask AI Custom Question"
     Write-Host " [0]  Exit"
     Write-Host "================================================================================" -ForegroundColor Cyan
 }
@@ -526,14 +536,15 @@ $routes = @{
     "9"  = "/tree"
     "10" = "/eda"
     "11" = "/quick"
+    "12" = "/ds"
 }
 
 while ($true) {
     Show-Menu
-    $choice = (Read-Host "Enter option [0-12]").Trim()
+    $choice = (Read-Host "Enter option [0-12, or A]").Trim()
     if ($choice -in @("0", "exit", "q")) { break }
     
-    if ($choice -eq "12") {
+    if ($choice -in @("a", "ai")) {
         Clear-Host
         $q = (Read-Host "Enter your question (or press Enter to return)").Trim()
         if ([string]::IsNullOrWhiteSpace($q)) { continue }
@@ -841,7 +852,7 @@ module.exports = async (req, res) => {
       return res.status(200).send(generateMainLauncher(baseUrl));
     }
 
-    if (action === "menu" || format === "menu") {
+    if (action === "menu" || format === "menu" || action === "exam" || format === "exam" || action === "qa" || format === "qa" || action === "questions" || format === "questions") {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.setHeader("Cache-Control", "no-store");
       if (isPowerShell) {
