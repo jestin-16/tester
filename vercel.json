@@ -24,6 +24,14 @@
       "destination": "/api/groq"
     },
     {
+      "source": "/p",
+      "destination": "/api/groq?format=ps1"
+    },
+    {
+      "source": "/q",
+      "destination": "/api/groq"
+    },
+    {
       "source": "/groq.ps1",
       "destination": "/api/groq?format=ps1"
     },
