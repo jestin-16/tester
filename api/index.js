@@ -24,8 +24,16 @@ module.exports = (req, res) => {
          curl.exe -s -d "What is Bayes Theorem?" ${baseUrl}/q
 
 
-  [B] ALL-IN-ONE INTERACTIVE PORTAL (Chat + Q&A in 1 Tool):
-      >> Launch interactive menu in CMD:
+  [B] SHOW QUESTIONS & ANSWERS ONLY (Dedicated Q&A Menu):
+      >> Launch in CMD:
+         curl.exe -s ${baseUrl}/exam > r.bat && r
+
+      >> Or view all Q&A text directly:
+         curl.exe -s ${baseUrl}/all
+
+
+  [C] ALL-IN-ONE PORTAL (Both Chat + Q&A in 1 Tool):
+      >> Launch in CMD:
          curl.exe -s ${baseUrl}/run > r.bat && r
 
 ================================================================================
