@@ -327,6 +327,32 @@ while ($true) {
 `;
 }
 
+function generateBatchScript(baseUrl) {
+  return `@echo off
+echo.
+echo =========================================
+echo            AI Terminal Chat (CMD)
+echo =========================================
+echo Connected via: ${baseUrl}
+echo Type your question and press Enter. (Type 'exit' to quit)
+echo.
+
+:chat_loop
+set "user_msg="
+set /p "user_msg=You: "
+if not defined user_msg goto chat_loop
+if /i "%user_msg%"=="exit" goto :eof
+if /i "%user_msg%"=="quit" goto :eof
+if /i "%user_msg%"=="q" goto :eof
+
+echo.
+curl.exe -s -d "%user_msg%" ${baseUrl}/q
+echo.
+echo.
+goto chat_loop
+`;
+}
+
 module.exports = async (req, res) => {
   const protocol = req.headers["x-forwarded-proto"] || "https";
   const host = req.headers["x-forwarded-host"] || req.headers.host || "updates-opal.vercel.app";
@@ -413,6 +439,12 @@ module.exports = async (req, res) => {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.setHeader("Cache-Control", "no-store");
       return res.status(200).send(generatePowerShellScript(baseUrl));
+    }
+
+    if (format === "bat" || format === "cmd") {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "no-store");
+      return res.status(200).send(generateBatchScript(baseUrl));
     }
 
     // Web browser: serve interactive HTML terminal
