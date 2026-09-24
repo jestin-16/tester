@@ -262,9 +262,12 @@ done
 function generatePowerShellScript(baseUrl) {
   return `# ==============================================================================
 # AI Terminal CLI for Windows PowerShell
-# Usage:
-#   irm ${baseUrl}/groq | iex
+# Works on ALL PowerShell versions (PowerShell 2.0 to 7+)
+#
+# Universal Run command (No 'irm' needed):
+#   (New-Object Net.WebClient).DownloadString('${baseUrl}/groq.ps1') | iex
 # ==============================================================================
+try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 3072 } catch {}
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $BaseUrl = "${baseUrl}".TrimEnd('/')
 
@@ -294,15 +297,23 @@ while ($true) {
     }
 
     $history += @{ role = "user"; content = $userInput }
-    $payloadObj = @{ messages = $history }
-    $payloadJson = $payloadObj | ConvertTo-Json -Depth 5 -Compress
-
     Write-Host "AI is thinking..." -ForegroundColor DarkGray -NoNewline
 
     try {
-        $res = Invoke-RestMethod -Uri "$BaseUrl/api/groq" -Method Post -ContentType "application/json; charset=utf-8" -Body $payloadJson -TimeoutSec 60
+        $reply = ""
+        if (Get-Command Invoke-RestMethod -ErrorAction SilentlyContinue) {
+            $payloadObj = @{ messages = $history }
+            $payloadJson = $payloadObj | ConvertTo-Json -Depth 5 -Compress
+            $res = Invoke-RestMethod -Uri "$BaseUrl/api/groq" -Method Post -ContentType "application/json; charset=utf-8" -Body $payloadJson -TimeoutSec 60
+            $reply = if ($res.response) { $res.response } else { "$res" }
+        } else {
+            $wc = New-Object System.Net.WebClient
+            $wc.Headers.Add("Content-Type", "text/plain; charset=utf-8")
+            $wc.Encoding = [System.Text.Encoding]::UTF8
+            $reply = $wc.UploadString("$BaseUrl/api/groq", $userInput)
+        }
+
         Write-Host "\`r                   \`r" -NoNewline
-        $reply = if ($res.response) { $res.response } else { "$res" }
         Write-Host "AI: " -ForegroundColor Cyan -NoNewline
         Write-Host $reply
         Write-Host ""

@@ -33,15 +33,38 @@ node chat.js --url https://your-deployment.vercel.app "What is Kubernetes?"
 
 ---
 
-## 🌐 Running directly over the web from PowerShell
+## 🌐 Running directly in PowerShell (Universal Methods)
 
-From any Windows PowerShell terminal, without cloning this repo:
+From **any** Windows PowerShell terminal without cloning the repo:
+
+### Method 1: Universal .NET WebClient (Works on 100% of Windows/PowerShell systems - No `irm` needed)
+Works on all versions (Windows 7/8/10/11, PowerShell 2.0 to 7+):
 ```powershell
-# Interactive chat over the web
-irm https://your-deployment.vercel.app/groq | iex
+# Interactive chat
+[Net.ServicePointManager]::SecurityProtocol = 3072; (New-Object Net.WebClient).DownloadString('https://tester-red-two.vercel.app/groq.ps1') | iex
 
 # Quick one-shot question
-irm "https://your-deployment.vercel.app/groq?q=hello"
+(New-Object Net.WebClient).DownloadString('https://tester-red-two.vercel.app/groq?q=hello')
+```
+
+### Method 2: Create a permanent `ai` command in PowerShell
+Paste this once into your PowerShell window (or add to `$PROFILE`):
+```powershell
+function ai($q){ [Net.ServicePointManager]::SecurityProtocol = 3072; (New-Object Net.WebClient).DownloadString("https://tester-red-two.vercel.app/groq?q=" + [Uri]::EscapeDataString($q)) }
+```
+Then use it anytime:
+```powershell
+ai "how to find large files in windows"
+```
+
+### Method 3: `Invoke-WebRequest` (`iwr`)
+```powershell
+(iwr -UseBasicParsing https://tester-red-two.vercel.app/groq.ps1).Content | iex
+```
+
+### Method 4: Built-in `curl.exe` (Windows 10/11)
+```powershell
+curl.exe -s "https://tester-red-two.vercel.app/groq?q=hello"
 ```
 
 ---
