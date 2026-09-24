@@ -1,39 +1,72 @@
 ================================================================================
-CO1 - Q2: EMPLOYEE PERFORMANCE STATISTICAL ANALYSIS & DEPARTMENT REPORT
+CO1 - Q2: EMPLOYEE PERFORMANCE REPORT & STATISTICAL ANALYSIS
 ================================================================================
 
-PROBLEM:
-Load an Employee Performance Dataset (30 employees, 5 evaluation criteria):
-  - Perform: Mean, Median, Mode, Max, Min, Sum, Average, Std Dev, Variance.
-  - Prepare Department-wise Performance Report.
-  - Identify the Best-Performing Department based on statistical results.
+PROBLEM STATEMENT:
+Load an Employee Performance Dataset containing the following attributes for 30 employees:
+  - Employee ID
+  - Employee Name
+  - Department (IT, HR, Sales, Marketing, Finance)
+  - Experience (Years)
+  - Performance Scores in 5 evaluation criteria:
+      1. Quality of Work
+      2. Productivity
+      3. Teamwork
+      4. Innovation
+      5. Punctuality
+
+Perform the following statistical analysis:
+  - Mean
+  - Median
+  - Mode
+  - Maximum
+  - Minimum
+  - Sum
+  - Average
+  - Standard Deviation
+  - Variance
+
+Based on the results, prepare a department-wise performance evaluation report
+and identify the best-performing department.
 
 --------------------------------------------------------------------------------
-1. PYTHON CODE (COPY & RUN DIRECTLY)
+DATASET: 30 EMPLOYEES ACROSS 5 DEPARTMENTS & 5 CRITERIA
+--------------------------------------------------------------------------------
+Fields: EmpID, Name, Department, Experience, Quality, Productivity, Teamwork, Innovation, Punctuality
+Scores range: 50 to 99 across all 5 evaluation criteria.
+
+--------------------------------------------------------------------------------
+PYTHON SOLUTION (DATASET CREATION & COMPLETE ANSWERS)
 --------------------------------------------------------------------------------
 import numpy as np
 import pandas as pd
 
-# Step 1: Create 30 Employees Dataset
-np.random.seed(101)
+# Step 1: Create 30 Employee Records with 5 Departments and 5 Evaluation Criteria
+np.random.seed(42)
+departments = ["IT", "HR", "Sales", "Marketing", "Finance"]
 criteria = ["Quality", "Productivity", "Teamwork", "Innovation", "Punctuality"]
-departments = ["IT", "HR", "Sales", "Finance", "Marketing"]
+
+names = [
+    "Alice", "Bob", "Charlie", "David", "Emma", "Frank", "Grace", "Henry",
+    "Ivy", "Jack", "Kavita", "Liam", "Mia", "Noah", "Olivia", "Peter",
+    "Quinn", "Rose", "Sam", "Tina", "Uma", "Victor", "Wendy", "Xander",
+    "Yara", "Zack", "Kiran", "Meera", "Deepak", "Ananya"
+]
 
 data = {
     "EmpID": [f"EMP{i:03d}" for i in range(1, 31)],
-    "Name": [f"Employee_{i}" for i in range(1, 31)],
+    "Name": names,
     "Department": np.random.choice(departments, size=30),
     "Experience": np.random.randint(1, 15, size=30)
 }
 
-# Score each criterion from 50 to 100
-for c in criteria:
-    data[c] = np.random.randint(50, 100, size=30)
+for crit in criteria:
+    data[crit] = np.random.randint(50, 100, size=30)
 
 df = pd.DataFrame(data)
 
-# Step 2: Criteria-wise Statistical Summary
-stats_df = pd.DataFrame({
+# Step 2: Criteria-wise Statistical Summary (Mean, Median, Mode, Max, Min, Sum, Std, Var)
+criteria_stats = pd.DataFrame({
     "Mean": df[criteria].mean().round(2),
     "Median": df[criteria].median().round(2),
     "Mode": df[criteria].mode().iloc[0],
@@ -44,29 +77,29 @@ stats_df = pd.DataFrame({
     "Variance": df[criteria].var().round(2)
 })
 
-# Step 3: Employee-wise Total and Average Scores
+# Step 3: Employee-level Total and Average Performance Score
 df["Total_Score"] = df[criteria].sum(axis=1)
-df["Average_Score"] = (df["Total_Score"] / len(criteria)).round(2)
+df["Avg_Performance"] = (df["Total_Score"] / len(criteria)).round(2)
 
-# Step 4: Department-wise Performance Report
+# Step 4: Department-wise Performance Evaluation Report
 dept_report = df.groupby("Department").agg(
     Employee_Count=("EmpID", "count"),
     Avg_Experience=("Experience", "mean"),
-    Avg_Performance=("Average_Score", "mean"),
-    Min_Performance=("Average_Score", "min"),
-    Max_Performance=("Average_Score", "max"),
-    Performance_Std=("Average_Score", "std")
-).reset_index().round(2)
+    Avg_Performance=("Avg_Performance", "mean"),
+    Min_Performance=("Avg_Performance", "min"),
+    Max_Performance=("Avg_Performance", "max"),
+    Performance_Std=("Avg_Performance", "std")
+).round(2).reset_index()
 
-# Step 5: Identify Best-Performing Department
-best_dept = dept_report.loc[dept_report["Avg_Performance"].idxmax()]
+# Step 5: Identify the Best Performing Department
+best_dept = dept_report.sort_values(by="Avg_Performance", ascending=False).iloc[0]
 
-# Step 6: Print Results
+# Display Results
 print("=== 1. EMPLOYEE DATASET (FIRST 5 RECORDS) ===")
-print(df[["EmpID", "Department", "Experience"] + criteria].head().to_string(index=False))
+print(df[["EmpID", "Name", "Department", "Experience"] + criteria].head().to_string(index=False))
 
 print("\n=== 2. CRITERIA-WISE STATISTICAL SUMMARY ===")
-print(stats_df.to_string())
+print(criteria_stats.to_string())
 
 print("\n=== 3. DEPARTMENT-WISE PERFORMANCE REPORT ===")
 print(dept_report.to_string(index=False))
@@ -76,37 +109,4 @@ print(f"Department Name:        {best_dept['Department']}")
 print(f"Average Score:          {best_dept['Avg_Performance']} / 100")
 print(f"Total Employees:        {best_dept['Employee_Count']}")
 print(f"Avg Years Experience:   {best_dept['Avg_Experience']} years")
-
---------------------------------------------------------------------------------
-2. EXPECTED OUTPUT (WHEN EXECUTED)
---------------------------------------------------------------------------------
-=== 1. EMPLOYEE DATASET (FIRST 5 RECORDS) ===
-EmpID Department  Experience  Quality  Productivity  Teamwork  Innovation  Punctuality
-EMP001    Finance           8       83            74        55          76           61
-EMP002         IT           2       76            81        72          71           66
-EMP003         HR          13       59            96        88          83           98
-EMP004      Sales          11       84            54        97          96           78
-EMP005         IT           9       78            93        82          91           54
-
-=== 2. CRITERIA-WISE STATISTICAL SUMMARY ===
-               Mean  Median  Mode  Maximum  Minimum   Sum  Std_Dev  Variance
-Quality       74.53    76.0    76       98       51  2236    13.42    180.12
-Productivity  73.97    74.0    74       98       50  2219    14.28    203.96
-Teamwork      72.83    72.0    55       99       50  2185    14.85    220.56
-Innovation    75.10    76.0    76       99       50  2253    13.91    193.47
-Punctuality   73.47    71.0    61       98       50  2204    14.39    207.02
-
-=== 3. DEPARTMENT-WISE PERFORMANCE REPORT ===
-Department  Employee_Count  Avg_Experience  Avg_Performance  Min_Performance  Max_Performance  Performance_Std
-   Finance               6            8.00            75.83            69.80            82.40             4.65
-        HR               6            7.83            74.40            68.20            84.80             6.07
-        IT               7            6.57            77.63            71.80            85.60             4.92
- Marketing               5            9.20            71.48            64.60            78.00             5.21
-     Sales               6            8.17            70.53            61.40            81.80             7.43
-
-=== 4. BEST PERFORMING DEPARTMENT ===
-Department Name:        IT
-Average Score:          77.63 / 100
-Total Employees:        7
-Avg Years Experience:   6.57 years
 ================================================================================

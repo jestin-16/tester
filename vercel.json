@@ -87,54 +87,62 @@
     },
     {
       "source": "/5",
-      "destination": "/files/knn_scratch.txt"
+      "destination": "/files/record_eda.txt"
     },
     {
       "source": "/05",
-      "destination": "/files/knn_scratch.txt"
+      "destination": "/files/record_eda.txt"
     },
     {
       "source": "/6",
-      "destination": "/files/bayes_problem.txt"
+      "destination": "/files/record_dash.txt"
     },
     {
       "source": "/06",
-      "destination": "/files/bayes_problem.txt"
+      "destination": "/files/record_dash.txt"
     },
     {
       "source": "/7",
-      "destination": "/files/weather_laplace.txt"
+      "destination": "/files/record_full_eda.txt"
     },
     {
       "source": "/07",
-      "destination": "/files/weather_laplace.txt"
+      "destination": "/files/record_full_eda.txt"
     },
     {
       "source": "/8",
-      "destination": "/files/feedback_nb.txt"
+      "destination": "/files/knn_scratch.txt"
     },
     {
       "source": "/08",
-      "destination": "/files/feedback_nb.txt"
+      "destination": "/files/knn_scratch.txt"
     },
     {
       "source": "/9",
-      "destination": "/files/decision_tree.txt"
+      "destination": "/files/bayes_problem.txt"
     },
     {
       "source": "/09",
-      "destination": "/files/decision_tree.txt"
+      "destination": "/files/bayes_problem.txt"
     },
     {
       "source": "/10",
-      "destination": "/files/eda_record.txt"
+      "destination": "/files/weather_laplace.txt"
     },
     {
       "source": "/11",
-      "destination": "/files/quick.txt"
+      "destination": "/files/feedback_nb.txt"
     },
     {
       "source": "/12",
+      "destination": "/files/decision_tree.txt"
+    },
+    {
+      "source": "/13",
+      "destination": "/files/quick.txt"
+    },
+    {
+      "source": "/14",
       "destination": "/files/ds.txt"
     },
     {
@@ -199,7 +207,27 @@
     },
     {
       "source": "/eda",
-      "destination": "/files/eda_record.txt"
+      "destination": "/files/record_eda.txt"
+    },
+    {
+      "source": "/eda1",
+      "destination": "/files/record_eda.txt"
+    },
+    {
+      "source": "/dash",
+      "destination": "/files/record_dash.txt"
+    },
+    {
+      "source": "/eda2",
+      "destination": "/files/record_dash.txt"
+    },
+    {
+      "source": "/eda3",
+      "destination": "/files/record_full_eda.txt"
+    },
+    {
+      "source": "/full",
+      "destination": "/files/record_full_eda.txt"
     },
     {
       "source": "/quick",

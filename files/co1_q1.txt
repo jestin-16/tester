@@ -2,20 +2,37 @@
 CO1 - Q1: STUDENT DATASET STATISTICAL ANALYSIS
 ================================================================================
 
-PROBLEM:
-Load a student dataset containing 25 students with 5 subjects:
-  - Calculate Mean, Median, Mode, Max, Min, Sum for each subject.
-  - Calculate Total marks and Average marks for each student.
-  - Determine overall Class Average.
-  - Prepare a Class Performance Evaluation report based on statistical results.
+PROBLEM STATEMENT:
+Load a student dataset containing the details of 25 students with the following fields:
+  - Student ID
+  - Student Name
+  - Marks obtained in 5 subjects (Maths, Physics, Chemistry, English, CS)
+
+Perform the following statistical analyses on the dataset:
+  1. Calculate the Mean of marks for each subject.
+  2. Calculate the Median of marks for each subject.
+  3. Calculate the Mode of marks for each subject.
+  4. Find the Maximum mark obtained in each subject.
+  5. Find the Minimum mark obtained in each subject.
+  6. Calculate the Sum of marks for each subject.
+  7. Calculate the Average marks for each student.
+  8. Calculate the Total marks for each student.
+  9. Determine the overall Class Average.
+ 10. Prepare a Class Performance Evaluation based on the statistical results.
 
 --------------------------------------------------------------------------------
-1. PYTHON CODE (COPY & RUN DIRECTLY)
+DATASET: 25 STUDENTS WITH 5 SUBJECTS
+--------------------------------------------------------------------------------
+Fields: StudentID, Name, Maths, Physics, Chemistry, English, CS
+Marks range: 45 to 99 across all 5 subjects.
+
+--------------------------------------------------------------------------------
+PYTHON SOLUTION (DATASET CREATION & COMPLETE ANSWERS)
 --------------------------------------------------------------------------------
 import numpy as np
 import pandas as pd
 
-# Step 1: Create 25 Students and 5 Subjects with reproducible marks
+# Step 1: Create Dataset with 25 Students and 5 Subjects
 np.random.seed(42)
 subjects = ["Maths", "Physics", "Chemistry", "English", "CS"]
 
@@ -35,7 +52,7 @@ for sub in subjects:
 
 df = pd.DataFrame(data)
 
-# Step 2: Subject-wise Statistical Analysis
+# Step 2: Subject-wise Statistical Analysis (Mean, Median, Mode, Max, Min, Sum)
 sub_stats = pd.DataFrame({
     "Mean": df[subjects].mean().round(2),
     "Median": df[subjects].median().round(2),
@@ -65,7 +82,7 @@ def evaluate_performance(avg):
 
 df["Performance"] = df["Average_Marks"].apply(evaluate_performance)
 
-# Step 6: Print All Results
+# Display Results
 print("=== 1. STUDENT DATASET (FIRST 5 RECORDS) ===")
 print(df[["StudentID", "Name"] + subjects].head().to_string(index=False))
 
@@ -80,37 +97,4 @@ print(df["Performance"].value_counts().to_string())
 print("\n=== 5. TOP 3 PERFORMERS ===")
 top_3 = df.sort_values(by="Total_Marks", ascending=False).head(3)
 print(top_3[["StudentID", "Name", "Total_Marks", "Average_Marks", "Performance"]].to_string(index=False))
-
---------------------------------------------------------------------------------
-2. EXPECTED OUTPUT (WHEN EXECUTED)
---------------------------------------------------------------------------------
-=== 1. STUDENT DATASET (FIRST 5 RECORDS) ===
-StudentID   Name  Maths  Physics  Chemistry  English  CS
-   STU001  Aarav     83       77         76       58  93
-   STU002  Aditi     96       79         65       81  68
-   STU003 Bhavya     60       68         78       81  74
-   STU004 Chetan     52       77         57       64  83
-   STU005  Divya     91       55         91       78  62
-
-=== 2. SUBJECT-WISE STATISTICAL ANALYSIS ===
-            Mean  Median  Mode  Maximum  Minimum   Sum
-Maths      73.44    76.0    83       98       46  1836
-Physics    71.20    72.0    65       97       47  1780
-Chemistry  69.88    69.0    54       96       45  1747
-English    72.60    75.0    81       98       48  1815
-CS         73.12    71.0    93       98       45  1828
-
-=== 3. OVERALL CLASS AVERAGE: 72.05 ===
-
-=== 4. CLASS PERFORMANCE EVALUATION SUMMARY ===
-Performance
-First Class          16
-Second Class          6
-Distinction           3
-
-=== 5. TOP 3 PERFORMERS ===
-StudentID   Name  Total_Marks  Average_Marks Performance
-   STU001  Aarav          387          77.40 First Class
-   STU002  Aditi          389          77.80 First Class
-   STU010 Ishaan          431          86.20 Distinction
 ================================================================================

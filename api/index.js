@@ -33,18 +33,20 @@ module.exports = (req, res) => {
 ================================================================================
  VIEW DIRECT QUESTIONS (Use: curl.exe -s ${baseUrl}/<num>  OR  irm ${baseUrl}/<num>):
 ================================================================================
-   * ${baseUrl}/1   -> CO1 Q1: Student Dataset Stats (25 Students)
-   * ${baseUrl}/2   -> CO1 Q2: Employee Performance & Best Dept
-   * ${baseUrl}/3   -> CO1 Q3: 30-Record Pandas Workflow (Impute, Rank)
-   * ${baseUrl}/4   -> Q4: All 13 Visualizations (Matplotlib & Seaborn)
-   * ${baseUrl}/5   -> k-NN Classifier From Scratch (All 5 Metrics)
-   * ${baseUrl}/6   -> Bayes Theorem (Clinical Liver Disease Problem)
-   * ${baseUrl}/7   -> Weather Prediction (Naive Bayes & Laplace)
-   * ${baseUrl}/8   -> Student Feedback Text Multinomial Naive Bayes
-   * ${baseUrl}/9   -> Decision Tree C5.0 (Loan Eligibility Rules)
-   * ${baseUrl}/10  -> Record EDA, 5 Observations & 6-Plot Dashboard
-   * ${baseUrl}/11  -> 10-Minute Quick Summary Table
-   * ${baseUrl}/12  -> Master Revision Sheet (Complete All-in-One: /all)
+   * ${baseUrl}/1   -> [CO1 Q1] Student Dataset Stats (25 Students)
+   * ${baseUrl}/2   -> [CO1 Q2] Employee Performance Report & Best Department (30 Emps)
+   * ${baseUrl}/3   -> [CO1 Q3] 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
+   * ${baseUrl}/4   -> [Q4] All 13 Visualization Exercises (Matplotlib & Seaborn)
+   * ${baseUrl}/5   -> [Record 1] Exploratory Data Visualization (7 Plots & 5 Observations)
+   * ${baseUrl}/6   -> [Record 2] Unified 6-Plot Dashboard & Report
+   * ${baseUrl}/7   -> [Record 3] Public Dataset EDA (100+ Records & Insights)
+   * ${baseUrl}/8   -> [k-NN] Classification From Scratch (All Metrics, Parts A-E)
+   * ${baseUrl}/9   -> [Bayes] Clinical Liver Disease Calculation & Derivation
+   * ${baseUrl}/10  -> [Weather] Weather Prediction with Laplace Estimator
+   * ${baseUrl}/11  -> [Feedback] Student Feedback Text Multinomial Naive Bayes
+   * ${baseUrl}/12  -> [Decision Tree] C5.0 Algorithm (Loan Eligibility & Rules)
+   * ${baseUrl}/13  -> [Summary] 10-Minute Final Revision Summary Table
+   * ${baseUrl}/14  -> [Master] Complete All-in-One Revision Sheet (/all)
 ================================================================================
 `;
 

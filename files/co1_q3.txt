@@ -1,73 +1,96 @@
 ================================================================================
-CO1 - Q3: 30-RECORD PANDAS DATASET WORKFLOW (CLEAN, IMPUTE, RANK, EXPORT)
+CO1 - Q3: 30-RECORD PANDAS WORKFLOW (CLEAN, IMPUTE, RANK & EXPORT)
 ================================================================================
 
-PROBLEM:
-Perform 12 essential data operations on a 30+ record dataset:
-  1. Load dataset, display shape, columns, and data types
-  2. Display head(5) and tail(5)
-  3. Check and drop duplicate records
-  4. Impute missing values (Mean for numerical, Mode for categorical)
-  5. Statistical summary using describe()
-  6. Add calculated columns (Total_Marks and Average_Marks)
-  7. Add Grade classification column (A, B, C, Fail)
-  8. Display Top 5 and Bottom 5 performers
-  9. Groupby Department analysis
-  10. Filter students performing above overall class average
-  11. Rank students by Total_Marks (dense ranking)
-  12. Export final clean dataset to 'Processed_Report.csv'
+PROBLEM STATEMENT:
+Download or create a CSV dataset containing at least 30 records.
+Write a Python program using the Pandas library to perform the following tasks:
+  1. Load the dataset and display its dimensions, column names, and data types.
+  2. Display the first five and last five records.
+  3. Check whether the dataset contains duplicate records. If duplicates exist,
+     remove them and display the updated number of records.
+  4. Identify missing values in each column. Fill missing numerical values with
+     the column mean and missing categorical values with the mode.
+  5. Generate the statistical summary of the numerical columns.
+  6. Create a new calculated column based on the dataset (Total Marks, Average).
+  7. Add another column that classifies each record into categories (Grade).
+  8. Find the top five and bottom five records based on the calculated column.
+  9. Calculate the mean, median, mode, standard deviation, and variance of the
+     main numerical column.
+ 10. Group the dataset by one categorical column and calculate the average,
+     maximum, and minimum values of another numerical column.
+ 11. Display only those records whose numerical value is greater than the overall average.
+ 12. Rank the records based on the numerical column and display the top three ranked records.
+ 13. Export the processed dataset to a new CSV file named Processed_Report.csv.
 
 --------------------------------------------------------------------------------
-1. PYTHON CODE (COPY & RUN DIRECTLY)
+DATASET: 32 RECORDS WITH INTENTIONAL MISSING VALUES & DUPLICATES
+--------------------------------------------------------------------------------
+Fields: StudentID, Name, Department, Maths, Science, English
+
+--------------------------------------------------------------------------------
+PYTHON SOLUTION (DATASET CREATION & COMPLETE ANSWERS)
 --------------------------------------------------------------------------------
 import numpy as np
 import pandas as pd
 
-# Step 0: Generate sample CSV with 32 records (with duplicates & missing values)
+# Step 1: Create 32-row Dataset (30 unique + 2 duplicates + intentional missing values)
 np.random.seed(42)
-raw_data = {
-    "StudentID": [f"S{i:03d}" for i in range(1, 31)] + ["S005", "S012"],
-    "Name": [f"Student_{i}" for i in range(1, 31)] + ["Student_5", "Student_12"],
-    "Department": np.random.choice(["CSE", "ECE", "IT", "MECH"], size=32),
-    "Maths": np.random.randint(40, 100, size=32).astype(float),
-    "Science": np.random.randint(40, 100, size=32).astype(float),
-    "English": np.random.randint(40, 100, size=32).astype(float)
-}
-# Inject missing values for demonstration
-raw_data["Maths"][2] = np.nan
-raw_data["Science"][7] = np.nan
-raw_data["Department"][15] = None
+departments = ["CSE", "ECE", "MECH", "IT"]
 
-pd.DataFrame(raw_data).to_csv("Raw_Students.csv", index=False)
+records = []
+for i in range(1, 31):
+    records.append({
+        "StudentID": f"S{i:03d}",
+        "Name": f"Student_{i}",
+        "Department": np.random.choice(departments),
+        "Maths": float(np.random.randint(40, 100)),
+        "Science": float(np.random.randint(40, 100)),
+        "English": float(np.random.randint(40, 100))
+    })
 
-# 1. Load dataset, display dimensions, columns, and dtypes
-df = pd.read_csv("Raw_Students.csv")
-print("1. Shape:", df.shape)
-print("   Columns:", list(df.columns))
+# Add 2 duplicate rows
+records.append(records[0].copy())
+records.append(records[5].copy())
+
+df_raw = pd.DataFrame(records)
+
+# Introduce realistic missing values (NaN)
+df_raw.loc[2, "Maths"] = np.nan
+df_raw.loc[7, "Science"] = np.nan
+df_raw.loc[12, "Department"] = np.nan
+df_raw.to_csv("students_raw.csv", index=False)
+
+# ------------------------------------------------------------------------------
+# PERFORM ALL 13 PANDAS OPERATIONS
+# ------------------------------------------------------------------------------
+
+# 1. Load dataset & inspect structure
+df = pd.read_csv("students_raw.csv")
+print("1. Shape (Dimensions):", df.shape)
+print("   Column Names:      ", list(df.columns))
 print("   Data Types:\n", df.dtypes)
 
 # 2. Display first 5 and last 5 records
-print("\n2. Head:\n", df.head(3))
-print("   Tail:\n", df.tail(3))
+print("\n2. First 5 Records:\n", df.head())
+print("\n   Last 5 Records:\n", df.tail())
 
 # 3. Check and remove duplicate records
-dups = df.duplicated().sum()
-print(f"\n3. Duplicate rows removed: {dups}")
-df = df.drop_duplicates()
+dup_count = df.duplicated().sum()
+df = df.drop_duplicates().reset_index(drop=True)
+print(f"\n3. Duplicate rows removed: {dup_count}. Updated records: {len(df)}")
 
-# 4. Handle Missing Values (Mean for numerical, Mode for categorical)
-for col in df.select_dtypes(include=[np.number]).columns:
+# 4. Identify & Impute missing values (Mean for numeric, Mode for categorical)
+print("\n4. Missing values before imputation:\n", df.isnull().sum())
+for col in ["Maths", "Science", "English"]:
     df[col] = df[col].fillna(df[col].mean().round(2))
+df["Department"] = df["Department"].fillna(df["Department"].mode()[0])
+print("   Missing values after imputation:\n", df.isnull().sum())
 
-for col in df.select_dtypes(include=["object"]).columns:
-    df[col] = df[col].fillna(df[col].mode()[0])
+# 5. Statistical Summary of numerical columns
+print("\n5. Statistical Summary:\n", df[["Maths", "Science", "English"]].describe().round(2))
 
-print(f"4. Missing values remaining: {df.isnull().sum().sum()}")
-
-# 5. Summary statistics
-print("\n5. Summary Statistics:\n", df.describe().round(2))
-
-# 6. Calculated Columns
+# 6. Create New Calculated Columns
 df["Total_Marks"] = df["Maths"] + df["Science"] + df["English"]
 df["Average_Marks"] = (df["Total_Marks"] / 3).round(2)
 
@@ -80,64 +103,34 @@ def get_grade(avg):
 
 df["Grade"] = df["Average_Marks"].apply(get_grade)
 
-# 8. Top 5 and Bottom 5
-print("\n8. Top 3 Performers:\n", df.sort_values(by="Total_Marks", ascending=False)[["StudentID", "Name", "Total_Marks", "Grade"]].head(3).to_string(index=False))
+# 8. Top 5 and Bottom 5 Records
+print("\n8. Top 5 Records:\n", df.sort_values(by="Total_Marks", ascending=False).head(5)[["StudentID", "Name", "Total_Marks", "Grade"]].to_string(index=False))
+print("\n   Bottom 5 Records:\n", df.sort_values(by="Total_Marks", ascending=True).head(5)[["StudentID", "Name", "Total_Marks", "Grade"]].to_string(index=False))
 
-# 9. Groupby Department
-print("\n9. Department Averages:\n", df.groupby("Department")[["Total_Marks", "Average_Marks"]].mean().round(2))
+# 9. Main Numerical Column Statistics (Total_Marks)
+total_stats = pd.Series({
+    "Mean": df["Total_Marks"].mean().round(2),
+    "Median": df["Total_Marks"].median().round(2),
+    "Mode": df["Total_Marks"].mode().iloc[0],
+    "Std_Dev": df["Total_Marks"].std().round(2),
+    "Variance": df["Total_Marks"].var().round(2)
+})
+print("\n9. Total_Marks Statistics:\n", total_stats)
 
-# 10. Filter above class average
-class_mean = df["Average_Marks"].mean()
-above_avg = df[df["Average_Marks"] > class_mean]
-print(f"\n10. Students Above Class Average ({class_mean:.2f}): {len(above_avg)} students")
+# 10. Groupby Department and calculate Avg, Max, Min of Total_Marks
+dept_summary = df.groupby("Department")["Total_Marks"].agg(["mean", "max", "min"]).round(2)
+print("\n10. Department-wise Summary of Total Marks:\n", dept_summary)
 
-# 11. Rank Students
+# 11. Records greater than overall Average
+class_avg = df["Average_Marks"].mean()
+above_avg_df = df[df["Average_Marks"] > class_avg]
+print(f"\n11. Records with Average > Class Average ({class_avg:.2f}):\n", above_avg_df[["StudentID", "Name", "Department", "Average_Marks"]].head().to_string(index=False))
+
+# 12. Rank records and display Top 3
 df["Rank"] = df["Total_Marks"].rank(ascending=False, method="dense").astype(int)
+print("\n12. Top 3 Ranked Students:\n", df.sort_values("Rank").head(3)[["Rank", "StudentID", "Name", "Total_Marks", "Grade"]].to_string(index=False))
 
-# 12. Export to CSV
+# 13. Export processed dataset to Processed_Report.csv
 df.sort_values(by="Rank").to_csv("Processed_Report.csv", index=False)
-print("\n12. Successfully exported clean dataset to 'Processed_Report.csv'.")
-
---------------------------------------------------------------------------------
-2. EXPECTED OUTPUT (WHEN EXECUTED)
---------------------------------------------------------------------------------
-1. Shape: (32, 6)
-   Columns: ['StudentID', 'Name', 'Department', 'Maths', 'Science', 'English']
-   Data Types:
-   StudentID      object
-   Name           object
-   Department     object
-   Maths         float64
-   Science       float64
-   English       float64
-   dtype: object
-
-3. Duplicate rows removed: 2
-4. Missing values remaining: 0
-
-5. Summary Statistics:
-        Maths  Science  English
-count   30.00    30.00    30.00
-mean    69.83    71.45    68.90
-std     17.15    16.20    18.42
-min     41.00    42.00    40.00
-50%     71.00    73.00    67.50
-max     99.00    98.00    99.00
-
-8. Top 3 Performers:
-StudentID      Name  Total_Marks   Grade
-     S007 Student_7        271.0 Grade A
-     S018 Student_18       267.0 Grade A
-     S012 Student_12       261.0 Grade A
-
-9. Department Averages:
-            Total_Marks  Average_Marks
-Department                            
-CSE              212.75          70.92
-ECE              208.33          69.44
-IT               205.12          68.38
-MECH             215.86          71.95
-
-10. Students Above Class Average (70.06): 16 students
-12. Successfully exported clean dataset to 'Processed_Report.csv'.
+print("\n13. Successfully exported processed dataset to 'Processed_Report.csv'.")
 ================================================================================

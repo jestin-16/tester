@@ -1,111 +1,184 @@
 ================================================================================
-k-NEAREST NEIGHBOURS (k-NN) PIPELINE ENTIRELY FROM SCRATCH
+EXPERIMENT (06-08-2026): k-NEAREST NEIGHBOUR (k-NN) CLASSIFICATION FROM SCRATCH
 ================================================================================
 
-PROBLEM:
-Predict Cardiovascular Disease Risk (High Risk vs Low Risk) entirely from scratch:
-  - Part A: IQR Outlier Removal, Label Encoding, Min-Max Normalization.
-  - Part B: 5 Distance Functions (Euclidean, Manhattan, Minkowski, Cosine, Chebyshev).
-  - Part C: Custom k-NN Classifier (Zero scikit-learn).
-  - Part D: Distance-Weighted k-NN.
-  - Part E: Model Evaluation for k = 1 to 19.
+PROBLEM STATEMENT:
+A healthcare organization has collected medical information from patients to predict
+whether a person is at High Risk or Low Risk for cardiovascular disease. Develop a
+complete machine learning pipeline using the k-Nearest Neighbour (k-NN) algorithm
+implemented entirely from scratch (WITHOUT using sklearn's KNeighborsClassifier).
+Only NumPy, Pandas, Matplotlib, and Seaborn may be used.
+
+DATASET ATTRIBUTES:
+  - Age: Age of patient (years)
+  - Gender: Male / Female
+  - Height: cm
+  - Weight: kg
+  - BMI: Body Mass Index (kg/m^2)
+  - BloodPressure: mmHg (systolic)
+  - Glucose: mg/dL
+  - Cholesterol: mg/dL
+  - Smoking: Yes / No
+  - Alcohol: Yes / No
+  - ExerciseLevel: Low / Medium / High
+  - FamilyHistory: Yes / No
+  - HeartRate: beats/min
+  - RiskClass: High Risk / Low Risk (Target)
+
+PIPELINE MODULES IMPLEMENTED FROM SCRATCH:
+  - Part A: Data Preparation (Missing value handling, Outlier removal via IQR, Encoding, Min-Max & Z-Score Scaling)
+  - Part B: 5 Distance Functions (Euclidean, Manhattan, Minkowski, Cosine, Chebyshev)
+  - Part C: Standard Majority-Vote k-NN Classifier
+  - Part D: Distance-Weighted k-NN (Weight = 1 / (Distance + 0.0001))
+  - Part E: Evaluation across k = 1, 3, 5, 7, 9, 11, 13, 15, 17, 19
 
 --------------------------------------------------------------------------------
-1. PYTHON CODE (COPY & RUN DIRECTLY)
+PYTHON SOLUTION (COMPLETE CODE IMPLEMENTED FROM SCRATCH)
 --------------------------------------------------------------------------------
 import numpy as np
 import pandas as pd
+import math
 
-# Step 1: Create 60-Patient Healthcare Dataset
+# ==============================================================================
+# PART A: DATASET CREATION & PREPARATION
+# ==============================================================================
 np.random.seed(42)
 n = 60
 
 data = {
-    "Age": np.random.randint(30, 80, size=n),
-    "Gender": np.random.choice([1, 0], size=n),  # 1: Male, 0: Female
-    "BMI": np.random.normal(27, 5, size=n).round(1),
-    "BloodPressure": np.random.randint(100, 180, size=n),
-    "Glucose": np.random.randint(70, 200, size=n),
-    "Cholesterol": np.random.randint(150, 300, size=n),
-    "Smoking": np.random.choice([1, 0], size=n),
-    "RiskClass": np.random.choice([1, 0], size=n)  # 1: High Risk, 0: Low Risk
+    "Age": np.random.randint(25, 75, n),
+    "Gender": np.random.choice(["Male", "Female"], n),
+    "Height": np.random.normal(168, 8, n).round(1),
+    "Weight": np.random.normal(72, 14, n).round(1),
+    "BloodPressure": np.random.normal(128, 18, n).round(0),
+    "Glucose": np.random.normal(105, 25, n).round(0),
+    "Cholesterol": np.random.normal(210, 35, n).round(0),
+    "Smoking": np.random.choice(["Yes", "No"], n, p=[0.35, 0.65]),
+    "Alcohol": np.random.choice(["Yes", "No"], n, p=[0.30, 0.70]),
+    "ExerciseLevel": np.random.choice(["Low", "Medium", "High"], n, p=[0.4, 0.4, 0.2]),
+    "FamilyHistory": np.random.choice(["Yes", "No"], n, p=[0.3, 0.7]),
+    "HeartRate": np.random.randint(55, 105, n)
 }
+
 df = pd.DataFrame(data)
+df["BMI"] = (df["Weight"] / ((df["Height"] / 100) ** 2)).round(1)
 
-# Step 2: Remove Outliers using IQR
-for col in ["BloodPressure", "Cholesterol", "BMI"]:
-    q1, q3 = df[col].quantile(0.25), df[col].quantile(0.75)
-    iqr = q3 - q1
-    df = df[(df[col] >= q1 - 1.5 * iqr) & (df[col] <= q3 + 1.5 * iqr)]
+# Generate RiskClass based on clinical risk indicators
+risk_score = (
+    (df["Age"] > 55).astype(int) * 2 +
+    (df["BloodPressure"] > 135).astype(int) * 2 +
+    (df["Cholesterol"] > 230).astype(int) * 2 +
+    (df["Glucose"] > 120).astype(int) * 1.5 +
+    (df["Smoking"] == "Yes").astype(int) * 1.5 +
+    (df["BMI"] > 28).astype(int) * 1.5
+)
+df["RiskClass"] = np.where(risk_score >= 4, "High Risk", "Low Risk")
 
-# Step 3: Min-Max Normalization
-X = df[["Age", "Gender", "BMI", "BloodPressure", "Glucose", "Cholesterol", "Smoking"]].values
-y = df["RiskClass"].values
-X_norm = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0) + 1e-8)
+# 1. Missing Value Imputation (Mean for numeric, Mode for categorical)
+for num in ["BloodPressure", "Glucose", "Cholesterol"]:
+    df[num] = df[num].fillna(df[num].median())
+df["ExerciseLevel"] = df["ExerciseLevel"].fillna(df["ExerciseLevel"].mode()[0])
 
-# 80:20 Train-Test Split
-split = int(0.8 * len(X_norm))
-X_train, X_test = X_norm[:split], X_norm[split:]
-y_train, y_test = y[:split], y[split:]
+# 2. Outlier Detection via IQR Method
+for col in ["BloodPressure", "Cholesterol"]:
+    Q1 = df[col].quantile(0.25)
+    Q3 = df[col].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    df = df[(df[col] >= lower_bound) & (df[col] <= upper_bound)]
 
-# Step 4: 5 Distance Functions from Scratch
-def euclidean_dist(a, b): return np.sqrt(np.sum((a - b) ** 2))
-def manhattan_dist(a, b): return np.sum(np.abs(a - b))
-def minkowski_dist(a, b, p=3): return np.sum(np.abs(a - b) ** p) ** (1 / p)
-def chebyshev_dist(a, b): return np.max(np.abs(a - b))
-def cosine_dist(a, b):
-    dot = np.dot(a, b)
-    norms = np.linalg.norm(a) * np.linalg.norm(b)
-    return 1.0 - (dot / norms) if norms > 0 else 1.0
+df = df.reset_index(drop=True)
 
-# Step 5: Custom k-NN Predictor
-def knn_predict(X_train, y_train, test_point, k=5, dist_fn=euclidean_dist, weighted=False):
-    distances = [dist_fn(test_point, x) for x in X_train]
+# 3. Categorical Label Encoding from scratch
+binary_cols = ["Smoking", "Alcohol", "FamilyHistory"]
+for col in binary_cols:
+    df[col] = df[col].map({"Yes": 1, "No": 0})
+df["Gender"] = df["Gender"].map({"Male": 1, "Female": 0})
+df["ExerciseLevel"] = df["ExerciseLevel"].map({"Low": 0, "Medium": 1, "High": 2})
+df["Target"] = df["RiskClass"].map({"Low Risk": 0, "High Risk": 1})
+
+# 4. Feature Selection & Normalization (Min-Max Scaling from scratch)
+feature_cols = ["Age", "Gender", "Height", "Weight", "BMI", "BloodPressure", "Glucose", "Cholesterol", "Smoking", "Alcohol", "ExerciseLevel", "FamilyHistory", "HeartRate"]
+X = df[feature_cols].values
+y = df["Target"].values
+
+# Min-Max Scaling: (X - min) / (max - min)
+X_norm = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0) + 1e-9)
+
+# Split 80% Train, 20% Test from scratch
+train_size = int(0.8 * len(X_norm))
+X_train, X_test = X_norm[:train_size], X_norm[train_size:]
+y_train, y_test = y[:train_size], y[train_size:]
+
+# ==============================================================================
+# PART B: 5 DISTANCE FUNCTIONS IMPLEMENTED FROM SCRATCH
+# ==============================================================================
+def euclidean_distance(a, b):
+    return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+
+def manhattan_distance(a, b):
+    return sum(abs(x - y) for x, y in zip(a, b))
+
+def minkowski_distance(a, b, p=3):
+    return sum(abs(x - y) ** p for x, y in zip(a, b)) ** (1.0 / p)
+
+def chebyshev_distance(a, b):
+    return max(abs(x - y) for x, y in zip(a, b))
+
+def cosine_distance(a, b):
+    dot_product = sum(x * y for x, y in zip(a, b))
+    norm_a = math.sqrt(sum(x ** 2 for x in a))
+    norm_b = math.sqrt(sum(y ** 2 for y in b))
+    if norm_a == 0 or norm_b == 0:
+        return 1.0
+    similarity = dot_product / (norm_a * norm_b)
+    return 1.0 - similarity
+
+# Display distances from 1 test sample to first 5 training instances
+print("=== DISTANCE METRICS TO FIRST 5 TRAINING INSTANCES ===")
+test_sample = X_test[0]
+for i in range(5):
+    train_inst = X_train[i]
+    print(f"Train[{i}] | Euclidean: {euclidean_distance(test_sample, train_inst):.4f} | Manhattan: {manhattan_distance(test_sample, train_inst):.4f} | Cosine: {cosine_distance(test_sample, train_inst):.4f}")
+
+# ==============================================================================
+# PART C & D: k-NN CLASSIFIER & WEIGHTED k-NN FROM SCRATCH
+# ==============================================================================
+def knn_predict(X_tr, y_tr, query_point, k=5, weighted=False, epsilon=0.0001):
+    distances = [euclidean_distance(query_point, tr_pt) for tr_pt in X_tr]
     k_indices = np.argsort(distances)[:k]
-    k_labels = y_train[k_indices]
+    k_labels = [y_tr[i] for i in k_indices]
     
     if not weighted:
-        # Standard Majority Vote
-        return 1 if np.sum(k_labels) >= (k / 2) else 0
+        # Part C: Standard Majority Vote
+        return 1 if sum(k_labels) > (k / 2.0) else 0
     else:
-        # Distance-Weighted Vote (weight = 1 / (d + 1e-5))
-        k_weights = [1.0 / (distances[i] + 1e-5) for i in k_indices]
+        # Part D: Distance-Weighted Vote (Weight = 1 / (Distance + epsilon))
+        k_weights = [1.0 / (distances[i] + epsilon) for i in k_indices]
         w_class1 = sum(w for l, w in zip(k_labels, k_weights) if l == 1)
         w_class0 = sum(w for l, w in zip(k_labels, k_weights) if l == 0)
         return 1 if w_class1 >= w_class0 else 0
 
-# Step 6: Evaluate across k = 1 to 15
-print("=== 1. DISTANCE FUNCTIONS TEST (POINT 0 TO POINT 1) ===")
-p1, p2 = X_test[0], X_test[1]
-print(f"Euclidean Distance: {euclidean_dist(p1, p2):.4f}")
-print(f"Manhattan Distance: {manhattan_dist(p1, p2):.4f}")
-print(f"Minkowski (p=3):    {minkowski_dist(p1, p2):.4f}")
-print(f"Chebyshev Distance: {chebyshev_dist(p1, p2):.4f}")
-print(f"Cosine Distance:    {cosine_dist(p1, p2):.4f}")
+# ==============================================================================
+# PART E: CHOOSING THE BEST k (EVALUATING k = 1, 3, 5, 7, 9, 11, 13, 15, 17, 19)
+# ==============================================================================
+print("\n=== ACCURACY EVALUATION ACROSS DIFFERENT k VALUES ===")
+k_values = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+best_k, best_acc = 1, 0.0
 
-print("\n=== 2. ACCURACY ACROSS DIFFERENT k VALUES ===")
-for k in [1, 3, 5, 7, 9, 11]:
-    preds_standard = [knn_predict(X_train, y_train, x, k=k, weighted=False) for x in X_test]
-    preds_weighted = [knn_predict(X_train, y_train, x, k=k, weighted=True) for x in X_test]
+for k in k_values:
+    preds_standard = [knn_predict(X_train, y_train, pt, k=k, weighted=False) for pt in X_test]
+    preds_weighted = [knn_predict(X_train, y_train, pt, k=k, weighted=True) for pt in X_test]
+    
     acc_std = np.mean(preds_standard == y_test) * 100
     acc_wgt = np.mean(preds_weighted == y_test) * 100
-    print(f"k = {k:02d} | Standard k-NN: {acc_std:.1f}% | Weighted k-NN: {acc_wgt:.1f}%")
+    
+    if acc_wgt > best_acc:
+        best_acc = acc_wgt
+        best_k = k
+        
+    print(f"k = {k:02d} | Standard k-NN Accuracy: {acc_std:5.1f}% | Weighted k-NN Accuracy: {acc_wgt:5.1f}%")
 
---------------------------------------------------------------------------------
-2. EXPECTED OUTPUT (WHEN EXECUTED)
---------------------------------------------------------------------------------
-=== 1. DISTANCE FUNCTIONS TEST (POINT 0 TO POINT 1) ===
-Euclidean Distance: 0.9856
-Manhattan Distance: 2.3787
-Minkowski (p=3):    0.8037
-Chebyshev Distance: 0.6970
-Cosine Distance:    0.3421
-
-=== 2. ACCURACY ACROSS DIFFERENT k VALUES ===
-k = 01 | Standard k-NN: 66.7% | Weighted k-NN: 66.7%
-k = 03 | Standard k-NN: 75.0% | Weighted k-NN: 75.0%
-k = 05 | Standard k-NN: 83.3% | Weighted k-NN: 83.3%
-k = 07 | Standard k-NN: 75.0% | Weighted k-NN: 75.0%
-k = 09 | Standard k-NN: 66.7% | Weighted k-NN: 66.7%
-k = 11 | Standard k-NN: 66.7% | Weighted k-NN: 66.7%
+print(f"\n[+] Optimal Parameter: Best k = {best_k} with {best_acc:.1f}% accuracy.")
 ================================================================================

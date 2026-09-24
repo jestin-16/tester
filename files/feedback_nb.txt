@@ -1,114 +1,143 @@
 ================================================================================
-MULTINOMIAL NAIVE BAYES TEXT CLASSIFICATION WITH LAPLACE SMOOTHING
+RECORD QUESTION: STUDENT FEEDBACK TEXT MULTINOMIAL NAIVE BAYES
 ================================================================================
 
-PROBLEM:
-Classify student feedback messages into Positive or Negative classes:
-  - Vectorize text using CountVectorizer (Bag-of-Words).
-  - Train Multinomial Naive Bayes model WITHOUT Laplace Smoothing (alpha=1e-9).
-  - Train Multinomial Naive Bayes model WITH Laplace Smoothing (alpha=1.0).
-  - Compare classification accuracy and explain the Zero-Probability / unseen words problem.
+PROBLEM STATEMENT:
+A college wants to classify student feedback messages as Positive or Negative.
+Create a small dataset containing at least 20 feedback messages and their corresponding
+classes. Develop a Python program to implement a Multinomial Naive Bayes classifier
+with Laplace estimation.
+
+TASKS:
+  1. Create or load the feedback dataset using Pandas.
+  2. Display the first five records and class distribution.
+  3. Convert the feedback messages into numerical features using CountVectorizer.
+  4. Split the dataset into training and testing sets using an 80:20 ratio.
+  5. Train a Multinomial Naive Bayes model without Laplace smoothing (alpha ~ 0).
+  6. Train another model using Laplace smoothing with alpha = 1.
+  7. Identify words that do not occur in one of the classes.
+  8. Calculate and display the probability of an unseen word:
+       P(w | C) = (Count(w, C) + 1) / (N_C + V)
+  9. Predict the class of the test messages using both models.
+ 10. Accept a new feedback message from the user and predict Positive or Negative.
+ 11. Display the predicted class probabilities.
+ 12. Explain how Laplace estimation prevents the zero-probability problem.
 
 --------------------------------------------------------------------------------
-1. PYTHON CODE (COPY & RUN DIRECTLY)
+FEEDBACK DATASET: 20 STUDENT FEEDBACK MESSAGES & LABELS
+--------------------------------------------------------------------------------
+Messages cover course content, lab facilities, teaching methodology, and grading.
+
+--------------------------------------------------------------------------------
+PYTHON SOLUTION (DATASET CREATION & COMPLETE ANSWERS)
 --------------------------------------------------------------------------------
 import pandas as pd
+import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 
-# Step 1: Create 20 Student Feedback Messages Dataset
+# Step 1: Create 20-Sample Student Feedback Dataset
 data = {
     "message": [
-        "The professor explained the machine learning concepts very clearly",
-        "Excellent practical lab sessions and very helpful teaching assistants",
+        "The professor explains concepts with remarkable clarity and patience",
+        "Terrible experience lab computers are slow and constantly crashing",
+        "Excellent practical demonstrations and insightful project guidance",
+        "Extremely boring lectures with completely outdated syllabus slides",
+        "Great interactive doubt clearing sessions and friendly staff support",
+        "Rude behavior from lab assistant and useless lab manuals",
+        "Well organized course curriculum with great real world relevance",
+        "Very confusing explanations and impossible exam evaluation criteria",
+        "Thoroughly enjoyed the hands on programming exercises and feedback",
+        "Disorganized schedule and frequent last minute class cancellations",
+        "Inspiring teacher with immense knowledge and supportive guidance",
+        "Dull monotonous voice and zero practical implementation taught",
+        "Outstanding learning environment and highly encouraging faculty",
+        "Poor guidance for final semester project work and delayed marks",
+        "The assignments were challenging interesting and highly educational",
         "Worst course structure and terribly disorganized lab instructions",
-        "I really enjoyed the hands on coding assignments and data projects",
-        "The instructor was completely unresponsive and rude to students",
-        "Brilliant lecture delivery with great practical demonstrations",
-        "Extremely slow pace and outdated course content and syllabus",
-        "Loved the interactive coding quizzes and helpful visual explanations",
-        "Terrible experience the sound quality was poor and confusing",
-        "Outstanding guidance and supportive faculty throughout the semester",
-        "The lab exercises were broken and buggy with zero assistance",
-        "Great course highly recommended for beginners in data science",
-        "Dull monotonous lectures and boring presentation slides",
-        "Very clear explanations and well structured learning modules",
-        "Horrible grading system and unfair mark deductions",
-        "Inspiring teacher with immense knowledge and patience",
-        "Waste of valuable time and completely irrelevant exercises",
         "Fantastic coverage of algorithms and real world applications",
-        "Poorly managed labs and broken software environment",
-        "Superb support and wonderful hands-on laboratory environment"
+        "Frustrating grading system with biased evaluation marks",
+        "Engaging presentation skills and clear step by step tutorials",
+        "Complete waste of time reading directly from textbook without examples"
     ],
     "label": [
-        "Positive", "Positive", "Negative", "Positive", "Negative",
         "Positive", "Negative", "Positive", "Negative", "Positive",
         "Negative", "Positive", "Negative", "Positive", "Negative",
-        "Positive", "Negative", "Positive", "Negative", "Positive"
+        "Positive", "Negative", "Positive", "Negative", "Positive",
+        "Negative", "Positive", "Negative", "Positive", "Negative"
     ]
 }
 
 df = pd.DataFrame(data)
 
-# Step 2: Vectorize Text into Bag-of-Words
+# Step 2: Inspect first 5 records & class distribution
+print("=== 1. DATASET OVERVIEW & CLASS DISTRIBUTION ===")
+print("First 5 records:\n", df.head())
+print("\nClass Distribution:\n", df["label"].value_counts())
+
+# Step 3: Vectorize text using CountVectorizer (Bag of Words)
 vectorizer = CountVectorizer(stop_words="english")
 X = vectorizer.fit_transform(df["message"])
 y = df["label"]
 vocab = vectorizer.get_feature_names_out()
 
-# Step 3: Train-Test Split (80:20)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Step 4: Split into 80% Train, 20% Test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42, stratify=y)
 
-# Step 4: Model Training: Without vs With Laplace Smoothing
-model_no_lap = MultinomialNB(alpha=1e-9).fit(X_train, y_train)
-model_with_lap = MultinomialNB(alpha=1.0).fit(X_train, y_train)
+# Step 5: Train Model WITHOUT Laplace Smoothing (alpha = 1e-9)
+model_no_lap = MultinomialNB(alpha=1e-9)
+model_no_lap.fit(X_train, y_train)
 
-# Step 5: Test Evaluation
+# Step 6: Train Model WITH Laplace Smoothing (alpha = 1.0)
+model_with_lap = MultinomialNB(alpha=1.0)
+model_with_lap.fit(X_train, y_train)
+
+# Step 7 & 8: Unseen Word Probability Demonstration
+# Formula: P(w | C) = (Count(w, C) + 1) / (N_C + V)
+V = len(vocab)
+classes = model_with_lap.classes_
+print("\n=== 2. UNSEEN WORD PROBABILITY FORMULA ===")
+print(f"Total Unique Vocabulary Size (V): {V} words")
+
+unseen_word = "quantum"
+print(f"For an unseen test word like '{unseen_word}':")
+for i, c in enumerate(classes):
+    N_c = model_with_lap.feature_count_[i].sum()
+    p_unseen = 1.0 / (N_c + V)
+    print(f"   In Class '{c}': Count=0, Total Words N_C={int(N_c)}, P('{unseen_word}'|{c}) = (0+1)/({int(N_c)}+{V}) = {p_unseen:.6f}")
+
+# Step 9: Compare Predictions on Test Split
 preds_no = model_no_lap.predict(X_test)
 preds_lap = model_with_lap.predict(X_test)
 
-results = pd.DataFrame({
-    "Test_Feedback": [df["message"].iloc[i] for i in y_test.index],
-    "Actual_Label": y_test.values,
-    "No_Laplace (alpha~0)": preds_no,
-    "With_Laplace (alpha=1)": preds_lap
+comparison_df = pd.DataFrame({
+    "Test_Message": [df["message"].iloc[idx] for idx in y_test.index],
+    "Actual_Class": y_test.values,
+    "No_Laplace_Prediction": preds_no,
+    "With_Laplace_Prediction": preds_lap
 })
+print("\n=== 3. TEST SET PREDICTIONS COMPARISON ===")
+print(comparison_df.to_string(index=False))
 
-print("=== 1. DATASET & VOCABULARY ===")
-print(f"Total Feedback Messages: {len(df)}")
-print(f"Vocabulary Size (Unique Words): {len(vocab)}")
+# Step 10 & 11: Accept New Feedback & Predict with Probabilities
+new_sample = "The teacher explained difficult topics with outstanding clarity"
+new_vec = vectorizer.transform([new_sample])
 
-print("\n=== 2. TEST PREDICTIONS COMPARISON ===")
-print(results.to_string(index=False))
+pred_class = model_with_lap.predict(new_vec)[0]
+probs = dict(zip(model_with_lap.classes_, model_with_lap.predict_proba(new_vec)[0].round(4)))
 
-# Step 6: Prediction on Unseen Test Sample
-sample = "The teacher explained difficult topics with outstanding clarity"
-sample_vec = vectorizer.transform([sample])
-pred = model_with_lap.predict(sample_vec)[0]
-probs = dict(zip(model_with_lap.classes_, model_with_lap.predict_proba(sample_vec)[0].round(4)))
-
-print(f"\n=== 3. PREDICTING NEW UNSEEN FEEDBACK ===")
-print(f"Sample: '{sample}'")
-print(f"Prediction: {pred}")
+print(f"\n=== 4. PREDICTION ON NEW USER FEEDBACK ===")
+print(f"Input Message:  '{new_sample}'")
+print(f"Predicted Class: {pred_class}")
 print(f"Class Probabilities: {probs}")
 
---------------------------------------------------------------------------------
-2. EXPECTED OUTPUT (WHEN EXECUTED)
---------------------------------------------------------------------------------
-=== 1. DATASET & VOCABULARY ===
-Total Feedback Messages: 20
-Vocabulary Size (Unique Words): 67
-
-=== 2. TEST PREDICTIONS COMPARISON ===
-Test_Feedback                                                       Actual_Label No_Laplace (alpha~0) With_Laplace (alpha=1)
-Worst course structure and terribly disorganized lab instructions       Negative             Negative              Negative
-Inspiring teacher with immense knowledge and patience                   Positive             Positive              Positive
-Fantastic coverage of algorithms and real world applications            Positive             Positive              Positive
-Dull monotonous lectures and boring presentation slides                 Negative             Negative              Negative
-
-=== 3. PREDICTING NEW UNSEEN FEEDBACK ===
-Sample: 'The teacher explained difficult topics with outstanding clarity'
-Prediction: Positive
-Class Probabilities: {'Negative': 0.1132, 'Positive': 0.8868}
+# Step 12: Explanation of Zero-Probability Problem
+print("\n=== 5. HOW LAPLACE ESTIMATION PREVENTS ZERO PROBABILITIES ===")
+print("In Naive Bayes, the class score is computed as the product of conditional probabilities:")
+print("   P(Class) * P(w1|Class) * P(w2|Class) * ... * P(wn|Class)")
+print("If a single word does not appear in a training class, its count is 0, making P(wi|Class) = 0.")
+print("This single zero causes the entire multiplicative product to collapse to zero, regardless of other words.")
+print("Laplace smoothing adds alpha=1 to the numerator and V to the denominator, guaranteeing every word")
+print("has a non-zero probability and ensuring robust classification on real-world text.")
 ================================================================================

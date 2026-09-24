@@ -1,18 +1,21 @@
 ================================================================================
 DATA SCIENCE LAB -- COMPLETE EXAM QUESTIONS & CODE REPOSITORY
 ================================================================================
-INDEX OF QUESTIONS & DIRECT CURL ENDPOINTS:
-- CO1 Q1: Student Dataset Stats            -> curl.exe -s https://tester-red-two.vercel.app/q1
-- CO1 Q2: Employee Performance Report      -> curl.exe -s https://tester-red-two.vercel.app/q2
-- CO1 Q3: 30-Record Pandas Workflow        -> curl.exe -s https://tester-red-two.vercel.app/q3
-- Q4: All 13 Visualization Exercises       -> curl.exe -s https://tester-red-two.vercel.app/viz
-- Record: EDA & 6-Plot Dashboard           -> curl.exe -s https://tester-red-two.vercel.app/eda
-- k-NN From Scratch (Cardiovascular Risk)  -> curl.exe -s https://tester-red-two.vercel.app/knn
-- Bayes Theorem (Clinical Liver Disease)   -> curl.exe -s https://tester-red-two.vercel.app/bayes
-- Weather Prediction (Laplace Naive Bayes) -> curl.exe -s https://tester-red-two.vercel.app/weather
-- Feedback Text Multinomial Naive Bayes    -> curl.exe -s https://tester-red-two.vercel.app/feedback
-- Decision Tree (Bank Loan C5.0 Algorithm) -> curl.exe -s https://tester-red-two.vercel.app/tree
-- 10-Minute Final Revision Summary Table   -> curl.exe -s https://tester-red-two.vercel.app/quick
+INDEX OF LAB RECORD QUESTIONS & DIRECT URL ENDPOINTS:
+  [1]  CO1 Q1: Student Dataset Stats (25 Students)          -> /1  or  /q1
+  [2]  CO1 Q2: Employee Performance & Best Dept (30 Emps)   -> /2  or  /q2
+  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute)     -> /3  or  /q3
+  [4]  Q4: All 13 Visualization Exercises (Matplotlib/SNS)  -> /4  or  /viz
+  [5]  Record 1: Exploratory Data Visualization (7 Plots)    -> /5  or  /eda1
+  [6]  Record 2: Unified 6-Plot Dashboard & Report           -> /6  or  /dash
+  [7]  Record 3: Public Dataset EDA (100+ Records, Insights) -> /7  or  /eda3
+  [8]  k-NN Classifier from Scratch (Parts A to E)           -> /8  or  /knn
+  [9]  Bayes Theorem (Clinical Liver Disease Calculation)    -> /9  or  /bayes
+  [10] Weather Prediction (Laplace Naive Bayes)              -> /10 or  /weather
+  [11] Student Feedback Text Multinomial Naive Bayes         -> /11 or  /feedback
+  [12] Decision Tree C5.0 (Loan Eligibility & IF-THEN Rules) -> /12 or  /tree
+  [13] Final 10-Minute Quick Revision Summary Table          -> /13 or  /quick
+  [14] Master Revision Sheet (Complete All-in-One: /all)     -> /14 or  /all
 ================================================================================
 
 --------------------------------------------------------------------------------

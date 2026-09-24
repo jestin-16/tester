@@ -1,5 +1,5 @@
 ================================================================================
-BAYES THEOREM PROBLEM: CLINICAL LIVER DISEASE & ALCOHOLISM
+EXPERIMENT (13-08-2026): BAYES THEOREM (CLINICAL LIVER DISEASE CALCULATION)
 ================================================================================
 
 PROBLEM STATEMENT:
@@ -7,10 +7,10 @@ Consider a set of patients coming for treatment in a certain clinic.
 Let A denote the event that a "Patient has liver disease".
 Let B denote the event that a "Patient is an alcoholic".
 
-GIVEN VALUES:
-  - P(A)   = 0.10  (10% of patients in the clinic have liver disease)
-  - P(B)   = 0.05  (5% of patients are alcoholics)
-  - P(B|A) = 0.07  (Among patients with liver disease, 7% are alcoholics)
+GIVEN CLINICAL VALUES:
+  - P(A)   = 0.10  (10% of patients entering the clinic have liver disease)
+  - P(B)   = 0.05  (5% of patients entering the clinic are alcoholics)
+  - P(B|A) = 0.07  (Among patients diagnosed with liver disease, 7% are alcoholics)
 
 QUESTION:
 Given that a patient is an alcoholic, what is the probability that he will
@@ -24,48 +24,42 @@ Bayes' Theorem Formula:
 P(A|B) = -----------------
                P(B)
 
-Substitute the given values:
+Substitute the given values into the formula:
            0.07 * 0.10
 P(A|B) = ---------------
                0.05
 
            0.007
 P(A|B) = ---------
-           0.05
+            0.05
 
 P(A|B) = 0.14 = 14.0%
 
 Conclusion:
-The probability that an alcoholic patient has liver disease is 14% (0.14).
+The probability that an alcoholic patient entering the clinic has liver disease
+is 0.14 (14%).
 
 --------------------------------------------------------------------------------
-2. PYTHON VERIFICATION CODE (COPY & RUN DIRECTLY)
+2. PYTHON SOLUTION
 --------------------------------------------------------------------------------
-def bayes_theorem(p_a, p_b, p_b_given_a):
+def calculate_bayes(p_a, p_b, p_b_given_a):
+    """
+    Computes posterior probability P(A|B) using Bayes' Theorem.
+    """
     return (p_b_given_a * p_a) / p_b
 
-# Given values
-P_A = 0.10         # Prior: Patient has liver disease
-P_B = 0.05         # Prior: Patient is an alcoholic
-P_B_given_A = 0.07  # Likelihood: Alcoholic given liver disease
+# Given Prior & Likelihood Values
+P_LiverDisease = 0.10            # P(A)
+P_Alcoholic = 0.05               # P(B)
+P_Alcoholic_Given_Liver = 0.07   # P(B|A)
 
-# Compute Posterior Probability
-P_A_given_B = bayes_theorem(P_A, P_B, P_B_given_A)
+# Calculate Posterior Probability P(A|B)
+P_Liver_Given_Alcoholic = calculate_bayes(P_LiverDisease, P_Alcoholic, P_Alcoholic_Given_Liver)
 
 print("=== BAYES THEOREM CALCULATION RESULTS ===")
-print(f"P(Liver Disease)                  = {P_A:.2f}")
-print(f"P(Alcoholic)                      = {P_B:.2f}")
-print(f"P(Alcoholic | Liver Disease)      = {P_B_given_A:.2f}")
+print(f"P(Liver Disease)                  = {P_LiverDisease:.2f}")
+print(f"P(Alcoholic)                      = {P_Alcoholic:.2f}")
+print(f"P(Alcoholic | Liver Disease)      = {P_Alcoholic_Given_Liver:.2f}")
 print("------------------------------------------")
-print(f"P(Liver Disease | Alcoholic)      = {P_A_given_B:.4f} ({P_A_given_B * 100:.1f}%)")
-
---------------------------------------------------------------------------------
-3. EXPECTED OUTPUT (WHEN EXECUTED)
---------------------------------------------------------------------------------
-=== BAYES THEOREM CALCULATION RESULTS ===
-P(Liver Disease)                  = 0.10
-P(Alcoholic)                      = 0.05
-P(Alcoholic | Liver Disease)      = 0.07
-------------------------------------------
-P(Liver Disease | Alcoholic)      = 0.1400 (14.0%)
+print(f"P(Liver Disease | Alcoholic)      = {P_Liver_Given_Alcoholic:.4f} ({P_Liver_Given_Alcoholic * 100:.1f}%)")
 ================================================================================

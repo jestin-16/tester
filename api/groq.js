@@ -489,35 +489,39 @@ echo ===========================================================================
 echo            DATA SCIENCE LAB -- QUESTIONS & ANSWERS (EXAM REVISION)
 echo ================================================================================
 echo  [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
-echo  [2]  CO1 Q2: Employee Performance Report ^& Best Department
+echo  [2]  CO1 Q2: Employee Performance Report ^& Best Department (30 Emps)
 echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
 echo  [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)
-echo  [5]  k-NN Classification From Scratch (All Distance Metrics ^& Predict)
-echo  [6]  Bayes Theorem (Clinical Liver Disease Calculation)
-echo  [7]  Weather Prediction (Laplace Smoothing ^& Naive Bayes)
-echo  [8]  Student Feedback Text Multinomial Naive Bayes
-echo  [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
-echo  [10] Record: EDA, 5 Observations ^& 6-Plot Dashboard
-echo  [11] Final 10-Minute Quick Revision Table
-echo  [12] Master Revision Sheet (Complete All-in-One)
+echo  [5]  Record 1: Exploratory Data Visualization (7 Plots ^& 5 Observations)
+echo  [6]  Record 2: Unified 6-Plot Dashboard ^& Report
+echo  [7]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)
+echo  [8]  k-NN Classification From Scratch (Healthcare Cardiovascular Risk)
+echo  [9]  Bayes Theorem (Clinical Liver Disease Calculation)
+echo  [10] Weather Prediction (Laplace Smoothing ^& Naive Bayes)
+echo  [11] Student Feedback Text Multinomial Naive Bayes
+echo  [12] Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
+echo  [13] Final 10-Minute Quick Revision Table
+echo  [14] Master Revision Sheet (Complete All-in-One)
 echo  [A]  Ask AI Custom Question
 echo  [0]  Exit
 echo ================================================================================
 set "choice="
-set /p "choice=Enter option [0-12, or A]: "
+set /p "choice=Enter option [0-14, or A]: "
 
 if "%choice%"=="1" goto q1
 if "%choice%"=="2" goto q2
 if "%choice%"=="3" goto q3
-if "%choice%"=="4" goto viz
-if "%choice%"=="5" goto knn
-if "%choice%"=="6" goto bayes
-if "%choice%"=="7" goto weather
-if "%choice%"=="8" goto feedback
-if "%choice%"=="9" goto tree
-if "%choice%"=="10" goto eda
-if "%choice%"=="11" goto quick
-if "%choice%"=="12" goto ds
+if "%choice%"=="4" goto q4
+if "%choice%"=="5" goto q5
+if "%choice%"=="6" goto q6
+if "%choice%"=="7" goto q7
+if "%choice%"=="8" goto q8
+if "%choice%"=="9" goto q9
+if "%choice%"=="10" goto q10
+if "%choice%"=="11" goto q11
+if "%choice%"=="12" goto q12
+if "%choice%"=="13" goto q13
+if "%choice%"=="14" goto q14
 if /i "%choice%"=="a" goto ai
 if "%choice%"=="0" goto :eof
 echo Invalid selection. Please try again.
@@ -526,84 +530,98 @@ goto menu
 
 :q1
 cls
-curl.exe -s ${baseUrl}/q1
+curl.exe -s ${baseUrl}/1
 echo.
 pause
 goto menu
 
 :q2
 cls
-curl.exe -s ${baseUrl}/q2
+curl.exe -s ${baseUrl}/2
 echo.
 pause
 goto menu
 
 :q3
 cls
-curl.exe -s ${baseUrl}/q3
+curl.exe -s ${baseUrl}/3
 echo.
 pause
 goto menu
 
-:viz
+:q4
 cls
-curl.exe -s ${baseUrl}/viz
+curl.exe -s ${baseUrl}/4
 echo.
 pause
 goto menu
 
-:knn
+:q5
 cls
-curl.exe -s ${baseUrl}/knn
+curl.exe -s ${baseUrl}/5
 echo.
 pause
 goto menu
 
-:bayes
+:q6
 cls
-curl.exe -s ${baseUrl}/bayes
+curl.exe -s ${baseUrl}/6
 echo.
 pause
 goto menu
 
-:weather
+:q7
 cls
-curl.exe -s ${baseUrl}/weather
+curl.exe -s ${baseUrl}/7
 echo.
 pause
 goto menu
 
-:feedback
+:q8
 cls
-curl.exe -s ${baseUrl}/feedback
+curl.exe -s ${baseUrl}/8
 echo.
 pause
 goto menu
 
-:tree
+:q9
 cls
-curl.exe -s ${baseUrl}/tree
+curl.exe -s ${baseUrl}/9
 echo.
 pause
 goto menu
 
-:eda
+:q10
 cls
-curl.exe -s ${baseUrl}/eda
+curl.exe -s ${baseUrl}/10
 echo.
 pause
 goto menu
 
-:quick
+:q11
 cls
-curl.exe -s ${baseUrl}/quick
+curl.exe -s ${baseUrl}/11
 echo.
 pause
 goto menu
 
-:ds
+:q12
 cls
-curl.exe -s ${baseUrl}/ds
+curl.exe -s ${baseUrl}/12
+echo.
+pause
+goto menu
+
+:q13
+cls
+curl.exe -s ${baseUrl}/13
+echo.
+pause
+goto menu
+
+:q14
+cls
+curl.exe -s ${baseUrl}/14
 echo.
 pause
 goto menu
@@ -633,41 +651,35 @@ function Show-Menu {
     Write-Host "================================================================================" -ForegroundColor Cyan
     Write-Host "                   DATA SCIENCE LAB -- SELECT A QUESTION                        " -ForegroundColor Green
     Write-Host "================================================================================" -ForegroundColor Cyan
-    Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis"
-    Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department"
+    Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)"
+    Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department (30 Emps)"
     Write-Host " [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
     Write-Host " [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)"
-    Write-Host " [5]  k-NN Classification From Scratch (All Distance Metrics & Predict)"
-    Write-Host " [6]  Bayes Theorem (Clinical Liver Disease Calculation)"
-    Write-Host " [7]  Weather Prediction (Laplace Smoothing & Naive Bayes)"
-    Write-Host " [8]  Student Feedback Text Multinomial Naive Bayes"
-    Write-Host " [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
-    Write-Host " [10] Record: EDA, 5 Observations & 6-Plot Dashboard"
-    Write-Host " [11] Final 10-Minute Quick Revision Table"
-    Write-Host " [12] Master Revision Sheet (Complete All-in-One)"
+    Write-Host " [5]  Record 1: Exploratory Data Visualization (7 Plots & 5 Observations)"
+    Write-Host " [6]  Record 2: Unified 6-Plot Dashboard & Report"
+    Write-Host " [7]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)"
+    Write-Host " [8]  k-NN Classification From Scratch (All Distance Metrics & Predict)"
+    Write-Host " [9]  Bayes Theorem (Clinical Liver Disease Calculation)"
+    Write-Host " [10] Weather Prediction (Laplace Smoothing & Naive Bayes)"
+    Write-Host " [11] Student Feedback Text Multinomial Naive Bayes"
+    Write-Host " [12] Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
+    Write-Host " [13] Final 10-Minute Quick Revision Table"
+    Write-Host " [14] Master Revision Sheet (Complete All-in-One)"
     Write-Host " [A]  Ask AI Custom Question"
     Write-Host " [0]  Exit"
     Write-Host "================================================================================" -ForegroundColor Cyan
 }
 
 $routes = @{
-    "1"  = "/q1"
-    "2"  = "/q2"
-    "3"  = "/q3"
-    "4"  = "/viz"
-    "5"  = "/knn"
-    "6"  = "/bayes"
-    "7"  = "/weather"
-    "8"  = "/feedback"
-    "9"  = "/tree"
-    "10" = "/eda"
-    "11" = "/quick"
-    "12" = "/ds"
+    "1"  = "/1";  "2"  = "/2";  "3"  = "/3";  "4"  = "/4"
+    "5"  = "/5";  "6"  = "/6";  "7"  = "/7";  "8"  = "/8"
+    "9"  = "/9";  "10" = "/10"; "11" = "/11"; "12" = "/12"
+    "13" = "/13"; "14" = "/14"
 }
 
 while ($true) {
     Show-Menu
-    $choice = (Read-Host "Enter option [0-12, or A]").Trim()
+    $choice = (Read-Host "Enter option [0-14, or A]").Trim()
     if ($choice -in @("0", "exit", "q")) { break }
     
     if ($choice -in @("a", "ai")) {
@@ -696,7 +708,7 @@ while ($true) {
         }
         Read-Host "\`nPress Enter to return to menu..."
     } else {
-        Write-Host "Invalid option. Please choose 0 to 12." -ForegroundColor Yellow
+        Write-Host "Invalid option. Please choose 0 to 14." -ForegroundColor Yellow
         Start-Sleep -Seconds 1
     }
 }
@@ -763,36 +775,40 @@ echo ===========================================================================
 echo                   QUESTIONS ^& ANSWERS -- SELECT A TOPIC
 echo ================================================================================
 echo  [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
-echo  [2]  CO1 Q2: Employee Performance Report ^& Department Stats
+echo  [2]  CO1 Q2: Employee Performance Report ^& Department Stats (30 Emps)
 echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
 echo  [4]  Q4: All 13 Visualizations (Matplotlib, Seaborn, Subplots)
-echo  [5]  k-NN Classifier From Scratch (All Metrics, Predict, Evaluate)
-echo  [6]  Bayes Theorem (Clinical Liver Disease Problem)
-echo  [7]  Weather Prediction (Naive Bayes ^& Laplace Smoothing)
-echo  [8]  Student Feedback Text Multinomial Naive Bayes
-echo  [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
-echo  [10] Record: EDA, 5 Observations ^& 6-Plot Dashboard
-echo  [11] Final 10-Minute Quick Revision Table
-echo  [12] Master Revision Sheet (Complete syllabus in one file)
+echo  [5]  Record 1: Exploratory Data Visualization (7 Plots ^& 5 Observations)
+echo  [6]  Record 2: Unified 6-Plot Dashboard ^& Report
+echo  [7]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)
+echo  [8]  k-NN Classifier From Scratch (All Metrics, Predict, Evaluate)
+echo  [9]  Bayes Theorem (Clinical Liver Disease Problem)
+echo  [10] Weather Prediction (Naive Bayes ^& Laplace Smoothing)
+echo  [11] Student Feedback Text Multinomial Naive Bayes
+echo  [12] Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
+echo  [13] Final 10-Minute Quick Revision Table
+echo  [14] Master Revision Sheet (Complete syllabus in one file)
 echo.
 echo  [M]  Return to Main Portal
 echo  [0]  Exit
 echo ================================================================================
 set "qa_choice="
-set /p "qa_choice=Select topic [1-12, or M]: "
+set /p "qa_choice=Select topic [1-14, or M]: "
 
-if "%qa_choice%"=="1" ( cls & curl.exe -s ${baseUrl}/q1 & echo. & pause & goto qa_section )
-if "%qa_choice%"=="2" ( cls & curl.exe -s ${baseUrl}/q2 & echo. & pause & goto qa_section )
-if "%qa_choice%"=="3" ( cls & curl.exe -s ${baseUrl}/q3 & echo. & pause & goto qa_section )
-if "%qa_choice%"=="4" ( cls & curl.exe -s ${baseUrl}/viz & echo. & pause & goto qa_section )
-if "%qa_choice%"=="5" ( cls & curl.exe -s ${baseUrl}/knn & echo. & pause & goto qa_section )
-if "%qa_choice%"=="6" ( cls & curl.exe -s ${baseUrl}/bayes & echo. & pause & goto qa_section )
-if "%qa_choice%"=="7" ( cls & curl.exe -s ${baseUrl}/weather & echo. & pause & goto qa_section )
-if "%qa_choice%"=="8" ( cls & curl.exe -s ${baseUrl}/feedback & echo. & pause & goto qa_section )
-if "%qa_choice%"=="9" ( cls & curl.exe -s ${baseUrl}/tree & echo. & pause & goto qa_section )
-if "%qa_choice%"=="10" ( cls & curl.exe -s ${baseUrl}/eda & echo. & pause & goto qa_section )
-if "%qa_choice%"=="11" ( cls & curl.exe -s ${baseUrl}/quick & echo. & pause & goto qa_section )
-if "%qa_choice%"=="12" ( cls & curl.exe -s ${baseUrl}/ds & echo. & pause & goto qa_section )
+if "%qa_choice%"=="1" ( cls & curl.exe -s ${baseUrl}/1 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="2" ( cls & curl.exe -s ${baseUrl}/2 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="3" ( cls & curl.exe -s ${baseUrl}/3 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="4" ( cls & curl.exe -s ${baseUrl}/4 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="5" ( cls & curl.exe -s ${baseUrl}/5 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="6" ( cls & curl.exe -s ${baseUrl}/6 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="7" ( cls & curl.exe -s ${baseUrl}/7 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="8" ( cls & curl.exe -s ${baseUrl}/8 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="9" ( cls & curl.exe -s ${baseUrl}/9 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="10" ( cls & curl.exe -s ${baseUrl}/10 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="11" ( cls & curl.exe -s ${baseUrl}/11 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="12" ( cls & curl.exe -s ${baseUrl}/12 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="13" ( cls & curl.exe -s ${baseUrl}/13 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="14" ( cls & curl.exe -s ${baseUrl}/14 & echo. & pause & goto qa_section )
 if /i "%qa_choice%"=="m" goto main_menu
 if "%qa_choice%"=="0" goto :eof
 
@@ -829,31 +845,34 @@ function Start-Chat {
 
 function Show-QaMenu {
     $routes = @{
-        "1"  = "/q1"; "2"  = "/q2"; "3"  = "/q3"; "4"  = "/viz"
-        "5"  = "/knn"; "6" = "/bayes"; "7"  = "/weather"; "8"  = "/feedback"
-        "9"  = "/tree"; "10" = "/eda"; "11" = "/quick"; "12" = "/ds"
+        "1"  = "/1";  "2"  = "/2";  "3"  = "/3";  "4"  = "/4"
+        "5"  = "/5";  "6"  = "/6";  "7"  = "/7";  "8"  = "/8"
+        "9"  = "/9";  "10" = "/10"; "11" = "/11"; "12" = "/12"
+        "13" = "/13"; "14" = "/14"
     }
     while ($true) {
         Clear-Host
         Write-Host "================================================================================" -ForegroundColor Cyan
         Write-Host "                   QUESTIONS & ANSWERS -- SELECT A TOPIC                        " -ForegroundColor Green
         Write-Host "================================================================================" -ForegroundColor Cyan
-        Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis"
-        Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department"
+        Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)"
+        Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department (30 Emps)"
         Write-Host " [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
         Write-Host " [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)"
-        Write-Host " [5]  k-NN Classification From Scratch (All Distance Metrics & Predict)"
-        Write-Host " [6]  Bayes Theorem (Clinical Liver Disease Calculation)"
-        Write-Host " [7]  Weather Prediction (Laplace Smoothing & Naive Bayes)"
-        Write-Host " [8]  Student Feedback Text Multinomial Naive Bayes"
-        Write-Host " [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
-        Write-Host " [10] Record: EDA, 5 Observations & 6-Plot Dashboard"
-        Write-Host " [11] Final 10-Minute Quick Revision Table"
-        Write-Host " [12] Master Revision Sheet (Complete syllabus in one file)"
+        Write-Host " [5]  Record 1: Exploratory Data Visualization (7 Plots & 5 Observations)"
+        Write-Host " [6]  Record 2: Unified 6-Plot Dashboard & Report"
+        Write-Host " [7]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)"
+        Write-Host " [8]  k-NN Classification From Scratch (All Distance Metrics & Predict)"
+        Write-Host " [9]  Bayes Theorem (Clinical Liver Disease Calculation)"
+        Write-Host " [10] Weather Prediction (Laplace Smoothing & Naive Bayes)"
+        Write-Host " [11] Student Feedback Text Multinomial Naive Bayes"
+        Write-Host " [12] Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
+        Write-Host " [13] Final 10-Minute Quick Revision Table"
+        Write-Host " [14] Master Revision Sheet (Complete syllabus in one file)"
         Write-Host " [M]  Return to Main Portal"
         Write-Host " [0]  Exit"
         Write-Host "================================================================================" -ForegroundColor Cyan
-        $choice = (Read-Host "Select topic [1-12, or M]").Trim()
+        $choice = (Read-Host "Select topic [1-14, or M]").Trim()
         if ($choice -in @("0", "exit", "q")) { exit }
         if ($choice -in @("m", "back", "menu")) { return }
         if ($routes.ContainsKey($choice)) {
