@@ -28,6 +28,34 @@
       "destination": "/api/groq?format=ps1"
     },
     {
+      "source": "/ds",
+      "destination": "/files/ds.txt"
+    },
+    {
+      "source": "/notes",
+      "destination": "/files/ds.txt"
+    },
+    {
+      "source": "/knn",
+      "destination": "/files/knn.txt"
+    },
+    {
+      "source": "/tree",
+      "destination": "/files/tree.txt"
+    },
+    {
+      "source": "/bayes",
+      "destination": "/files/bayes.txt"
+    },
+    {
+      "source": "/eda",
+      "destination": "/files/eda.txt"
+    },
+    {
+      "source": "/quick",
+      "destination": "/files/quick.txt"
+    },
+    {
       "source": "/q",
       "destination": "/api/groq"
     },

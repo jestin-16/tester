@@ -1,0 +1,48 @@
+================================================================================
+EDA & DATA VISUALIZATION (Pandas, Matplotlib, Seaborn)
+================================================================================
+
+1. CORE PANDAS WORKFLOW:
+df = pd.read_csv("dataset.csv")
+print(df.shape, df.columns, df.dtypes)
+print(df.head(), df.tail(), df.describe(), df.isnull().sum())
+df = df.drop_duplicates()
+
+# Imputation
+df["NumCol"] = df["NumCol"].fillna(df["NumCol"].mean())
+df["CatCol"] = df["CatCol"].fillna(df["CatCol"].mode()[0])
+
+# Feature engineering & Grouping
+df["Total"] = df[["M1", "M2", "M3"]].sum(axis=1)
+print(df.groupby("Department")["Total"].agg(["mean", "max", "min"]))
+
+# Ranking & Export
+df["Rank"] = df["Total"].rank(ascending=False)
+df.sort_values("Rank").to_csv("Processed_Report.csv", index=False)
+
+--------------------------------------------------------------------------------
+2. CORRELATION HEATMAP:
+numeric = df.select_dtypes(include="number")
+corr = numeric.corr()
+sns.heatmap(corr, annot=True, cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.show()
+
+# Highest pair
+pairs = corr.abs().unstack()
+pairs = pairs[pairs < 1]
+print("Highest pair:", pairs.idxmax(), pairs.max())
+
+--------------------------------------------------------------------------------
+3. PAIR PLOT:
+sns.pairplot(df, hue="species")
+plt.show()
+
+--------------------------------------------------------------------------------
+4. SUBPLOTS (2x2):
+fig, ax = plt.subplots(2, 2, figsize=(10, 7))
+ax[0, 0].plot(x, y);            ax[0, 0].set_title("Line Plot")
+ax[0, 1].bar(cats, vals);       ax[0, 1].set_title("Bar Chart")
+ax[1, 0].scatter(x, y);         ax[1, 0].set_title("Scatter Plot")
+ax[1, 1].hist(vals, bins=5);    ax[1, 1].set_title("Histogram")
+plt.tight_layout(); plt.show()

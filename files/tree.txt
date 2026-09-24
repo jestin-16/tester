@@ -1,0 +1,35 @@
+================================================================================
+DECISION TREE -- VERY HIGH PRIORITY
+Workflow: dataset -> target entropy -> information gain -> best split -> repeat
+================================================================================
+
+import math
+
+def entropy(series):
+    counts = series.value_counts()
+    total = len(series)
+    result = 0
+    for count in counts:
+        p = count / total
+        result -= p * math.log2(p)
+    return result
+
+def information_gain(df, attribute, target):
+    total_entropy = entropy(df[target])
+    weighted = 0
+    for value in df[attribute].unique():
+        subset = df[df[attribute] == value]
+        weighted += (len(subset) / len(df)) * entropy(subset[target])
+    return total_entropy - weighted
+
+Definitions:
+- Root node: first / best split
+- Internal node: later decision
+- Branch: attribute value
+- Leaf node: final class / outcome
+
+Higher information gain means a more useful split because it reduces uncertainty.
+
+Formulas:
+- Entropy(S) = -SUM(p_i * log2(p_i))
+- Information Gain = Entropy(parent) - weighted entropy(children)

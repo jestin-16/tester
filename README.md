@@ -4,6 +4,26 @@ A modern, fast CLI and web interface for **Groq** and **xAI (Grok)**, deployable
 
 ---
 
+## 📚 Data Science Lab Revision Notes (Instant Curl)
+
+View exam-focused code and notes directly inside any terminal:
+
+```cmd
+# Full Revision Sheet (All 12 Topics)
+curl.exe -s https://tester-red-two.vercel.app/ds
+
+# Quick 10-Minute Summary Table
+curl.exe -s https://tester-red-two.vercel.app/quick
+
+# Topic-Specific Sheets:
+curl.exe -s https://tester-red-two.vercel.app/knn     # k-NN from scratch & distance metrics
+curl.exe -s https://tester-red-two.vercel.app/tree    # Decision Tree entropy & information gain
+curl.exe -s https://tester-red-two.vercel.app/bayes   # Bayes theorem & Laplace smoothing
+curl.exe -s https://tester-red-two.vercel.app/eda     # Pandas, Matplotlib, Seaborn, Heatmap
+```
+
+---
+
 ## 🚀 Running in Terminal on Windows
 
 You can run the CLI locally using Node.js (cross-platform, zero dependencies required):
