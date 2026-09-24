@@ -33,38 +33,48 @@ node chat.js --url https://your-deployment.vercel.app "What is Kubernetes?"
 
 ---
 
-## 🌐 Running directly in PowerShell (Universal Methods)
+## 🌐 Running directly in PowerShell with `curl.exe`
 
-From **any** Windows PowerShell terminal without cloning the repo:
+Windows 10 (build 17063+) and Windows 11 have `curl.exe` pre-installed.
 
-### Method 1: Universal .NET WebClient (Works on 100% of Windows/PowerShell systems - No `irm` needed)
-Works on all versions (Windows 7/8/10/11, PowerShell 2.0 to 7+):
+### 1. Instant One-Shot Question
+```powershell
+curl.exe -s -d "What is Docker in 2 sentences?" https://tester-red-two.vercel.app/groq
+```
+*(or via query string: `curl.exe -s "https://tester-red-two.vercel.app/groq?q=hello"`)*
+
+### 2. Interactive Terminal Chat
+```powershell
+(curl.exe -s https://tester-red-two.vercel.app/groq.ps1 | Out-String) | iex
+```
+
+### 3. Create an `ask` Command (Recommended)
+Paste this once into your PowerShell terminal:
+```powershell
+function ask($q) { curl.exe -s -d "$q" https://tester-red-two.vercel.app/groq }
+```
+Then ask anything anytime:
+```powershell
+ask "how to find open ports in powershell"
+ask "write a python regex for email"
+```
+
+> **Tip**: In Windows PowerShell, `curl` is an alias to `Invoke-WebRequest`. If you want to type `curl` instead of `curl.exe`, run:
+> ```powershell
+> Remove-Item Alias:curl -ErrorAction SilentlyContinue
+> ```
+
+---
+
+## ⚡ Fallback Methods (If `curl.exe` is absent on older Windows)
+
+### Universal .NET WebClient (PowerShell 2.0+ / Windows 7+)
 ```powershell
 # Interactive chat
 [Net.ServicePointManager]::SecurityProtocol = 3072; (New-Object Net.WebClient).DownloadString('https://tester-red-two.vercel.app/groq.ps1') | iex
 
-# Quick one-shot question
+# Quick question
 (New-Object Net.WebClient).DownloadString('https://tester-red-two.vercel.app/groq?q=hello')
-```
-
-### Method 2: Create a permanent `ai` command in PowerShell
-Paste this once into your PowerShell window (or add to `$PROFILE`):
-```powershell
-function ai($q){ [Net.ServicePointManager]::SecurityProtocol = 3072; (New-Object Net.WebClient).DownloadString("https://tester-red-two.vercel.app/groq?q=" + [Uri]::EscapeDataString($q)) }
-```
-Then use it anytime:
-```powershell
-ai "how to find large files in windows"
-```
-
-### Method 3: `Invoke-WebRequest` (`iwr`)
-```powershell
-(iwr -UseBasicParsing https://tester-red-two.vercel.app/groq.ps1).Content | iex
-```
-
-### Method 4: Built-in `curl.exe` (Windows 10/11)
-```powershell
-curl.exe -s "https://tester-red-two.vercel.app/groq?q=hello"
 ```
 
 ---
