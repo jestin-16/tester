@@ -24,6 +24,38 @@
       "destination": "/api/groq"
     },
     {
+      "source": "/run",
+      "destination": "/api/groq?action=run"
+    },
+    {
+      "source": "/r",
+      "destination": "/api/groq?action=run"
+    },
+    {
+      "source": "/start",
+      "destination": "/api/groq?action=run"
+    },
+    {
+      "source": "/c",
+      "destination": "/api/groq?format=bat"
+    },
+    {
+      "source": "/chat",
+      "destination": "/api/groq?format=bat"
+    },
+    {
+      "source": "/1",
+      "destination": "/api/groq?format=bat"
+    },
+    {
+      "source": "/2",
+      "destination": "/files/ds.txt"
+    },
+    {
+      "source": "/qa",
+      "destination": "/files/ds.txt"
+    },
+    {
       "source": "/m",
       "destination": "/api/groq?action=menu"
     },

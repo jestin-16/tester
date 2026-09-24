@@ -566,9 +566,193 @@ while ($true) {
 `;
 }
 
+function generateMainLauncher(baseUrl) {
+  return `@echo off
+setlocal EnableDelayedExpansion
+title Data Science Lab Helper
+
+:main_menu
+cls
+echo ================================================================================
+echo                    DATA SCIENCE LAB -- MAIN PORTAL
+echo ================================================================================
+echo.
+echo  [1] Chat with AI Assistant (Interactive Terminal)
+echo  [2] Show Questions ^& Answers (CO1, k-NN, Bayes, Decision Trees, EDA)
+echo.
+echo  [0] Exit
+echo.
+echo ================================================================================
+set "main_choice="
+set /p "main_choice=Enter choice [1 or 2]: "
+
+if "%main_choice%"=="1" goto chat_section
+if "%main_choice%"=="2" goto qa_section
+if "%main_choice%"=="0" goto :eof
+
+echo Invalid selection. Please enter 1, 2, or 0.
+timeout /t 2 >nul 2>&1
+goto main_menu
+
+:chat_section
+cls
+echo ================================================================================
+echo                         CHAT WITH AI ASSISTANT
+echo ================================================================================
+echo Type your question and press Enter.
+echo Special commands: 'menu' (return to main portal), 'exit' (quit)
+echo.
+
+:chat_loop
+set "user_msg="
+set /p "user_msg=You: "
+if not defined user_msg goto chat_loop
+if /i "%user_msg%"=="exit" goto :eof
+if /i "%user_msg%"=="quit" goto :eof
+if /i "%user_msg%"=="q" goto :eof
+if /i "%user_msg%"=="menu" goto main_menu
+if /i "%user_msg%"=="back" goto main_menu
+
+echo.
+echo AI is thinking...
+curl.exe -s -d "%user_msg%" ${baseUrl}/q
+echo.
+echo.
+goto chat_loop
+
+:qa_section
+cls
+echo ================================================================================
+echo                   QUESTIONS ^& ANSWERS -- SELECT A TOPIC
+echo ================================================================================
+echo  [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
+echo  [2]  CO1 Q2: Employee Performance Report ^& Department Stats
+echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
+echo  [4]  Q4: All 13 Visualizations (Matplotlib, Seaborn, Subplots)
+echo  [5]  k-NN Classifier From Scratch (All Metrics, Predict, Evaluate)
+echo  [6]  Bayes Theorem (Clinical Liver Disease Problem)
+echo  [7]  Weather Prediction (Naive Bayes ^& Laplace Smoothing)
+echo  [8]  Student Feedback Text Multinomial Naive Bayes
+echo  [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
+echo  [10] Record: EDA, 5 Observations ^& 6-Plot Dashboard
+echo  [11] Final 10-Minute Quick Revision Table
+echo  [12] Master Revision Sheet (Complete syllabus in one file)
+echo.
+echo  [M]  Return to Main Portal
+echo  [0]  Exit
+echo ================================================================================
+set "qa_choice="
+set /p "qa_choice=Select topic [1-12, or M]: "
+
+if "%qa_choice%"=="1" ( cls & curl.exe -s ${baseUrl}/q1 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="2" ( cls & curl.exe -s ${baseUrl}/q2 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="3" ( cls & curl.exe -s ${baseUrl}/q3 & echo. & pause & goto qa_section )
+if "%qa_choice%"=="4" ( cls & curl.exe -s ${baseUrl}/viz & echo. & pause & goto qa_section )
+if "%qa_choice%"=="5" ( cls & curl.exe -s ${baseUrl}/knn & echo. & pause & goto qa_section )
+if "%qa_choice%"=="6" ( cls & curl.exe -s ${baseUrl}/bayes & echo. & pause & goto qa_section )
+if "%qa_choice%"=="7" ( cls & curl.exe -s ${baseUrl}/weather & echo. & pause & goto qa_section )
+if "%qa_choice%"=="8" ( cls & curl.exe -s ${baseUrl}/feedback & echo. & pause & goto qa_section )
+if "%qa_choice%"=="9" ( cls & curl.exe -s ${baseUrl}/tree & echo. & pause & goto qa_section )
+if "%qa_choice%"=="10" ( cls & curl.exe -s ${baseUrl}/eda & echo. & pause & goto qa_section )
+if "%qa_choice%"=="11" ( cls & curl.exe -s ${baseUrl}/quick & echo. & pause & goto qa_section )
+if "%qa_choice%"=="12" ( cls & curl.exe -s ${baseUrl}/ds & echo. & pause & goto qa_section )
+if /i "%qa_choice%"=="m" goto main_menu
+if "%qa_choice%"=="0" goto :eof
+
+echo Invalid selection.
+pause
+goto qa_section
+`;
+}
+
+function generatePowerShellLauncher(baseUrl) {
+  return `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$BaseUrl = "${baseUrl}".TrimEnd('/')
+
+function Start-Chat {
+    Clear-Host
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "                         CHAT WITH AI ASSISTANT                                 " -ForegroundColor Green
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Type your question and press Enter. Type 'menu' to return, or 'exit' to quit.\`n"
+    while ($true) {
+        $q = (Read-Host "You").Trim()
+        if ([string]::IsNullOrWhiteSpace($q)) { continue }
+        if ($q -in @("exit", "quit", "q")) { break }
+        if ($q -in @("menu", "back")) { return }
+        Write-Host "\`nThinking..." -ForegroundColor DarkGray
+        try {
+            $ans = Invoke-RestMethod -Uri "$BaseUrl/q" -Method Post -Body $q
+            Write-Host "\`nAI Answer:\`n$ans\`n" -ForegroundColor Cyan
+        } catch {
+            Write-Host "Error: $($_.Exception.Message)\`n" -ForegroundColor Red
+        }
+    }
+}
+
+function Show-QaMenu {
+    $routes = @{
+        "1"  = "/q1"; "2"  = "/q2"; "3"  = "/q3"; "4"  = "/viz"
+        "5"  = "/knn"; "6" = "/bayes"; "7"  = "/weather"; "8"  = "/feedback"
+        "9"  = "/tree"; "10" = "/eda"; "11" = "/quick"; "12" = "/ds"
+    }
+    while ($true) {
+        Clear-Host
+        Write-Host "================================================================================" -ForegroundColor Cyan
+        Write-Host "                   QUESTIONS & ANSWERS -- SELECT A TOPIC                        " -ForegroundColor Green
+        Write-Host "================================================================================" -ForegroundColor Cyan
+        Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis"
+        Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department"
+        Write-Host " [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
+        Write-Host " [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)"
+        Write-Host " [5]  k-NN Classification From Scratch (All Distance Metrics & Predict)"
+        Write-Host " [6]  Bayes Theorem (Clinical Liver Disease Calculation)"
+        Write-Host " [7]  Weather Prediction (Laplace Smoothing & Naive Bayes)"
+        Write-Host " [8]  Student Feedback Text Multinomial Naive Bayes"
+        Write-Host " [9]  Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
+        Write-Host " [10] Record: EDA, 5 Observations & 6-Plot Dashboard"
+        Write-Host " [11] Final 10-Minute Quick Revision Table"
+        Write-Host " [12] Master Revision Sheet (Complete syllabus in one file)"
+        Write-Host " [M]  Return to Main Portal"
+        Write-Host " [0]  Exit"
+        Write-Host "================================================================================" -ForegroundColor Cyan
+        $choice = (Read-Host "Select topic [1-12, or M]").Trim()
+        if ($choice -in @("0", "exit", "q")) { exit }
+        if ($choice -in @("m", "back", "menu")) { return }
+        if ($routes.ContainsKey($choice)) {
+            Clear-Host
+            $url = "$BaseUrl$($routes[$choice])"
+            try {
+                $txt = (New-Object Net.WebClient).DownloadString($url)
+                Write-Host $txt
+            } catch {
+                Write-Host "Error fetching $url" -ForegroundColor Red
+            }
+            Read-Host "\`nPress Enter to return to menu..."
+        }
+    }
+}
+
+while ($true) {
+    Clear-Host
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "                    DATA SCIENCE LAB -- MAIN PORTAL                             " -ForegroundColor Green
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host " [1] Chat with AI Assistant (Interactive Terminal)"
+    Write-Host " [2] Show Questions & Answers (CO1, k-NN, Bayes, Decision Trees, EDA)"
+    Write-Host " [0] Exit"
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    $mainChoice = (Read-Host "Enter choice [1 or 2]").Trim()
+    if ($mainChoice -eq "1") { Start-Chat }
+    elseif ($mainChoice -eq "2") { Show-QaMenu }
+    elseif ($mainChoice -in @("0", "exit", "q")) { break }
+}
+`;
+}
+
 module.exports = async (req, res) => {
   const protocol = req.headers["x-forwarded-proto"] || "https";
-  const host = req.headers["x-forwarded-host"] || req.headers.host || "updates-opal.vercel.app";
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "tester-red-two.vercel.app";
   const baseUrl = `${protocol}://${host}`;
 
   const accept = (req.headers["accept"] || "").toLowerCase();
@@ -647,6 +831,15 @@ module.exports = async (req, res) => {
       format === "ps1" ||
       userAgent.includes("powershell") ||
       userAgent.includes("pwsh");
+
+    if (action === "run" || format === "run" || action === "start" || format === "start" || action === "launcher" || format === "launcher") {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.setHeader("Cache-Control", "no-store");
+      if (isPowerShell) {
+        return res.status(200).send(generatePowerShellLauncher(baseUrl));
+      }
+      return res.status(200).send(generateMainLauncher(baseUrl));
+    }
 
     if (action === "menu" || format === "menu") {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");

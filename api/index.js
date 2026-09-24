@@ -2,55 +2,60 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = (req, res) => {
+  // If request has POST body or ?q= query, forward directly to AI
   if (req.method === "POST" || req.query?.q) {
     const groqHandler = require("./groq");
     return groqHandler(req, res);
   }
 
-  const filesDirectory = path.join(process.cwd(), "files");
+  const protocol = req.headers["x-forwarded-proto"] || "https";
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "tester-red-two.vercel.app";
+  const baseUrl = `${protocol}://${host}`;
 
-  try {
-    const files = fs
-      .readdirSync(filesDirectory, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && !entry.name.startsWith("."))
-      .map((entry) => entry.name)
-      .sort((a, b) => a.localeCompare(b));
+  const output = `================================================================================
+                    DATA SCIENCE LAB -- COMMAND PORTAL
+================================================================================
 
-    const protocol = req.headers["x-forwarded-proto"] || "https";
-    const host = req.headers.host || "updates-opal.vercel.app";
-    const baseUrl = `${protocol}://${host}`;
+CHOOSE AN OPTION:
 
-    let output = `${baseUrl}\n│\n`;
+ [1] CHAT WITH AI ASSISTANT
+     Interactive CLI chat to ask any question and get instant code & answers.
 
-    // List files
-    files.forEach((file, index) => {
-      const fileUrl = `${baseUrl}/${encodeURIComponent(file)}`;
-      const num = String(index + 1).padStart(2, "0");
+     >> To start Chat in CMD:
+        curl.exe -s ${baseUrl}/c > c.bat && c
 
-      output += `├── ${num} ${file}\n`;
-      output += `│      ${fileUrl}\n`;
-      output += `│\n`;
-    });
+     >> Or ask a single question directly:
+        curl.exe -s -d "What is Bayes Theorem?" ${baseUrl}/q
 
-    // Add Groq CLI
-    const groqNumber = String(files.length + 1).padStart(2, "0");
 
-    output += `└── ${groqNumber} groq\n`;
-    output += `       ${baseUrl}/groq\n`;
-    output += `                              │\n`;
-    output += `                              ▼\n`;
-    output += `                         Groq CLI\n`;
+ [2] SHOW QUESTIONS & ANSWERS
+     Complete syllabus questions, step-by-step python code, and explanations.
 
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
+     >> To open Interactive Q&A Menu in CMD:
+        curl.exe -s ${baseUrl}/m > m.bat && m
 
-    return res.status(200).send(output);
+     >> Or view all questions & answers directly:
+        curl.exe -s ${baseUrl}/2
 
-  } catch (error) {
-    console.error("File listing error:", error);
+================================================================================
+ ALL-IN-ONE INTERACTIVE PORTAL (Chat + Q&A in a single command):
+ curl.exe -s ${baseUrl}/run > r.bat && r
+================================================================================
+ QUICK DIRECT ANSWERS:
+   * 10-Min Revision Sheet:   curl.exe -s ${baseUrl}/quick
+   * CO1 Q1 (Students 25):    curl.exe -s ${baseUrl}/q1
+   * CO1 Q2 (Employees 30):   curl.exe -s ${baseUrl}/q2
+   * CO1 Q3 (Pandas 30):      curl.exe -s ${baseUrl}/q3
+   * Q4 (13 Visualizations):  curl.exe -s ${baseUrl}/viz
+   * k-NN From Scratch:       curl.exe -s ${baseUrl}/knn
+   * Bayes Theorem Problem:   curl.exe -s ${baseUrl}/bayes
+   * Weather Naive Bayes:     curl.exe -s ${baseUrl}/weather
+   * Decision Tree (C5.0):    curl.exe -s ${baseUrl}/tree
+   * Record EDA & Dashboard:  curl.exe -s ${baseUrl}/eda
+================================================================================
+`;
 
-    return res
-      .status(500)
-      .send("Unable to read files directory.");
-  }
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  return res.status(200).send(output);
 };
