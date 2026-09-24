@@ -22,9 +22,9 @@ module.exports = (req, res) => {
          In PowerShell: irm ${baseUrl}/s
 
       >> Direct Single Questions:
-         * ${baseUrl}/s1  (or /eda)      -> Q1: Exploratory Data Visualization
-         * ${baseUrl}/s2  (or /knn)      -> Q2: k-NN Classification From Scratch
-         * ${baseUrl}/s3  (or /nb)       -> Q2: Multinomial Naive Bayes with Laplace
+         * ${baseUrl}/1   (or /eda)      -> Q1: Exploratory Data Visualization
+         * ${baseUrl}/2   (or /knn)      -> Q2: k-NN Classification From Scratch
+         * ${baseUrl}/3   (or /nb)       -> Q2: Multinomial Naive Bayes with Laplace
 
   [A] CHAT WITH AI ASSISTANT:
       >> In CMD:        curl.exe -s ${baseUrl}/c > c.bat && c
@@ -41,19 +41,19 @@ module.exports = (req, res) => {
       >> In PowerShell: irm ${baseUrl}/run | iex
 
 ================================================================================
- VIEW DIRECT QUESTIONS (Use: curl.exe -s ${baseUrl}/<num>  OR  irm ${baseUrl}/<num>):
+ COMPLETE QUESTIONS LIST (Use: curl.exe -s ${baseUrl}/<num>  OR  irm ${baseUrl}/<num>):
 ================================================================================
-   * ${baseUrl}/1   -> [CO1 Q1] Student Dataset Stats (25 Students)
-   * ${baseUrl}/2   -> [CO1 Q2] Employee Performance Report & Best Department (30 Emps)
-   * ${baseUrl}/3   -> [CO1 Q3] 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
-   * ${baseUrl}/4   -> [Q4] All 13 Visualization Exercises (Matplotlib & Seaborn)
-   * ${baseUrl}/5   -> [Record 1] Exploratory Data Visualization (7 Plots & 5 Observations)
-   * ${baseUrl}/6   -> [Record 2] Unified 6-Plot Dashboard & Report
-   * ${baseUrl}/7   -> [Record 3] Public Dataset EDA (100+ Records & Insights)
-   * ${baseUrl}/8   -> [k-NN] Classification From Scratch (All Metrics, Parts A-E)
-   * ${baseUrl}/9   -> [Bayes] Clinical Liver Disease Calculation & Derivation
-   * ${baseUrl}/10  -> [Weather] Weather Prediction with Laplace Estimator
-   * ${baseUrl}/11  -> [Feedback] Student Feedback Text Multinomial Naive Bayes
+   * ${baseUrl}/1   -> [★ SURE-SHOT 1] Exploratory Data Visualization (7 Plots & 5 Observations)
+   * ${baseUrl}/2   -> [★ SURE-SHOT 2] k-NN Classification From Scratch (All Metrics, Parts A-E)
+   * ${baseUrl}/3   -> [★ SURE-SHOT 3] Multinomial Naive Bayes with Laplace (Feedback Text)
+   * ${baseUrl}/4   -> [CO1 Q1] Student Dataset Statistical Analysis (25 Students)
+   * ${baseUrl}/5   -> [CO1 Q2] Employee Performance Report & Best Department (30 Emps)
+   * ${baseUrl}/6   -> [CO1 Q3] 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
+   * ${baseUrl}/7   -> [Q4] All 13 Visualization Exercises (Matplotlib & Seaborn)
+   * ${baseUrl}/8   -> [Record 2] Unified 6-Plot Dashboard & Report
+   * ${baseUrl}/9   -> [Record 3] Public Dataset EDA (100+ Records & Insights)
+   * ${baseUrl}/10  -> [Bayes] Clinical Liver Disease Calculation & Derivation
+   * ${baseUrl}/11  -> [Weather] Weather Prediction with Laplace Estimator
    * ${baseUrl}/12  -> [Decision Tree] C5.0 Algorithm (Loan Eligibility & Rules)
    * ${baseUrl}/13  -> [Summary] 10-Minute Final Revision Summary Table
    * ${baseUrl}/14  -> [Master] Complete All-in-One Revision Sheet (/all)

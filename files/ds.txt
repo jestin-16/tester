@@ -2,20 +2,21 @@
 DATA SCIENCE LAB -- COMPLETE EXAM QUESTIONS & CODE REPOSITORY
 ================================================================================
 INDEX OF LAB RECORD QUESTIONS & DIRECT URL ENDPOINTS:
-  [1]  CO1 Q1: Student Dataset Stats (25 Students)          -> /1  or  /q1
-  [2]  CO1 Q2: Employee Performance & Best Dept (30 Emps)   -> /2  or  /q2
-  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute)     -> /3  or  /q3
-  [4]  Q4: All 13 Visualization Exercises (Matplotlib/SNS)  -> /4  or  /viz
-  [5]  Record 1: Exploratory Data Visualization (7 Plots)    -> /5  or  /eda1
-  [6]  Record 2: Unified 6-Plot Dashboard & Report           -> /6  or  /dash
-  [7]  Record 3: Public Dataset EDA (100+ Records, Insights) -> /7  or  /eda3
-  [8]  k-NN Classifier from Scratch (Parts A to E)           -> /8  or  /knn
-  [9]  Bayes Theorem (Clinical Liver Disease Calculation)    -> /9  or  /bayes
-  [10] Weather Prediction (Laplace Naive Bayes)              -> /10 or  /weather
-  [11] Student Feedback Text Multinomial Naive Bayes         -> /11 or  /feedback
-  [12] Decision Tree C5.0 (Loan Eligibility & IF-THEN Rules) -> /12 or  /tree
-  [13] Final 10-Minute Quick Revision Summary Table          -> /13 or  /quick
-  [14] Master Revision Sheet (Complete All-in-One: /all)     -> /14 or  /all
+  [S]  ★ ALL 3 SURE-SHOT EXAM QUESTIONS (Unified)       -> /s  or  /sure
+  [1]  ★ SURE-SHOT 1: Exploratory Data Viz (7 Plots)    -> /1  or  /eda
+  [2]  ★ SURE-SHOT 2: k-NN From Scratch (All Metrics)   -> /2  or  /knn
+  [3]  ★ SURE-SHOT 3: Multinomial Naive Bayes (Laplace) -> /3  or  /nb
+  [4]  CO1 Q1: Student Dataset Stats (25 Students)      -> /4  or  /q1
+  [5]  CO1 Q2: Employee Performance & Best Dept (30)    -> /5  or  /q2
+  [6]  CO1 Q3: 30-Record Pandas Workflow (Clean, Rank)  -> /6  or  /q3
+  [7]  Q4: All 13 Visualization Exercises (Matplotlib)   -> /7  or  /viz
+  [8]  Record 2: Unified 6-Plot Dashboard & Report       -> /8  or  /dash
+  [9]  Record 3: Public Dataset EDA (100+ Records)       -> /9  or  /eda3
+  [10] Bayes Theorem (Clinical Liver Disease)            -> /10 or  /bayes
+  [11] Weather Prediction (Laplace Naive Bayes)          -> /11 or  /weather
+  [12] Decision Tree C5.0 (Loan Eligibility & Rules)     -> /12 or  /tree
+  [13] Final 10-Minute Quick Revision Summary Table      -> /13 or  /quick
+  [14] Master Revision Sheet (Complete All-in-One: /all) -> /14 or  /all
 ================================================================================
 
 --------------------------------------------------------------------------------

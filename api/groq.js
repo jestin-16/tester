@@ -488,22 +488,22 @@ cls
 echo ================================================================================
 echo            DATA SCIENCE LAB -- QUESTIONS & ANSWERS (EXAM REVISION)
 echo ================================================================================
-echo  [S]  ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)
+echo  [1]  ★ SURE-SHOT 1: Exploratory Data Visualization (7 Plots ^& 5 Observations)
+echo  [2]  ★ SURE-SHOT 2: k-NN Classification From Scratch (Healthcare Cardio Risk)
+echo  [3]  ★ SURE-SHOT 3: Multinomial Naive Bayes with Laplace (Feedback Text)
 echo --------------------------------------------------------------------------------
-echo  [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
-echo  [2]  CO1 Q2: Employee Performance Report ^& Best Department (30 Emps)
-echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
-echo  [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)
-echo  [5]  Record 1: Exploratory Data Visualization (7 Plots ^& 5 Observations)
-echo  [6]  Record 2: Unified 6-Plot Dashboard ^& Report
-echo  [7]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)
-echo  [8]  k-NN Classification From Scratch (Healthcare Cardiovascular Risk)
-echo  [9]  Bayes Theorem (Clinical Liver Disease Calculation)
-echo  [10] Weather Prediction (Laplace Smoothing ^& Naive Bayes)
-echo  [11] Student Feedback Text Multinomial Naive Bayes
+echo  [4]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
+echo  [5]  CO1 Q2: Employee Performance Report ^& Best Department (30 Emps)
+echo  [6]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
+echo  [7]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)
+echo  [8]  Record 2: Unified 6-Plot Dashboard ^& Report
+echo  [9]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)
+echo  [10] Bayes Theorem (Clinical Liver Disease Calculation)
+echo  [11] Weather Prediction (Laplace Smoothing ^& Naive Bayes)
 echo  [12] Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
 echo  [13] Final 10-Minute Quick Revision Table
 echo  [14] Master Revision Sheet (Complete All-in-One)
+echo  [S]  ★ All 3 Sure-Shot Questions Combined in 1 File
 echo  [A]  Ask AI Custom Question
 echo  [0]  Exit
 echo ================================================================================
@@ -662,22 +662,22 @@ function Show-Menu {
     Write-Host "================================================================================" -ForegroundColor Cyan
     Write-Host "                   DATA SCIENCE LAB -- SELECT A QUESTION                        " -ForegroundColor Green
     Write-Host "================================================================================" -ForegroundColor Cyan
-    Write-Host " [S]  ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)" -ForegroundColor Yellow
+    Write-Host " [1]  ★ SURE-SHOT 1: Exploratory Data Visualization (7 Plots & 5 Observations)" -ForegroundColor Yellow
+    Write-Host " [2]  ★ SURE-SHOT 2: k-NN Classification From Scratch (Healthcare Cardio Risk)" -ForegroundColor Yellow
+    Write-Host " [3]  ★ SURE-SHOT 3: Multinomial Naive Bayes with Laplace (Feedback Text)" -ForegroundColor Yellow
     Write-Host "--------------------------------------------------------------------------------" -ForegroundColor DarkGray
-    Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)"
-    Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department (30 Emps)"
-    Write-Host " [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
-    Write-Host " [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)"
-    Write-Host " [5]  Record 1: Exploratory Data Visualization (7 Plots & 5 Observations)"
-    Write-Host " [6]  Record 2: Unified 6-Plot Dashboard & Report"
-    Write-Host " [7]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)"
-    Write-Host " [8]  k-NN Classification From Scratch (All Distance Metrics & Predict)"
-    Write-Host " [9]  Bayes Theorem (Clinical Liver Disease Calculation)"
-    Write-Host " [10] Weather Prediction (Laplace Smoothing & Naive Bayes)"
-    Write-Host " [11] Student Feedback Text Multinomial Naive Bayes"
+    Write-Host " [4]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)"
+    Write-Host " [5]  CO1 Q2: Employee Performance Report & Best Department (30 Emps)"
+    Write-Host " [6]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
+    Write-Host " [7]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)"
+    Write-Host " [8]  Record 2: Unified 6-Plot Dashboard & Report"
+    Write-Host " [9]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)"
+    Write-Host " [10] Bayes Theorem (Clinical Liver Disease Calculation)"
+    Write-Host " [11] Weather Prediction (Laplace Smoothing & Naive Bayes)"
     Write-Host " [12] Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
     Write-Host " [13] Final 10-Minute Quick Revision Table"
     Write-Host " [14] Master Revision Sheet (Complete All-in-One)"
+    Write-Host " [S]  ★ All 3 Sure-Shot Questions Combined in 1 File" -ForegroundColor Cyan
     Write-Host " [A]  Ask AI Custom Question"
     Write-Host " [0]  Exit"
     Write-Host "================================================================================" -ForegroundColor Cyan
@@ -791,22 +791,22 @@ cls
 echo ================================================================================
 echo                   QUESTIONS ^& ANSWERS -- SELECT A TOPIC
 echo ================================================================================
-echo  [S]  ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)
+echo  [1]  ★ SURE-SHOT 1: Exploratory Data Visualization (7 Plots ^& 5 Observations)
+echo  [2]  ★ SURE-SHOT 2: k-NN Classification From Scratch (Healthcare Cardio Risk)
+echo  [3]  ★ SURE-SHOT 3: Multinomial Naive Bayes with Laplace (Feedback Text)
 echo --------------------------------------------------------------------------------
-echo  [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
-echo  [2]  CO1 Q2: Employee Performance Report ^& Department Stats (30 Emps)
-echo  [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
-echo  [4]  Q4: All 13 Visualizations (Matplotlib, Seaborn, Subplots)
-echo  [5]  Record 1: Exploratory Data Visualization (7 Plots ^& 5 Observations)
-echo  [6]  Record 2: Unified 6-Plot Dashboard ^& Report
-echo  [7]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)
-echo  [8]  k-NN Classifier From Scratch (All Metrics, Predict, Evaluate)
-echo  [9]  Bayes Theorem (Clinical Liver Disease Problem)
-echo  [10] Weather Prediction (Naive Bayes ^& Laplace Smoothing)
-echo  [11] Student Feedback Text Multinomial Naive Bayes
+echo  [4]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)
+echo  [5]  CO1 Q2: Employee Performance Report ^& Department Stats (30 Emps)
+echo  [6]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)
+echo  [7]  Q4: All 13 Visualizations (Matplotlib, Seaborn, Subplots)
+echo  [8]  Record 2: Unified 6-Plot Dashboard ^& Report
+echo  [9]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)
+echo  [10] Bayes Theorem (Clinical Liver Disease Problem)
+echo  [11] Weather Prediction (Naive Bayes ^& Laplace Smoothing)
 echo  [12] Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)
 echo  [13] Final 10-Minute Quick Revision Table
 echo  [14] Master Revision Sheet (Complete syllabus in one file)
+echo  [S]  ★ All 3 Sure-Shot Questions Combined in 1 File
 echo.
 echo  [M]  Return to Main Portal
 echo  [0]  Exit
@@ -877,22 +877,22 @@ function Show-QaMenu {
         Write-Host "================================================================================" -ForegroundColor Cyan
         Write-Host "                   QUESTIONS & ANSWERS -- SELECT A TOPIC                        " -ForegroundColor Green
         Write-Host "================================================================================" -ForegroundColor Cyan
-        Write-Host " [S]  ★ SURE-SHOT EXAM QUESTIONS (All 3 Confirmed Questions in 1)" -ForegroundColor Yellow
+        Write-Host " [1]  ★ SURE-SHOT 1: Exploratory Data Visualization (7 Plots & 5 Observations)" -ForegroundColor Yellow
+        Write-Host " [2]  ★ SURE-SHOT 2: k-NN Classification From Scratch (Healthcare Cardio Risk)" -ForegroundColor Yellow
+        Write-Host " [3]  ★ SURE-SHOT 3: Multinomial Naive Bayes with Laplace (Feedback Text)" -ForegroundColor Yellow
         Write-Host "--------------------------------------------------------------------------------" -ForegroundColor DarkGray
-        Write-Host " [1]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)"
-        Write-Host " [2]  CO1 Q2: Employee Performance Report & Best Department (30 Emps)"
-        Write-Host " [3]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
-        Write-Host " [4]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)"
-        Write-Host " [5]  Record 1: Exploratory Data Visualization (7 Plots & 5 Observations)"
-        Write-Host " [6]  Record 2: Unified 6-Plot Dashboard & Report"
-        Write-Host " [7]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)"
-        Write-Host " [8]  k-NN Classification From Scratch (All Distance Metrics & Predict)"
-        Write-Host " [9]  Bayes Theorem (Clinical Liver Disease Calculation)"
-        Write-Host " [10] Weather Prediction (Laplace Smoothing & Naive Bayes)"
-        Write-Host " [11] Student Feedback Text Multinomial Naive Bayes"
+        Write-Host " [4]  CO1 Q1: Student Dataset Statistical Analysis (25 Students)"
+        Write-Host " [5]  CO1 Q2: Employee Performance Report & Best Department (30 Emps)"
+        Write-Host " [6]  CO1 Q3: 30-Record Pandas Workflow (Clean, Impute, Rank, Export)"
+        Write-Host " [7]  Q4: All 13 Visualization Exercises (Matplotlib, Seaborn, Subplots)"
+        Write-Host " [8]  Record 2: Unified 6-Plot Dashboard & Report"
+        Write-Host " [9]  Record 3: Comprehensive EDA on Public Dataset (100+ Records, Insights)"
+        Write-Host " [10] Bayes Theorem (Clinical Liver Disease Calculation)"
+        Write-Host " [11] Weather Prediction (Laplace Smoothing & Naive Bayes)"
         Write-Host " [12] Decision Tree C5.0 (Bank Loan Eligibility, Entropy, Rules)"
         Write-Host " [13] Final 10-Minute Quick Revision Table"
         Write-Host " [14] Master Revision Sheet (Complete syllabus in one file)"
+        Write-Host " [S]  ★ All 3 Sure-Shot Questions Combined in 1 File" -ForegroundColor Cyan
         Write-Host " [M]  Return to Main Portal"
         Write-Host " [0]  Exit"
         Write-Host "================================================================================" -ForegroundColor Cyan

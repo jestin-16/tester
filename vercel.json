@@ -55,83 +55,83 @@
     },
     {
       "source": "/1",
-      "destination": "/files/co1_q1.txt"
+      "destination": "/files/record_eda.txt"
     },
     {
       "source": "/01",
-      "destination": "/files/co1_q1.txt"
+      "destination": "/files/record_eda.txt"
     },
     {
       "source": "/2",
-      "destination": "/files/co1_q2.txt"
+      "destination": "/files/knn_scratch.txt"
     },
     {
       "source": "/02",
-      "destination": "/files/co1_q2.txt"
+      "destination": "/files/knn_scratch.txt"
     },
     {
       "source": "/3",
-      "destination": "/files/co1_q3.txt"
+      "destination": "/files/feedback_nb.txt"
     },
     {
       "source": "/03",
-      "destination": "/files/co1_q3.txt"
+      "destination": "/files/feedback_nb.txt"
     },
     {
       "source": "/4",
-      "destination": "/files/q4_viz.txt"
+      "destination": "/files/co1_q1.txt"
     },
     {
       "source": "/04",
-      "destination": "/files/q4_viz.txt"
+      "destination": "/files/co1_q1.txt"
     },
     {
       "source": "/5",
-      "destination": "/files/record_eda.txt"
+      "destination": "/files/co1_q2.txt"
     },
     {
       "source": "/05",
-      "destination": "/files/record_eda.txt"
+      "destination": "/files/co1_q2.txt"
     },
     {
       "source": "/6",
-      "destination": "/files/record_dash.txt"
+      "destination": "/files/co1_q3.txt"
     },
     {
       "source": "/06",
-      "destination": "/files/record_dash.txt"
+      "destination": "/files/co1_q3.txt"
     },
     {
       "source": "/7",
-      "destination": "/files/record_full_eda.txt"
+      "destination": "/files/q4_viz.txt"
     },
     {
       "source": "/07",
-      "destination": "/files/record_full_eda.txt"
+      "destination": "/files/q4_viz.txt"
     },
     {
       "source": "/8",
-      "destination": "/files/knn_scratch.txt"
+      "destination": "/files/record_dash.txt"
     },
     {
       "source": "/08",
-      "destination": "/files/knn_scratch.txt"
+      "destination": "/files/record_dash.txt"
     },
     {
       "source": "/9",
-      "destination": "/files/bayes_problem.txt"
+      "destination": "/files/record_full_eda.txt"
     },
     {
       "source": "/09",
-      "destination": "/files/bayes_problem.txt"
+      "destination": "/files/record_full_eda.txt"
     },
     {
       "source": "/10",
-      "destination": "/files/weather_laplace.txt"
+      "destination": "/files/bayes_problem.txt"
     },
     {
       "source": "/11",
-      "destination": "/files/feedback_nb.txt"
+      "destination": "/files/weather_laplace.txt"
     },
     {
       "source": "/12",
