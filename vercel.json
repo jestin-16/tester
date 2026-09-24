@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
   "functions": {
     "api/index.js": {
       "includeFiles": "files/**"
@@ -9,7 +8,6 @@
       "includeFiles": "ui/**"
     }
   },
-
   "rewrites": [
     {
       "source": "/",
@@ -45,10 +43,86 @@
     },
     {
       "source": "/1",
-      "destination": "/api/groq?format=bat"
+      "destination": "/files/co1_q1.txt"
+    },
+    {
+      "source": "/01",
+      "destination": "/files/co1_q1.txt"
     },
     {
       "source": "/2",
+      "destination": "/files/co1_q2.txt"
+    },
+    {
+      "source": "/02",
+      "destination": "/files/co1_q2.txt"
+    },
+    {
+      "source": "/3",
+      "destination": "/files/co1_q3.txt"
+    },
+    {
+      "source": "/03",
+      "destination": "/files/co1_q3.txt"
+    },
+    {
+      "source": "/4",
+      "destination": "/files/q4_viz.txt"
+    },
+    {
+      "source": "/04",
+      "destination": "/files/q4_viz.txt"
+    },
+    {
+      "source": "/5",
+      "destination": "/files/knn_scratch.txt"
+    },
+    {
+      "source": "/05",
+      "destination": "/files/knn_scratch.txt"
+    },
+    {
+      "source": "/6",
+      "destination": "/files/bayes_problem.txt"
+    },
+    {
+      "source": "/06",
+      "destination": "/files/bayes_problem.txt"
+    },
+    {
+      "source": "/7",
+      "destination": "/files/weather_laplace.txt"
+    },
+    {
+      "source": "/07",
+      "destination": "/files/weather_laplace.txt"
+    },
+    {
+      "source": "/8",
+      "destination": "/files/feedback_nb.txt"
+    },
+    {
+      "source": "/08",
+      "destination": "/files/feedback_nb.txt"
+    },
+    {
+      "source": "/9",
+      "destination": "/files/decision_tree.txt"
+    },
+    {
+      "source": "/09",
+      "destination": "/files/decision_tree.txt"
+    },
+    {
+      "source": "/10",
+      "destination": "/files/eda_record.txt"
+    },
+    {
+      "source": "/11",
+      "destination": "/files/quick.txt"
+    },
+    {
+      "source": "/12",
       "destination": "/files/ds.txt"
     },
     {

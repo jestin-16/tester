@@ -16,42 +16,33 @@ module.exports = (req, res) => {
                     DATA SCIENCE LAB -- COMMAND PORTAL
 ================================================================================
 
-CHOOSE AN OPTION:
+  [A] CHAT WITH AI ASSISTANT:
+      >> Interactive Terminal Chat:
+         curl.exe -s ${baseUrl}/c > c.bat && c
 
- [1] CHAT WITH AI ASSISTANT
-     Interactive CLI chat to ask any question and get instant code & answers.
-
-     >> To start Chat in CMD:
-        curl.exe -s ${baseUrl}/c > c.bat && c
-
-     >> Or ask a single question directly:
-        curl.exe -s -d "What is Bayes Theorem?" ${baseUrl}/q
+      >> Ask single question directly:
+         curl.exe -s -d "What is Bayes Theorem?" ${baseUrl}/q
 
 
- [2] SHOW QUESTIONS & ANSWERS
-     Complete syllabus questions, step-by-step python code, and explanations.
-
-     >> To open Interactive Q&A Menu in CMD:
-        curl.exe -s ${baseUrl}/m > m.bat && m
-
-     >> Or view all questions & answers directly:
-        curl.exe -s ${baseUrl}/2
+  [B] ALL-IN-ONE INTERACTIVE PORTAL (Chat + Q&A in 1 Tool):
+      >> Launch interactive menu in CMD:
+         curl.exe -s ${baseUrl}/run > r.bat && r
 
 ================================================================================
- ALL-IN-ONE INTERACTIVE PORTAL (Chat + Q&A in a single command):
- curl.exe -s ${baseUrl}/run > r.bat && r
+ DIRECT QUESTION & ANSWER NUMBERS (View with: curl.exe -s ${baseUrl}/<num>):
 ================================================================================
- QUICK DIRECT ANSWERS:
-   * 10-Min Revision Sheet:   curl.exe -s ${baseUrl}/quick
-   * CO1 Q1 (Students 25):    curl.exe -s ${baseUrl}/q1
-   * CO1 Q2 (Employees 30):   curl.exe -s ${baseUrl}/q2
-   * CO1 Q3 (Pandas 30):      curl.exe -s ${baseUrl}/q3
-   * Q4 (13 Visualizations):  curl.exe -s ${baseUrl}/viz
-   * k-NN From Scratch:       curl.exe -s ${baseUrl}/knn
-   * Bayes Theorem Problem:   curl.exe -s ${baseUrl}/bayes
-   * Weather Naive Bayes:     curl.exe -s ${baseUrl}/weather
-   * Decision Tree (C5.0):    curl.exe -s ${baseUrl}/tree
-   * Record EDA & Dashboard:  curl.exe -s ${baseUrl}/eda
+   * curl.exe -s ${baseUrl}/1   -> CO1 Q1: Student Dataset Stats (25 Students)
+   * curl.exe -s ${baseUrl}/2   -> CO1 Q2: Employee Performance & Best Dept
+   * curl.exe -s ${baseUrl}/3   -> CO1 Q3: 30-Record Pandas Workflow (Impute, Rank)
+   * curl.exe -s ${baseUrl}/4   -> Q4: All 13 Visualizations (Matplotlib & Seaborn)
+   * curl.exe -s ${baseUrl}/5   -> k-NN Classifier From Scratch (All 5 Metrics)
+   * curl.exe -s ${baseUrl}/6   -> Bayes Theorem (Clinical Liver Disease Problem)
+   * curl.exe -s ${baseUrl}/7   -> Weather Prediction (Naive Bayes & Laplace)
+   * curl.exe -s ${baseUrl}/8   -> Student Feedback Text Multinomial Naive Bayes
+   * curl.exe -s ${baseUrl}/9   -> Decision Tree C5.0 (Loan Eligibility Rules)
+   * curl.exe -s ${baseUrl}/10  -> Record EDA, 5 Observations & 6-Plot Dashboard
+   * curl.exe -s ${baseUrl}/11  -> 10-Minute Quick Summary Table
+   * curl.exe -s ${baseUrl}/12  -> Master Revision Sheet (Complete All-in-One)
 ================================================================================
 `;
 

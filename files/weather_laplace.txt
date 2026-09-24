@@ -1,15 +1,20 @@
 ================================================================================
 WEATHER PREDICTION USING NAIVE BAYES & LAPLACE ESTIMATOR
 ================================================================================
-Problem Statement:
-Predict whether an outdoor game can be conducted for test condition:
-    Outlook = Overcast, Temperature = Mild, Humidity = High, Wind = Strong
-Compare Naive Bayes probabilities with and without Laplace smoothing.
-================================================================================
 
+PROBLEM STATEMENT:
+Predict whether an outdoor tennis match can be played for the test condition:
+  Outlook = Overcast, Temperature = Mild, Humidity = High, Wind = Strong
+Compare classification results:
+  (1) Without Laplace Smoothing (Demonstrating the Zero-Probability problem)
+  (2) With Laplace Smoothing (Using additive alpha = 1)
+
+--------------------------------------------------------------------------------
+1. PYTHON CODE (COPY & RUN DIRECTLY)
+--------------------------------------------------------------------------------
 import pandas as pd
 
-# 1. Create and display the Weather dataset
+# Training Dataset (10 instances)
 data = {
     "Outlook":     ["Sunny", "Sunny", "Overcast", "Rain", "Rain", "Rain", "Overcast", "Sunny", "Sunny", "Rain"],
     "Temperature": ["Hot",   "Hot",   "Hot",      "Mild", "Cool", "Cool", "Cool",     "Mild",  "Cool",  "Mild"],
@@ -19,103 +24,95 @@ data = {
 }
 
 df = pd.DataFrame(data)
-print("=== Weather Dataset ===")
-print(df)
 
-# Query instance to classify:
+# Query instance
 query = {"Outlook": "Overcast", "Temperature": "Mild", "Humidity": "High", "Wind": "Strong"}
-print(f"\nQuery Condition to Predict: {query}")
 
-# 2. Separate records according to classes
 df_yes = df[df["Play"] == "Yes"]
 df_no  = df[df["Play"] == "No"]
 
-total_records = len(df)
-count_yes = len(df_yes)
-count_no  = len(df_no)
+count_yes = len(df_yes)   # 6
+count_no  = len(df_no)    # 4
+total     = len(df)       # 10
 
-# 3. Calculate Prior Probabilities
-P_yes = count_yes / total_records
-P_no  = count_no / total_records
-print(f"\nPrior Probabilities: P(Yes) = {count_yes}/{total_records} = {P_yes:.4f}, P(No) = {count_no}/{total_records} = {P_no:.4f}")
+# Priors
+P_yes = count_yes / total  # 0.6
+P_no  = count_no / total   # 0.4
 
-# Number of distinct categories per attribute (k_i for Laplace)
+# Distinct attribute values (k_i)
 k_values = {
-    "Outlook": len(df["Outlook"].unique()),         # Sunny, Overcast, Rain -> 3
-    "Temperature": len(df["Temperature"].unique()), # Hot, Mild, Cool -> 3
-    "Humidity": len(df["Humidity"].unique()),       # High, Normal -> 2
-    "Wind": len(df["Wind"].unique())               # Weak, Strong -> 2
+    "Outlook": 3,      # Sunny, Overcast, Rain
+    "Temperature": 3,  # Hot, Mild, Cool
+    "Humidity": 2,     # High, Normal
+    "Wind": 2          # Weak, Strong
 }
 
-# 4 & 5. Conditional Probabilities: WITHOUT and WITH Laplace Smoothing
-print("\n=== Probability Breakdown (Without vs With Laplace Smoothing) ===")
+score_yes_raw, score_no_raw = P_yes, P_no
+score_yes_lap, score_no_lap = P_yes, P_no
 
-prob_without_laplace = {"Yes": {}, "No": {}}
-prob_with_laplace    = {"Yes": {}, "No": {}}
-
-zero_prob_detected = False
-
+print("=== CONDITIONAL PROBABILITIES ===")
 for feature, val in query.items():
-    # Counts in class Yes
     c_yes = len(df_yes[df_yes[feature] == val])
+    c_no  = len(df_no[df_no[feature] == val])
+    k     = k_values[feature]
+    
+    # Without Laplace
     p_yes_raw = c_yes / count_yes
-    p_yes_lap = (c_yes + 1) / (count_yes + k_values[feature])
+    p_no_raw  = c_no / count_no
+    score_yes_raw *= p_yes_raw
+    score_no_raw  *= p_no_raw
     
-    # Counts in class No
-    c_no = len(df_no[df_no[feature] == val])
-    p_no_raw = c_no / count_no
-    p_no_lap = (c_no + 1) / (count_no + k_values[feature])
+    # With Laplace: (count + 1) / (N + k)
+    p_yes_lap = (c_yes + 1) / (count_yes + k)
+    p_no_lap  = (c_no + 1) / (count_no + k)
+    score_yes_lap *= p_yes_lap
+    score_no_lap  *= p_no_lap
     
-    if p_yes_raw == 0 or p_no_raw == 0:
-        zero_prob_detected = True
-        
-    prob_without_laplace["Yes"][feature] = p_yes_raw
-    prob_without_laplace["No"][feature]  = p_no_raw
-    
-    prob_with_laplace["Yes"][feature] = p_yes_lap
-    prob_with_laplace["No"][feature]  = p_no_lap
-    
-    print(f"Feature: {feature} = '{val}' (k={k_values[feature]})")
-    print(f"   P({val}|Yes): Raw = {c_yes}/{count_yes} = {p_yes_raw:.4f}  |  Laplace = ({c_yes}+1)/({count_yes}+{k_values[feature]}) = {p_yes_lap:.4f}")
-    print(f"   P({val}|No) : Raw = {c_no}/{count_no}  = {p_no_raw:.4f}  |  Laplace = ({c_no}+1)/({count_no}+{k_values[feature]}) = {p_no_lap:.4f}")
+    print(f"Feature: {feature} = '{val}'")
+    print(f"   P({val}|Yes): Raw = {c_yes}/{count_yes} ({p_yes_raw:.3f}) | Laplace = ({c_yes}+1)/({count_yes}+{k}) = {p_yes_lap:.3f}")
+    print(f"   P({val}|No) : Raw = {c_no}/{count_no}  ({p_no_raw:.3f}) | Laplace = ({c_no}+1)/({count_no}+{k}) = {p_no_lap:.3f}")
 
-# 6. Zero Probability Observation
-if zero_prob_detected:
-    print("\n[!] Zero-Probability Problem Detected:")
-    print("    In the training data, 'Outlook = Overcast' NEVER occurred when Play = No (Count = 0).")
-    print("    Without Laplace estimation, P(Overcast | No) = 0, which zeroes out the entire score!")
+# Normalize probabilities
+norm_yes_raw = score_yes_raw / (score_yes_raw + score_no_raw) if (score_yes_raw + score_no_raw) > 0 else 0
+norm_no_raw  = 1 - norm_yes_raw
 
-# 7. Compute Naive Bayes Final Scores
-# Score WITHOUT Laplace:
-score_yes_raw = P_yes
-score_no_raw  = P_no
-for f in query:
-    score_yes_raw *= prob_without_laplace["Yes"][f]
-    score_no_raw  *= prob_without_laplace["No"][f]
+norm_yes_lap = score_yes_lap / (score_yes_lap + score_no_lap)
+norm_no_lap  = score_no_lap / (score_yes_lap + score_no_lap)
 
-# Score WITH Laplace:
-score_yes_lap = P_yes
-score_no_lap  = P_no
-for f in query:
-    score_yes_lap *= prob_with_laplace["Yes"][f]
-    score_no_lap  *= prob_with_laplace["No"][f]
+print("\n=== FINAL CLASSIFICATION COMPARISON ===")
+print(f"WITHOUT LAPLACE:")
+print(f"   Score(Yes) = {score_yes_raw:.5f}  |  Score(No) = {score_no_raw:.5f}  (Zero-Probability!)")
+print(f"   Prediction: {'Yes (Play)' if score_yes_raw > score_no_raw else 'No (Don\'t Play)'}")
 
-print("\n=== Final Naive Bayes Scores & Prediction ===")
-print("WITHOUT Laplace Smoothing:")
-print(f"   Score(Yes) = {score_yes_raw:.6f}")
-print(f"   Score(No)  = {score_no_raw:.6f}  (Completely collapsed to 0 due to missing observation!)")
-print(f"   Prediction = {'Play = Yes' if score_yes_raw > score_no_raw else 'Play = No'}")
+print(f"\nWITH LAPLACE SMOOTHING:")
+print(f"   Score(Yes) = {score_yes_lap:.5f}  (Normalized: {norm_yes_lap * 100:.1f}%)")
+print(f"   Score(No)  = {score_no_lap:.5f}  (Normalized: {norm_no_lap * 100:.1f}%)")
+print(f"   Prediction: {'Yes (Play)' if score_yes_lap > score_no_lap else 'No (Don\'t Play)'}")
 
-print("\nWITH Laplace Smoothing:")
-print(f"   Score(Yes) = {score_yes_lap:.6f}")
-print(f"   Score(No)  = {score_no_lap:.6f}")
-prediction = "Play = Yes" if score_yes_lap > score_no_lap else "Play = No"
-print(f"   Final Prediction = {prediction}")
+--------------------------------------------------------------------------------
+2. EXPECTED OUTPUT (WHEN EXECUTED)
+--------------------------------------------------------------------------------
+=== CONDITIONAL PROBABILITIES ===
+Feature: Outlook = 'Overcast'
+   P(Overcast|Yes): Raw = 2/6 (0.333) | Laplace = (2+1)/(6+3) = 0.333
+   P(Overcast|No) : Raw = 0/4 (0.000) | Laplace = (0+1)/(4+3) = 0.143
+Feature: Temperature = 'Mild'
+   P(Mild|Yes): Raw = 2/6 (0.333) | Laplace = (2+1)/(6+3) = 0.333
+   P(Mild|No) : Raw = 1/4 (0.250) | Laplace = (1+1)/(4+3) = 0.286
+Feature: Humidity = 'High'
+   P(High|Yes): Raw = 2/6 (0.333) | Laplace = (2+1)/(6+2) = 0.375
+   P(High|No) : Raw = 3/4 (0.750) | Laplace = (3+1)/(4+2) = 0.667
+Feature: Wind = 'Strong'
+   P(Strong|Yes): Raw = 1/6 (0.167) | Laplace = (1+1)/(6+2) = 0.250
+   P(Strong|No) : Raw = 1/4 (0.250) | Laplace = (1+1)/(4+2) = 0.333
 
-# 8. Short Observation
-print("\n=== Observation on Laplace Estimator ===")
-print("In Naive Bayes, all conditional probabilities are multiplied together.")
-print("If a particular attribute value (e.g. Outlook=Overcast) never occurs with a class (Play=No),")
-print("its probability P(Overcast|No) is 0. Multiplying by 0 wipes out all other evidence.")
-print("Laplace estimation adds 1 to the numerator and k to the denominator, guaranteeing non-zero")
-print("probabilities for all unseen attribute values while preserving relative rankings.")
+=== FINAL CLASSIFICATION COMPARISON ===
+WITHOUT LAPLACE:
+   Score(Yes) = 0.00370  |  Score(No) = 0.00000  (Zero-Probability!)
+   Prediction: Yes (Play)
+
+WITH LAPLACE SMOOTHING:
+   Score(Yes) = 0.00625  (Normalized: 63.8%)
+   Score(No)  = 0.00355  (Normalized: 36.2%)
+   Prediction: Yes (Play)
+================================================================================
