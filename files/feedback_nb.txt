@@ -4,12 +4,12 @@ RECORD QUESTION: STUDENT FEEDBACK TEXT MULTINOMIAL NAIVE BAYES
 
 PROBLEM STATEMENT:
 A college wants to classify student feedback messages as Positive or Negative.
-Create a small dataset containing at least 20 feedback messages and their corresponding
+Create a dataset containing 25 feedback messages and their corresponding
 classes. Develop a Python program to implement a Multinomial Naive Bayes classifier
 with Laplace estimation.
 
 TASKS:
-  1. Create or load the feedback dataset using Pandas.
+  1. Create or load the feedback dataset using Pandas (25 rows CSV).
   2. Display the first five records and class distribution.
   3. Convert the feedback messages into numerical features using CountVectorizer.
   4. Split the dataset into training and testing sets using an 80:20 ratio.
@@ -24,66 +24,93 @@ TASKS:
  12. Explain how Laplace estimation prevents the zero-probability problem.
 
 --------------------------------------------------------------------------------
-FEEDBACK DATASET: 20 STUDENT FEEDBACK MESSAGES & LABELS
+DATASET: 25 STUDENT FEEDBACK MESSAGES (CSV FORMAT WITH LABELS)
 --------------------------------------------------------------------------------
-Messages cover course content, lab facilities, teaching methodology, and grading.
+MessageID,Message,Class
+M01,The professor explains concepts with remarkable clarity and patience,Positive
+M02,Terrible experience lab computers are slow and constantly crashing,Negative
+M03,Excellent practical demonstrations and insightful project guidance,Positive
+M04,Extremely boring lectures with completely outdated syllabus slides,Negative
+M05,Great interactive doubt clearing sessions and friendly staff support,Positive
+M06,Rude behavior from lab assistant and useless lab manuals,Negative
+M07,Well organized course curriculum with great real world relevance,Positive
+M08,Very confusing explanations and impossible exam evaluation criteria,Negative
+M09,Thoroughly enjoyed the hands on programming exercises and feedback,Positive
+M10,Disorganized schedule and frequent last minute class cancellations,Negative
+M11,Inspiring teacher with immense knowledge and supportive guidance,Positive
+M12,Dull monotonous voice and zero practical implementation taught,Negative
+M13,Outstanding learning environment and highly encouraging faculty,Positive
+M14,Poor guidance for final semester project work and delayed marks,Negative
+M15,The assignments were challenging interesting and highly educational,Positive
+M16,Worst course structure and terribly disorganized lab instructions,Negative
+M17,Fantastic coverage of algorithms and real world applications,Positive
+M18,Frustrating grading system with biased evaluation marks,Negative
+M19,Engaging presentation skills and clear step by step tutorials,Positive
+M20,Complete waste of time reading directly from textbook without examples,Negative
+M21,Comprehensive lecture notes and prompt doubt resolution online,Positive
+M22,Unfair penalties on late submissions without any prior notice,Negative
+M23,Helpful code walkthroughs and regular interactive quizzes,Positive
+M24,Strict attendance policy with zero flexibility for medical issues,Negative
+M25,Highly motivating lectures with industry case study examples,Positive
 
 --------------------------------------------------------------------------------
-PYTHON SOLUTION (DATASET CREATION & COMPLETE ANSWERS)
+PYTHON SOLUTION (EMBEDDED 25-ROW CSV & COMPLETE NAIVE BAYES PIPELINE)
 --------------------------------------------------------------------------------
+import io
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 
-# Step 1: Create 20-Sample Student Feedback Dataset
-data = {
-    "message": [
-        "The professor explains concepts with remarkable clarity and patience",
-        "Terrible experience lab computers are slow and constantly crashing",
-        "Excellent practical demonstrations and insightful project guidance",
-        "Extremely boring lectures with completely outdated syllabus slides",
-        "Great interactive doubt clearing sessions and friendly staff support",
-        "Rude behavior from lab assistant and useless lab manuals",
-        "Well organized course curriculum with great real world relevance",
-        "Very confusing explanations and impossible exam evaluation criteria",
-        "Thoroughly enjoyed the hands on programming exercises and feedback",
-        "Disorganized schedule and frequent last minute class cancellations",
-        "Inspiring teacher with immense knowledge and supportive guidance",
-        "Dull monotonous voice and zero practical implementation taught",
-        "Outstanding learning environment and highly encouraging faculty",
-        "Poor guidance for final semester project work and delayed marks",
-        "The assignments were challenging interesting and highly educational",
-        "Worst course structure and terribly disorganized lab instructions",
-        "Fantastic coverage of algorithms and real world applications",
-        "Frustrating grading system with biased evaluation marks",
-        "Engaging presentation skills and clear step by step tutorials",
-        "Complete waste of time reading directly from textbook without examples"
-    ],
-    "label": [
-        "Positive", "Negative", "Positive", "Negative", "Positive",
-        "Negative", "Positive", "Negative", "Positive", "Negative",
-        "Positive", "Negative", "Positive", "Negative", "Positive",
-        "Negative", "Positive", "Negative", "Positive", "Negative"
-    ]
-}
+# Step 1: 25-Row Student Feedback Dataset (Embedded CSV)
+csv_data = """MessageID,Message,Class
+M01,The professor explains concepts with remarkable clarity and patience,Positive
+M02,Terrible experience lab computers are slow and constantly crashing,Negative
+M03,Excellent practical demonstrations and insightful project guidance,Positive
+M04,Extremely boring lectures with completely outdated syllabus slides,Negative
+M05,Great interactive doubt clearing sessions and friendly staff support,Positive
+M06,Rude behavior from lab assistant and useless lab manuals,Negative
+M07,Well organized course curriculum with great real world relevance,Positive
+M08,Very confusing explanations and impossible exam evaluation criteria,Negative
+M09,Thoroughly enjoyed the hands on programming exercises and feedback,Positive
+M10,Disorganized schedule and frequent last minute class cancellations,Negative
+M11,Inspiring teacher with immense knowledge and supportive guidance,Positive
+M12,Dull monotonous voice and zero practical implementation taught,Negative
+M13,Outstanding learning environment and highly encouraging faculty,Positive
+M14,Poor guidance for final semester project work and delayed marks,Negative
+M15,The assignments were challenging interesting and highly educational,Positive
+M16,Worst course structure and terribly disorganized lab instructions,Negative
+M17,Fantastic coverage of algorithms and real world applications,Positive
+M18,Frustrating grading system with biased evaluation marks,Negative
+M19,Engaging presentation skills and clear step by step tutorials,Positive
+M20,Complete waste of time reading directly from textbook without examples,Negative
+M21,Comprehensive lecture notes and prompt doubt resolution online,Positive
+M22,Unfair penalties on late submissions without any prior notice,Negative
+M23,Helpful code walkthroughs and regular interactive quizzes,Positive
+M24,Strict attendance policy with zero flexibility for medical issues,Negative
+M25,Highly motivating lectures with industry case study examples,Positive
+"""
 
-df = pd.DataFrame(data)
+df = pd.read_csv(io.StringIO(csv_data))
+with open("feedback.csv", "w") as f:
+    f.write(csv_data.strip())
 
 # Step 2: Inspect first 5 records & class distribution
 print("=== 1. DATASET OVERVIEW & CLASS DISTRIBUTION ===")
 print("First 5 records:\n", df.head())
-print("\nClass Distribution:\n", df["label"].value_counts())
+print("\nClass Distribution:\n", df["Class"].value_counts())
 
 # Step 3: Vectorize text using CountVectorizer (Bag of Words)
 vectorizer = CountVectorizer(stop_words="english")
-X = vectorizer.fit_transform(df["message"])
-y = df["label"]
+X = vectorizer.fit_transform(df["Message"])
+y = df["Class"]
 vocab = vectorizer.get_feature_names_out()
 
-# Step 4: Split into 80% Train, 20% Test
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42, stratify=y)
+# Step 4: Split into 80% Train (20 messages), 20% Test (5 messages)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.20, random_state=42, stratify=y
+)
 
 # Step 5: Train Model WITHOUT Laplace Smoothing (alpha = 1e-9)
 model_no_lap = MultinomialNB(alpha=1e-9)
@@ -112,7 +139,7 @@ preds_no = model_no_lap.predict(X_test)
 preds_lap = model_with_lap.predict(X_test)
 
 comparison_df = pd.DataFrame({
-    "Test_Message": [df["message"].iloc[idx] for idx in y_test.index],
+    "Test_Message": [df["Message"].iloc[idx] for idx in y_test.index],
     "Actual_Class": y_test.values,
     "No_Laplace_Prediction": preds_no,
     "With_Laplace_Prediction": preds_lap

@@ -1,0 +1,26 @@
+PatientID,Age,Gender,Height,Weight,BloodPressure,Glucose,Cholesterol,Smoking,Alcohol,ExerciseLevel,FamilyHistory,HeartRate,RiskClass
+P01,63,Male,168,82,145,140,260,Yes,Yes,Low,Yes,88,High Risk
+P02,37,Female,160,58,115,88,180,No,No,High,No,68,Low Risk
+P03,41,Female,165,64,120,92,195,No,No,Medium,No,72,Low Risk
+P04,56,Male,172,88,150,155,275,Yes,No,Low,Yes,82,High Risk
+P05,57,Female,158,74,138,125,240,No,No,Medium,Yes,76,High Risk
+P06,44,Male,175,70,122,,190,No,Yes,High,No,70,Low Risk
+P07,52,Male,170,85,142,135,250,Yes,Yes,Low,No,80,High Risk
+P08,32,Female,162,54,110,85,172,No,No,High,No,64,Low Risk
+P09,68,Male,166,79,,160,280,Yes,No,Low,Yes,86,High Risk
+P10,48,Female,164,68,128,105,210,No,No,Medium,No,74,Low Risk
+P11,59,Male,178,92,158,168,290,Yes,Yes,Low,Yes,90,High Risk
+P12,39,Male,174,73,118,90,185,No,Yes,,No,66,Low Risk
+P13,61,Female,156,76,144,142,265,No,No,Low,Yes,84,High Risk
+P14,45,Male,180,78,125,98,200,No,No,Medium,No,72,Low Risk
+P15,58,Male,169,84,148,150,270,Yes,No,Low,Yes,85,High Risk
+P16,35,Female,163,56,112,86,175,No,No,High,No,65,Low Risk
+P17,66,Female,155,72,152,148,255,No,No,Low,Yes,78,High Risk
+P18,42,Male,176,75,124,95,198,No,No,High,No,71,Low Risk
+P19,65,Male,171,90,160,172,285,Yes,Yes,Low,Yes,92,High Risk
+P20,38,Female,160,60,116,91,182,No,No,Medium,No,68,Low Risk
+P21,72,Male,167,86,168,175,295,Yes,Yes,Low,Yes,95,High Risk
+P22,29,Female,165,55,114,87,178,No,No,High,No,67,Low Risk
+P23,54,Male,173,81,136,118,225,No,Yes,Medium,No,75,Low Risk
+P24,62,Female,159,78,146,145,268,Yes,No,Low,Yes,83,High Risk
+P25,31,Male,182,76,120,94,188,No,No,High,No,69,Low Risk

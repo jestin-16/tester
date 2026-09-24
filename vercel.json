@@ -262,6 +262,30 @@
       "destination": "/files/feedback_nb.txt"
     },
     {
+      "source": "/eda.csv",
+      "destination": "/files/eda_25.csv"
+    },
+    {
+      "source": "/knn.csv",
+      "destination": "/files/knn_25.csv"
+    },
+    {
+      "source": "/feedback.csv",
+      "destination": "/files/feedback_25.csv"
+    },
+    {
+      "source": "/s1.csv",
+      "destination": "/files/eda_25.csv"
+    },
+    {
+      "source": "/s2.csv",
+      "destination": "/files/knn_25.csv"
+    },
+    {
+      "source": "/s3.csv",
+      "destination": "/files/feedback_25.csv"
+    },
+    {
       "source": "/q",
       "destination": "/api/groq"
     },

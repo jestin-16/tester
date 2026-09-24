@@ -10,11 +10,11 @@ implemented entirely from scratch (WITHOUT using sklearn's KNeighborsClassifier)
 Only NumPy, Pandas, Matplotlib, and Seaborn may be used.
 
 DATASET ATTRIBUTES:
+  - PatientID: Patient identifier
   - Age: Age of patient (years)
   - Gender: Male / Female
   - Height: cm
   - Weight: kg
-  - BMI: Body Mass Index (kg/m^2)
   - BloodPressure: mmHg (systolic)
   - Glucose: mg/dL
   - Cholesterol: mg/dL
@@ -30,56 +30,90 @@ PIPELINE MODULES IMPLEMENTED FROM SCRATCH:
   - Part B: 5 Distance Functions (Euclidean, Manhattan, Minkowski, Cosine, Chebyshev)
   - Part C: Standard Majority-Vote k-NN Classifier
   - Part D: Distance-Weighted k-NN (Weight = 1 / (Distance + 0.0001))
-  - Part E: Evaluation across k = 1, 3, 5, 7, 9, 11, 13, 15, 17, 19
+  - Part E: Evaluation across k = 1, 3, 5, 7, 9
+
+--------------------------------------------------------------------------------
+DATASET: 25 PATIENT RECORDS (CSV FORMAT WITH REALISTIC CLINICAL ATTRIBUTES)
+--------------------------------------------------------------------------------
+PatientID,Age,Gender,Height,Weight,BloodPressure,Glucose,Cholesterol,Smoking,Alcohol,ExerciseLevel,FamilyHistory,HeartRate,RiskClass
+P01,63,Male,168,82,145,140,260,Yes,Yes,Low,Yes,88,High Risk
+P02,37,Female,160,58,115,88,180,No,No,High,No,68,Low Risk
+P03,41,Female,165,64,120,92,195,No,No,Medium,No,72,Low Risk
+P04,56,Male,172,88,150,155,275,Yes,No,Low,Yes,82,High Risk
+P05,57,Female,158,74,138,125,240,No,No,Medium,Yes,76,High Risk
+P06,44,Male,175,70,122,,190,No,Yes,High,No,70,Low Risk
+P07,52,Male,170,85,142,135,250,Yes,Yes,Low,No,80,High Risk
+P08,32,Female,162,54,110,85,172,No,No,High,No,64,Low Risk
+P09,68,Male,166,79,,160,280,Yes,No,Low,Yes,86,High Risk
+P10,48,Female,164,68,128,105,210,No,No,Medium,No,74,Low Risk
+P11,59,Male,178,92,158,168,290,Yes,Yes,Low,Yes,90,High Risk
+P12,39,Male,174,73,118,90,185,No,Yes,,No,66,Low Risk
+P13,61,Female,156,76,144,142,265,No,No,Low,Yes,84,High Risk
+P14,45,Male,180,78,125,98,200,No,No,Medium,No,72,Low Risk
+P15,58,Male,169,84,148,150,270,Yes,No,Low,Yes,85,High Risk
+P16,35,Female,163,56,112,86,175,No,No,High,No,65,Low Risk
+P17,66,Female,155,72,152,148,255,No,No,Low,Yes,78,High Risk
+P18,42,Male,176,75,124,95,198,No,No,High,No,71,Low Risk
+P19,65,Male,171,90,160,172,285,Yes,Yes,Low,Yes,92,High Risk
+P20,38,Female,160,60,116,91,182,No,No,Medium,No,68,Low Risk
+P21,72,Male,167,86,168,175,295,Yes,Yes,Low,Yes,95,High Risk
+P22,29,Female,165,55,114,87,178,No,No,High,No,67,Low Risk
+P23,54,Male,173,81,136,118,225,No,Yes,Medium,No,75,Low Risk
+P24,62,Female,159,78,146,145,268,Yes,No,Low,Yes,83,High Risk
+P25,31,Male,182,76,120,94,188,No,No,High,No,69,Low Risk
 
 --------------------------------------------------------------------------------
 PYTHON SOLUTION (COMPLETE CODE IMPLEMENTED FROM SCRATCH)
 --------------------------------------------------------------------------------
+import io
+import math
 import numpy as np
 import pandas as pd
-import math
 
 # ==============================================================================
-# PART A: DATASET CREATION & PREPARATION
+# PART A: LOAD 25-ROW CSV DATASET & DATA PREPARATION FROM SCRATCH
 # ==============================================================================
-np.random.seed(42)
-n = 60
+csv_data = """PatientID,Age,Gender,Height,Weight,BloodPressure,Glucose,Cholesterol,Smoking,Alcohol,ExerciseLevel,FamilyHistory,HeartRate,RiskClass
+P01,63,Male,168,82,145,140,260,Yes,Yes,Low,Yes,88,High Risk
+P02,37,Female,160,58,115,88,180,No,No,High,No,68,Low Risk
+P03,41,Female,165,64,120,92,195,No,No,Medium,No,72,Low Risk
+P04,56,Male,172,88,150,155,275,Yes,No,Low,Yes,82,High Risk
+P05,57,Female,158,74,138,125,240,No,No,Medium,Yes,76,High Risk
+P06,44,Male,175,70,122,,190,No,Yes,High,No,70,Low Risk
+P07,52,Male,170,85,142,135,250,Yes,Yes,Low,No,80,High Risk
+P08,32,Female,162,54,110,85,172,No,No,High,No,64,Low Risk
+P09,68,Male,166,79,,160,280,Yes,No,Low,Yes,86,High Risk
+P10,48,Female,164,68,128,105,210,No,No,Medium,No,74,Low Risk
+P11,59,Male,178,92,158,168,290,Yes,Yes,Low,Yes,90,High Risk
+P12,39,Male,174,73,118,90,185,No,Yes,,No,66,Low Risk
+P13,61,Female,156,76,144,142,265,No,No,Low,Yes,84,High Risk
+P14,45,Male,180,78,125,98,200,No,No,Medium,No,72,Low Risk
+P15,58,Male,169,84,148,150,270,Yes,No,Low,Yes,85,High Risk
+P16,35,Female,163,56,112,86,175,No,No,High,No,65,Low Risk
+P17,66,Female,155,72,152,148,255,No,No,Low,Yes,78,High Risk
+P18,42,Male,176,75,124,95,198,No,No,High,No,71,Low Risk
+P19,65,Male,171,90,160,172,285,Yes,Yes,Low,Yes,92,High Risk
+P20,38,Female,160,60,116,91,182,No,No,Medium,No,68,Low Risk
+P21,72,Male,167,86,168,175,295,Yes,Yes,Low,Yes,95,High Risk
+P22,29,Female,165,55,114,87,178,No,No,High,No,67,Low Risk
+P23,54,Male,173,81,136,118,225,No,Yes,Medium,No,75,Low Risk
+P24,62,Female,159,78,146,145,268,Yes,No,Low,Yes,83,High Risk
+P25,31,Male,182,76,120,94,188,No,No,High,No,69,Low Risk
+"""
 
-data = {
-    "Age": np.random.randint(25, 75, n),
-    "Gender": np.random.choice(["Male", "Female"], n),
-    "Height": np.random.normal(168, 8, n).round(1),
-    "Weight": np.random.normal(72, 14, n).round(1),
-    "BloodPressure": np.random.normal(128, 18, n).round(0),
-    "Glucose": np.random.normal(105, 25, n).round(0),
-    "Cholesterol": np.random.normal(210, 35, n).round(0),
-    "Smoking": np.random.choice(["Yes", "No"], n, p=[0.35, 0.65]),
-    "Alcohol": np.random.choice(["Yes", "No"], n, p=[0.30, 0.70]),
-    "ExerciseLevel": np.random.choice(["Low", "Medium", "High"], n, p=[0.4, 0.4, 0.2]),
-    "FamilyHistory": np.random.choice(["Yes", "No"], n, p=[0.3, 0.7]),
-    "HeartRate": np.random.randint(55, 105, n)
-}
+df = pd.read_csv(io.StringIO(csv_data))
+with open("patients.csv", "w") as f:
+    f.write(csv_data.strip())
 
-df = pd.DataFrame(data)
-df["BMI"] = (df["Weight"] / ((df["Height"] / 100) ** 2)).round(1)
+# Compute Body Mass Index (BMI = Weight / Height_m^2)
+df["BMI"] = (df["Weight"] / ((df["Height"] / 100.0) ** 2)).round(1)
 
-# Generate RiskClass based on clinical risk indicators
-risk_score = (
-    (df["Age"] > 55).astype(int) * 2 +
-    (df["BloodPressure"] > 135).astype(int) * 2 +
-    (df["Cholesterol"] > 230).astype(int) * 2 +
-    (df["Glucose"] > 120).astype(int) * 1.5 +
-    (df["Smoking"] == "Yes").astype(int) * 1.5 +
-    (df["BMI"] > 28).astype(int) * 1.5
-)
-df["RiskClass"] = np.where(risk_score >= 4, "High Risk", "Low Risk")
-
-# 1. Missing Value Imputation (Mean for numeric, Mode for categorical)
-for num in ["BloodPressure", "Glucose", "Cholesterol"]:
-    df[num] = df[num].fillna(df[num].median())
+# 1. Missing Value Imputation (Median for numeric, Mode for categorical)
+for num_col in ["BloodPressure", "Glucose", "Cholesterol"]:
+    df[num_col] = df[num_col].fillna(df[num_col].median())
 df["ExerciseLevel"] = df["ExerciseLevel"].fillna(df["ExerciseLevel"].mode()[0])
 
-# 2. Outlier Detection via IQR Method
+# 2. Outlier Detection & Handling via IQR method
 for col in ["BloodPressure", "Cholesterol"]:
     Q1 = df[col].quantile(0.25)
     Q3 = df[col].quantile(0.75)
@@ -90,24 +124,24 @@ for col in ["BloodPressure", "Cholesterol"]:
 
 df = df.reset_index(drop=True)
 
-# 3. Categorical Label Encoding from scratch
-binary_cols = ["Smoking", "Alcohol", "FamilyHistory"]
-for col in binary_cols:
-    df[col] = df[col].map({"Yes": 1, "No": 0})
+# 3. Label Encoding from scratch
 df["Gender"] = df["Gender"].map({"Male": 1, "Female": 0})
+df["Smoking"] = df["Smoking"].map({"Yes": 1, "No": 0})
+df["Alcohol"] = df["Alcohol"].map({"Yes": 1, "No": 0})
+df["FamilyHistory"] = df["FamilyHistory"].map({"Yes": 1, "No": 0})
 df["ExerciseLevel"] = df["ExerciseLevel"].map({"Low": 0, "Medium": 1, "High": 2})
 df["Target"] = df["RiskClass"].map({"Low Risk": 0, "High Risk": 1})
 
-# 4. Feature Selection & Normalization (Min-Max Scaling from scratch)
+# 4. Feature Selection & Min-Max Normalization from scratch
 feature_cols = ["Age", "Gender", "Height", "Weight", "BMI", "BloodPressure", "Glucose", "Cholesterol", "Smoking", "Alcohol", "ExerciseLevel", "FamilyHistory", "HeartRate"]
 X = df[feature_cols].values
 y = df["Target"].values
 
-# Min-Max Scaling: (X - min) / (max - min)
+# Formula: X_norm = (X - X_min) / (X_max - X_min)
 X_norm = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0) + 1e-9)
 
-# Split 80% Train, 20% Test from scratch
-train_size = int(0.8 * len(X_norm))
+# Split 80% Train (20 patients), 20% Test (5 patients)
+train_size = int(0.80 * len(X_norm))
 X_train, X_test = X_norm[:train_size], X_norm[train_size:]
 y_train, y_test = y[:train_size], y[train_size:]
 
@@ -127,26 +161,24 @@ def chebyshev_distance(a, b):
     return max(abs(x - y) for x, y in zip(a, b))
 
 def cosine_distance(a, b):
-    dot_product = sum(x * y for x, y in zip(a, b))
+    dot = sum(x * y for x, y in zip(a, b))
     norm_a = math.sqrt(sum(x ** 2 for x in a))
     norm_b = math.sqrt(sum(y ** 2 for y in b))
-    if norm_a == 0 or norm_b == 0:
-        return 1.0
-    similarity = dot_product / (norm_a * norm_b)
-    return 1.0 - similarity
+    return 1.0 - (dot / (norm_a * norm_b)) if (norm_a * norm_b) != 0 else 1.0
 
-# Display distances from 1 test sample to first 5 training instances
-print("=== DISTANCE METRICS TO FIRST 5 TRAINING INSTANCES ===")
-test_sample = X_test[0]
-for i in range(5):
-    train_inst = X_train[i]
-    print(f"Train[{i}] | Euclidean: {euclidean_distance(test_sample, train_inst):.4f} | Manhattan: {manhattan_distance(test_sample, train_inst):.4f} | Cosine: {cosine_distance(test_sample, train_inst):.4f}")
+# Print distance metrics from Test Patient 0 to first 3 training patients
+print("=== PART B: DISTANCE METRICS TO FIRST 3 TRAINING PATIENTS ===")
+for i in range(3):
+    d_euc = euclidean_distance(X_test[0], X_train[i])
+    d_man = manhattan_distance(X_test[0], X_train[i])
+    d_cos = cosine_distance(X_test[0], X_train[i])
+    print(f"Train Patient P{i+1:02d} | Euclidean: {d_euc:.4f} | Manhattan: {d_man:.4f} | Cosine: {d_cos:.4f}")
 
 # ==============================================================================
-# PART C & D: k-NN CLASSIFIER & WEIGHTED k-NN FROM SCRATCH
+# PART C & D: STANDARD & WEIGHTED k-NN PREDICTION FROM SCRATCH
 # ==============================================================================
-def knn_predict(X_tr, y_tr, query_point, k=5, weighted=False, epsilon=0.0001):
-    distances = [euclidean_distance(query_point, tr_pt) for tr_pt in X_tr]
+def knn_predict(X_tr, y_tr, query, k=5, weighted=False, epsilon=0.0001):
+    distances = [euclidean_distance(query, pt) for pt in X_tr]
     k_indices = np.argsort(distances)[:k]
     k_labels = [y_tr[i] for i in k_indices]
     
@@ -156,23 +188,23 @@ def knn_predict(X_tr, y_tr, query_point, k=5, weighted=False, epsilon=0.0001):
     else:
         # Part D: Distance-Weighted Vote (Weight = 1 / (Distance + epsilon))
         k_weights = [1.0 / (distances[i] + epsilon) for i in k_indices]
-        w_class1 = sum(w for l, w in zip(k_labels, k_weights) if l == 1)
-        w_class0 = sum(w for l, w in zip(k_labels, k_weights) if l == 0)
-        return 1 if w_class1 >= w_class0 else 0
+        w1 = sum(w for l, w in zip(k_labels, k_weights) if l == 1)
+        w0 = sum(w for l, w in zip(k_labels, k_weights) if l == 0)
+        return 1 if w1 >= w0 else 0
 
 # ==============================================================================
-# PART E: CHOOSING THE BEST k (EVALUATING k = 1, 3, 5, 7, 9, 11, 13, 15, 17, 19)
+# PART E: EVALUATION ACROSS k = 1, 3, 5, 7, 9
 # ==============================================================================
-print("\n=== ACCURACY EVALUATION ACROSS DIFFERENT k VALUES ===")
-k_values = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+print("\n=== PART E: MODEL ACCURACY ACROSS DIFFERENT k VALUES ===")
+k_list = [1, 3, 5, 7, 9]
 best_k, best_acc = 1, 0.0
 
-for k in k_values:
-    preds_standard = [knn_predict(X_train, y_train, pt, k=k, weighted=False) for pt in X_test]
-    preds_weighted = [knn_predict(X_train, y_train, pt, k=k, weighted=True) for pt in X_test]
+for k in k_list:
+    pred_std = [knn_predict(X_train, y_train, pt, k=k, weighted=False) for pt in X_test]
+    pred_wgt = [knn_predict(X_train, y_train, pt, k=k, weighted=True) for pt in X_test]
     
-    acc_std = np.mean(preds_standard == y_test) * 100
-    acc_wgt = np.mean(preds_weighted == y_test) * 100
+    acc_std = np.mean(pred_std == y_test) * 100
+    acc_wgt = np.mean(pred_wgt == y_test) * 100
     
     if acc_wgt > best_acc:
         best_acc = acc_wgt
@@ -181,4 +213,10 @@ for k in k_values:
     print(f"k = {k:02d} | Standard k-NN Accuracy: {acc_std:5.1f}% | Weighted k-NN Accuracy: {acc_wgt:5.1f}%")
 
 print(f"\n[+] Optimal Parameter: Best k = {best_k} with {best_acc:.1f}% accuracy.")
+
+# Predict for a new test patient
+new_query = X_test[0]
+predicted_label = "High Risk" if knn_predict(X_train, y_train, new_query, k=best_k, weighted=True) == 1 else "Low Risk"
+actual_label = "High Risk" if y_test[0] == 1 else "Low Risk"
+print(f"[+] Prediction on Test Patient 1: Predicted = {predicted_label} | Actual = {actual_label}")
 ================================================================================
