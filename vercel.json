@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "files/**"
+    },
+    "api/groq.js": {
+      "includeFiles": "ui/**"
+    }
+  },
+
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/groq",
+      "destination": "/api/groq"
+    },
+    {
+      "source": "/groq/",
+      "destination": "/api/groq"
+    },
+    {
+      "source": "/groq/:query*",
+      "destination": "/api/groq?q=:query*"
+    },
+    {
+      "source": "/:file",
+      "destination": "/files/:file"
+    }
+  ]
+}

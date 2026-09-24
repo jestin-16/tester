@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Groq CLI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #0d1117;
+      color: #e6edf3;
+      font-family:
+        "JetBrains Mono",
+        "Fira Code",
+        monospace;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid #30363d;
+      background: #161b22;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3fb950;
+      margin-right: 10px;
+    }
+
+    .terminal {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .line {
+      margin-bottom: 16px;
+    }
+
+    .user {
+      color: #58a6ff;
+    }
+
+    .grok {
+      color: #e6edf3;
+    }
+
+    .error {
+      color: #f85149;
+    }
+
+    .input-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .prompt {
+      color: #58a6ff;
+      flex-shrink: 0;
+    }
+
+    #input {
+      flex: 1;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #e6edf3;
+      font: inherit;
+      resize: none;
+      min-height: 24px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <span class="status"></span>
+    Groq CLI
+  </div>
+
+  <main class="terminal" id="terminal">
+
+    <div class="line">
+      Groq CLI
+      ────────────────────────────────────────
+    </div>
+
+    <div class="line">
+      Connected to Groq.
+      Type your question and press Enter.
+    </div>
+
+    <div class="input-line">
+      <span class="prompt">You:</span>
+
+      <textarea
+        id="input"
+        rows="1"
+        autofocus
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="_"
+      ></textarea>
+    </div>
+
+  </main>
+
+<script>
+
+const terminal =
+  document.getElementById("terminal");
+
+const input =
+  document.getElementById("input");
+
+let waiting = false;
+
+function scrollToBottom() {
+  terminal.scrollTop =
+    terminal.scrollHeight;
+}
+
+function addMessage(type, text) {
+
+  const line =
+    document.createElement("div");
+
+  line.className =
+    `line ${type}`;
+
+  line.textContent = text;
+
+  terminal.insertBefore(
+    line,
+    terminal.lastElementChild
+  );
+
+  scrollToBottom();
+}
+
+async function askGroq(message) {
+
+  waiting = true;
+  input.disabled = true;
+
+  addMessage(
+    "user",
+    `You: ${message}`
+  );
+
+  const thinking =
+    document.createElement("div");
+
+  thinking.className =
+    "line";
+
+  thinking.textContent =
+    "Groq: thinking...";
+
+  terminal.insertBefore(
+    thinking,
+    terminal.lastElementChild
+  );
+
+  scrollToBottom();
+
+  try {
+
+    const response =
+      await fetch("/api/groq", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          message
+        })
+
+      });
+
+    const data =
+      await response.json();
+
+    thinking.remove();
+
+    if (!response.ok) {
+
+      addMessage(
+        "error",
+        `Error: ${
+          data.error ||
+          "Request failed"
+        }`
+      );
+
+      return;
+    }
+
+    addMessage(
+      "grok",
+      `Groq: ${data.response}`
+    );
+
+  } catch (error) {
+
+    thinking.remove();
+
+    addMessage(
+      "error",
+      "Error: Unable to connect to Groq."
+    );
+
+  } finally {
+
+    waiting = false;
+    input.disabled = false;
+    input.focus();
+
+  }
+}
+
+input.addEventListener(
+  "keydown",
+  (event) => {
+
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+
+      event.preventDefault();
+
+      const message =
+        input.value.trim();
+
+      if (
+        !message ||
+        waiting
+      ) {
+        return;
+      }
+
+      input.value = "";
+
+      askGroq(message);
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
