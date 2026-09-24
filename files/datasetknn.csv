@@ -1,0 +1,26 @@
+Age,Gender,Height,Weight,BMI,BloodPressure,Glucose,Cholesterol,Smoking,Alcohol,ExerciseLevel,FamilyHistory,HeartRate,RiskClass
+40,Male,146,80,37.5,121,155,165,Yes,Yes,High,No,87,High Risk
+21,Male,190,98,27.1,118,184,270,No,Yes,Low,No,76,High Risk
+26,Male,169,57,20.0,135,158,274,No,Yes,High,No,89,Low Risk
+29,Female,183,69,21.1,100,87,191,Yes,No,Low,Yes,110,High Risk
+43,Male,168,90,31.9,116,138,299,Yes,Yes,High,Yes,65,High Risk
+44,Female,188,86,24.3,97,128,228,No,No,Medium,Yes,68,Low Risk
+33,Female,170,103,35.6,108,137,155,Yes,No,High,No,92,Low Risk
+52,Female,150,51,22.7,104,109,260,No,No,High,Yes,79,Low Risk
+55,Male,188,153,56.7,177,207,210,No,No,High,No,108,High Risk
+66,Female,177,67,21.4,154,97,280,No,No,Low,No,103,High Risk
+63,Male,168,82,29.1,145,140,260,Yes,Yes,Low,Yes,88,High Risk
+37,Female,160,58,22.7,115,88,180,No,No,High,No,68,Low Risk
+41,Female,165,64,23.5,120,92,195,No,No,Medium,No,72,Low Risk
+56,Male,172,88,29.7,150,155,275,Yes,No,Low,Yes,82,High Risk
+57,Female,158,74,29.6,138,125,240,No,No,Medium,Yes,76,High Risk
+48,Female,164,68,25.3,128,105,210,No,No,Medium,No,74,Low Risk
+59,Male,178,92,29.0,158,168,290,Yes,Yes,Low,Yes,90,High Risk
+39,Male,174,73,24.1,118,90,185,No,Yes,Medium,No,66,Low Risk
+61,Female,156,76,31.2,144,142,265,No,No,Low,Yes,84,High Risk
+45,Male,180,78,24.1,125,98,200,No,No,Medium,No,72,Low Risk
+58,Male,169,84,29.4,148,150,270,Yes,No,Low,Yes,85,High Risk
+35,Female,163,56,21.1,112,86,175,No,No,High,No,65,Low Risk
+72,Male,167,86,30.8,168,175,295,Yes,Yes,Low,Yes,95,High Risk
+29,Female,165,55,20.2,114,87,178,No,No,High,No,67,Low Risk
+54,Male,173,81,27.1,136,118,225,No,Yes,Medium,No,75,Low Risk

@@ -1,180 +1,530 @@
 ================================================================================
-RECORD 1: EXPLORATORY DATA VISUALIZATION (7 PLOTS & 5 OBSERVATIONS)
+RECORD 1: EXPLORATORY DATA VISUALIZATION (DATASET ANALYSIS USING PANDAS)
 ================================================================================
 
 PROBLEM STATEMENT:
-Download or create a real-world dataset and perform:
-  1. Missing value analysis.
-  2. Distribution plots.
-  3. Correlation heatmap.
-  4. Pair plot.
-  5. Box plots for outlier detection.
-  6. Count plots for categorical variables.
-  7. Scatter plots for important feature relationships.
-  8. Write five statistical observations from the visualizations.
+Download or create a dataset (dataset.csv) and perform comprehensive Exploratory
+Data Analysis (EDA) using Pandas, NumPy, Matplotlib, and Seaborn:
+  1. Load dataset using Pandas and inspect first records.
+  2. Display dataset information (shape, columns, dtypes, info).
+  3. Missing value analysis (impute numerical with median, categorical with mode).
+  4. Descriptive statistics (mean, median, std, min, max, describe).
+  5. Generate required visualizations:
+     - 5.1 Line Chart
+     - 5.2 Bar Chart
+     - 5.3 Histogram
+     - 5.4 Pie Chart
+     - 5.5 Scatter Plot
+     - 5.6 Box Plot
+     - 5.7 Correlation Heatmap
+     - 5.8 Pair Plot
+  6. Outlier analysis using the IQR method (Q1, Q3, IQR, limits, outlier counts).
+  7. Correlation with target feature.
+  8. Identify strongest positive and negative relationships.
+  9. Automatically generate 10 statistical observations.
+ 10. Conclusion and save cleaned dataset to cleaned_dataset.csv.
 
 --------------------------------------------------------------------------------
-DATASET: 25 CUSTOMER RECORDS (CSV FORMAT WITH MISSING VALUES & OUTLIER)
+DATASET: 105 STUDENT PERFORMANCE RECORDS (dataset.csv)
 --------------------------------------------------------------------------------
-CustomerID,Age,Annual_Income,Spending_Score,Membership,Visits_Per_Month
-C001,19,15000,39,Bronze,3
-C002,21,18000,81,Silver,5
-C003,20,22000,6,Bronze,1
-C004,23,25000,77,Gold,6
-C005,31,30000,40,Bronze,2
-C006,22,,76,Silver,4
-C007,35,42000,6,Bronze,1
-C008,23,45000,94,Platinum,8
-C009,64,52000,3,Bronze,2
-C010,30,55000,72,Silver,5
-C011,,58000,14,Bronze,1
-C012,35,62000,99,Platinum,9
-C013,58,67000,15,Bronze,2
-C014,24,70000,77,Silver,6
-C015,37,73000,13,Bronze,3
-C016,50,78000,26,Bronze,2
-C017,27,82000,69,Gold,7
-C018,36,87000,10,Bronze,1
-C019,40,90000,88,Platinum,9
-C020,49,95000,28,Gold,4
-C021,28,102000,73,Gold,6
-C022,59,105000,14,Bronze,2
-C023,32,110000,93,Platinum,8
-C024,47,115000,16,Silver,3
-C025,38,185000,82,Platinum,7
+ID,Age,StudyHours,Attendance,Assignments,ExamScore
+1,20,4,85,8,72
+2,21,6,92,9,85
+3,19,3,78,7,65
+4,22,7,95,10,91
+5,20,5,88,8,78
+6,23,8,97,10,94
+7,21,4,82,7,70
+8,19,6,90,9,83
+9,22,5,86,8,76
+10,20,7,94,10,89
+11,21,3,75,6,62
+12,23,6,91,9,84
+13,19,4,80,7,68
+14,22,8,98,10,96
+15,20,5,87,8,77
+16,21,6,93,9,86
+17,23,7,95,10,92
+18,19,3,76,6,61
+19,22,5,89,8,79
+20,20,4,83,7,71
+21,21,7,94,9,88
+22,23,8,97,10,95
+23,19,5,84,8,74
+24,22,6,91,9,85
+25,20,3,77,6,64
+26,21,5,88,8,76
+27,23,7,96,10,93
+28,19,4,81,7,69
+29,22,6,90,9,84
+30,20,5,86,8,75
+31,21,8,98,10,97
+32,23,6,92,9,87
+33,19,3,74,6,60
+34,22,7,95,10,91
+35,20,4,82,7,70
+36,21,6,89,9,82
+37,23,8,99,10,98
+38,19,5,85,8,73
+39,22,4,80,7,68
+40,20,7,93,9,88
+41,21,5,87,8,77
+42,23,6,94,10,90
+43,19,3,72,5,58
+44,22,8,97,10,95
+45,20,5,86,8,76
+46,21,7,92,9,87
+47,23,4,84,7,73
+48,19,6,89,9,81
+49,22,5,88,8,79
+50,20,8,96,10,94
+51,21,4,83,7,70
+52,23,7,95,10,92
+53,19,5,81,8,71
+54,22,6,90,9,84
+55,20,3,76,6,63
+56,21,8,97,10,96
+57,23,5,89,8,82
+58,19,4,79,7,67
+59,22,7,94,9,89
+60,20,6,88,8,78
+61,21,5,85,8,75
+62,23,8,98,10,97
+63,19,3,73,6,59
+64,22,6,91,9,86
+65,20,4,84,7,72
+66,21,7,93,10,90
+67,23,6,96,9,91
+68,19,5,82,8,70
+69,22,8,99,10,98
+70,20,3,75,6,62
+71,21,6,90,9,84
+72,23,7,95,10,93
+73,19,4,80,7,68
+74,22,5,87,8,77
+75,20,8,97,10,95
+76,21,4,83,7,71
+77,23,6,92,9,88
+78,19,5,85,8,74
+79,22,7,94,10,91
+80,20,6,89,9,82
+81,21,3,77,6,64
+82,23,8,98,10,96
+83,19,4,81,7,69
+84,22,6,90,9,85
+85,20,5,86,8,76
+86,21,7,93,10,89
+87,23,5,88,8,81
+88,19,3,74,6,60
+89,22,8,97,10,95
+90,20,4,82,7,70
+91,21,6,91,9,85
+92,23,7,96,10,94
+93,19,5,84,8,73
+94,22,6,89,9,83
+95,20,3,78,6,65
+96,21,8,98,10,97
+97,23,4,85,7,74
+98,19,6,90,9,82
+99,22,5,87,8,78
+100,20,7,94,10,91
+101,21,6,92,9,86
+102,23,8,99,10,98
+103,19,4,79,7,67
+104,22,7,95,10,92
+105,20,5,88,8,79
 
 --------------------------------------------------------------------------------
-PYTHON SOLUTION (EMBEDDED 25-ROW CSV & COMPLETE EDA PIPELINE)
+PYTHON SOLUTION (COMPLETE CODE)
 --------------------------------------------------------------------------------
-import io
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Step 1: 25-Row Customer Dataset (Embedded CSV with missing values & outlier)
-csv_data = """CustomerID,Age,Annual_Income,Spending_Score,Membership,Visits_Per_Month
-C001,19,15000,39,Bronze,3
-C002,21,18000,81,Silver,5
-C003,20,22000,6,Bronze,1
-C004,23,25000,77,Gold,6
-C005,31,30000,40,Bronze,2
-C006,22,,76,Silver,4
-C007,35,42000,6,Bronze,1
-C008,23,45000,94,Platinum,8
-C009,64,52000,3,Bronze,2
-C010,30,55000,72,Silver,5
-C011,,58000,14,Bronze,1
-C012,35,62000,99,Platinum,9
-C013,58,67000,15,Bronze,2
-C014,24,70000,77,Silver,6
-C015,37,73000,13,Bronze,3
-C016,50,78000,26,Bronze,2
-C017,27,82000,69,Gold,7
-C018,36,87000,10,Bronze,1
-C019,40,90000,88,Platinum,9
-C020,49,95000,28,Gold,4
-C021,28,102000,73,Gold,6
-C022,59,105000,14,Bronze,2
-C023,32,110000,93,Platinum,8
-C024,47,115000,16,Silver,3
-C025,38,185000,82,Platinum,7
+# Auto-create dataset.csv if missing
+csv_content = """ID,Age,StudyHours,Attendance,Assignments,ExamScore
+1,20,4,85,8,72
+2,21,6,92,9,85
+3,19,3,78,7,65
+4,22,7,95,10,91
+5,20,5,88,8,78
+6,23,8,97,10,94
+7,21,4,82,7,70
+8,19,6,90,9,83
+9,22,5,86,8,76
+10,20,7,94,10,89
+11,21,3,75,6,62
+12,23,6,91,9,84
+13,19,4,80,7,68
+14,22,8,98,10,96
+15,20,5,87,8,77
+16,21,6,93,9,86
+17,23,7,95,10,92
+18,19,3,76,6,61
+19,22,5,89,8,79
+20,20,4,83,7,71
+21,21,7,94,9,88
+22,23,8,97,10,95
+23,19,5,84,8,74
+24,22,6,91,9,85
+25,20,3,77,6,64
+26,21,5,88,8,76
+27,23,7,96,10,93
+28,19,4,81,7,69
+29,22,6,90,9,84
+30,20,5,86,8,75
+31,21,8,98,10,97
+32,23,6,92,9,87
+33,19,3,74,6,60
+34,22,7,95,10,91
+35,20,4,82,7,70
+36,21,6,89,9,82
+37,23,8,99,10,98
+38,19,5,85,8,73
+39,22,4,80,7,68
+40,20,7,93,9,88
+41,21,5,87,8,77
+42,23,6,94,10,90
+43,19,3,72,5,58
+44,22,8,97,10,95
+45,20,5,86,8,76
+46,21,7,92,9,87
+47,23,4,84,7,73
+48,19,6,89,9,81
+49,22,5,88,8,79
+50,20,8,96,10,94
+51,21,4,83,7,70
+52,23,7,95,10,92
+53,19,5,81,8,71
+54,22,6,90,9,84
+55,20,3,76,6,63
+56,21,8,97,10,96
+57,23,5,89,8,82
+58,19,4,79,7,67
+59,22,7,94,9,89
+60,20,6,88,8,78
+61,21,5,85,8,75
+62,23,8,98,10,97
+63,19,3,73,6,59
+64,22,6,91,9,86
+65,20,4,84,7,72
+66,21,7,93,10,90
+67,23,6,96,9,91
+68,19,5,82,8,70
+69,22,8,99,10,98
+70,20,3,75,6,62
+71,21,6,90,9,84
+72,23,7,95,10,93
+73,19,4,80,7,68
+74,22,5,87,8,77
+75,20,8,97,10,95
+76,21,4,83,7,71
+77,23,6,92,9,88
+78,19,5,85,8,74
+79,22,7,94,10,91
+80,20,6,89,9,82
+81,21,3,77,6,64
+82,23,8,98,10,96
+83,19,4,81,7,69
+84,22,6,90,9,85
+85,20,5,86,8,76
+86,21,7,93,10,89
+87,23,5,88,8,81
+88,19,3,74,6,60
+89,22,8,97,10,95
+90,20,4,82,7,70
+91,21,6,91,9,85
+92,23,7,96,10,94
+93,19,5,84,8,73
+94,22,6,89,9,83
+95,20,3,78,6,65
+96,21,8,98,10,97
+97,23,4,85,7,74
+98,19,6,90,9,82
+99,22,5,87,8,78
+100,20,7,94,10,91
+101,21,6,92,9,86
+102,23,8,99,10,98
+103,19,4,79,7,67
+104,22,7,95,10,92
+105,20,5,88,8,79
 """
+if not os.path.exists("dataset.csv"):
+    with open("dataset.csv", "w", encoding="utf-8") as f:
+        f.write(csv_content.strip())
 
-# Load into DataFrame (also optionally write to customers.csv)
-df = pd.read_csv(io.StringIO(csv_data))
-with open("customers.csv", "w") as f:
-    f.write(csv_data.strip())
+# ------------------------------------------------------------
+# 1. LOAD DATASET USING PANDAS
+# ------------------------------------------------------------
+print("=" * 70)
+print("1. LOADING DATASET")
+print("=" * 70)
 
-# ------------------------------------------------------------------------------
-# 1. MISSING VALUE ANALYSIS & IMPUTATION
-# ------------------------------------------------------------------------------
-missing_summary = pd.DataFrame({
-    "Missing_Count": df.isnull().sum(),
-    "Missing_Percentage": (df.isnull().sum() / len(df) * 100).round(2)
-})
-print("=== 1. MISSING VALUE ANALYSIS ===")
-print(missing_summary)
+df = pd.read_csv("dataset.csv", sep=None, engine="python")
+print("\nDataset loaded successfully!")
+print("\nFirst 5 records:")
+print(df.head())
 
-# Impute missing values with column medians
-df["Annual_Income"] = df["Annual_Income"].fillna(df["Annual_Income"].median())
-df["Age"] = df["Age"].fillna(df["Age"].median())
+# ------------------------------------------------------------
+# 2. DISPLAY DATASET INFORMATION
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("2. DATASET INFORMATION")
+print("=" * 70)
 
-# ------------------------------------------------------------------------------
-# 2. DISTRIBUTION PLOT (AGE & ANNUAL INCOME)
-# ------------------------------------------------------------------------------
-plt.figure(figsize=(10, 4))
-plt.subplot(1, 2, 1)
-sns.histplot(df["Age"], kde=True, color="skyblue", bins=8)
-plt.title("Age Distribution (with KDE)")
+print("\nNumber of rows:", df.shape[0])
+print("Number of columns:", df.shape[1])
+print("\nColumn names:")
+print(df.columns.tolist())
+print("\nDataset information:")
+df.info()
+print("\nData types:")
+print(df.dtypes)
+print("\nFirst 10 records:")
+print(df.head(10))
 
-plt.subplot(1, 2, 2)
-sns.histplot(df["Annual_Income"], kde=True, color="teal", bins=8)
-plt.title("Annual Income Distribution (with KDE)")
-plt.tight_layout()
-plt.show()
+# ------------------------------------------------------------
+# 3. HANDLE MISSING VALUES
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("3. MISSING VALUE ANALYSIS")
+print("=" * 70)
 
-# ------------------------------------------------------------------------------
-# 3. CORRELATION HEATMAP
-# ------------------------------------------------------------------------------
-plt.figure(figsize=(6, 5))
-numeric_cols = df.select_dtypes(include="number")
-sns.heatmap(numeric_cols.corr(), annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
-plt.title("Correlation Heatmap")
-plt.show()
+missing_values = df.isnull().sum()
+print("\nMissing values in each column:")
+print(missing_values)
 
-# ------------------------------------------------------------------------------
-# 4. PAIR PLOT
-# ------------------------------------------------------------------------------
-sns.pairplot(df[["Age", "Annual_Income", "Spending_Score", "Membership"]], hue="Membership")
-plt.show()
+total_missing = df.isnull().sum().sum()
+print("\nTotal missing values:", total_missing)
 
-# ------------------------------------------------------------------------------
-# 5. BOX PLOTS FOR OUTLIER DETECTION
-# ------------------------------------------------------------------------------
-fig, axes = plt.subplots(1, 3, figsize=(12, 4))
-sns.boxplot(y=df["Annual_Income"], ax=axes[0], color="lightcoral")
-axes[0].set_title("Annual Income (Outlier Detection)")
+if total_missing == 0:
+    print("\nThere are no missing values in the dataset.")
+else:
+    print("\nMissing values found. Handling them...")
+    numeric_columns = df.select_dtypes(include=np.number).columns
+    for column in numeric_columns:
+        if df[column].isnull().sum() > 0:
+            df[column] = df[column].fillna(df[column].median())
 
-sns.boxplot(y=df["Age"], ax=axes[1], color="lightblue")
-axes[1].set_title("Age (Outlier Detection)")
+    categorical_columns = df.select_dtypes(exclude=np.number).columns
+    for column in categorical_columns:
+        if df[column].isnull().sum() > 0:
+            df[column] = df[column].fillna(df[column].mode()[0])
 
-sns.boxplot(y=df["Spending_Score"], ax=axes[2], color="lightgreen")
-axes[2].set_title("Spending Score")
-plt.tight_layout()
-plt.show()
+    print("\nMissing values after handling:")
+    print(df.isnull().sum())
 
-# ------------------------------------------------------------------------------
-# 6. COUNT PLOT FOR CATEGORICAL VARIABLE
-# ------------------------------------------------------------------------------
-plt.figure(figsize=(6, 4))
-sns.countplot(data=df, x="Membership", order=["Bronze", "Silver", "Gold", "Platinum"], palette="Set2")
-plt.title("Customer Count by Membership Tier")
-plt.xlabel("Membership Tier")
-plt.ylabel("Number of Customers")
-plt.show()
+# ------------------------------------------------------------
+# 4. DESCRIPTIVE STATISTICS
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("4. DESCRIPTIVE STATISTICS")
+print("=" * 70)
 
-# ------------------------------------------------------------------------------
-# 7. SCATTER PLOT FOR FEATURE RELATIONSHIP
-# ------------------------------------------------------------------------------
-plt.figure(figsize=(8, 5))
-sns.scatterplot(data=df, x="Annual_Income", y="Spending_Score", hue="Membership", size="Visits_Per_Month", sizes=(30, 200), palette="viridis")
-plt.title("Annual Income vs Spending Score by Membership Tier")
-plt.xlabel("Annual Income ($)")
-plt.ylabel("Spending Score (1-100)")
+print("\nDescriptive statistics:")
+print(df.describe())
+print("\nMedian:")
+print(df.median(numeric_only=True))
+print("\nStandard deviation:")
+print(df.std(numeric_only=True))
+print("\nMinimum values:")
+print(df.min(numeric_only=True))
+print("\nMaximum values:")
+print(df.max(numeric_only=True))
+
+# ------------------------------------------------------------
+# PREPARE NUMERICAL DATA
+# ------------------------------------------------------------
+numeric_columns = df.select_dtypes(include=np.number).columns.tolist()
+if len(numeric_columns) < 2:
+    print("\nThe dataset needs at least two numerical columns for the requested visualizations.")
+    exit()
+
+possible_targets = ["ExamScore", "quality", "Quality", "target", "Target", "score", "Score"]
+target_column = None
+for column in possible_targets:
+    if column in df.columns:
+        target_column = column
+        break
+
+if target_column is None:
+    target_column = numeric_columns[-1]
+
+print("\nNumerical columns:", numeric_columns)
+print("Selected target column:", target_column)
+
+feature_column = numeric_columns[1] if numeric_columns[0] == "ID" and len(numeric_columns) > 1 else numeric_columns[0]
+second_feature = numeric_columns[2] if len(numeric_columns) > 2 else numeric_columns[1]
+
+# ------------------------------------------------------------
+# 5. VISUALIZATIONS
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("5. CREATING VISUALIZATIONS")
+print("=" * 70)
+
+sns.set_theme(style="whitegrid")
+
+# 5.1 LINE CHART
+plt.figure(figsize=(10, 6))
+line_data = df.groupby(feature_column)[target_column].mean()
+plt.plot(line_data.index, line_data.values, marker="o", linewidth=2)
+plt.title(f"Line Chart: Average {target_column} vs {feature_column}")
+plt.xlabel(feature_column)
+plt.ylabel(f"Average {target_column}")
 plt.grid(True)
+plt.tight_layout()
 plt.show()
 
-# ------------------------------------------------------------------------------
-# FIVE STATISTICAL OBSERVATIONS
-# ------------------------------------------------------------------------------
-observations = """
-=== 5 KEY STATISTICAL OBSERVATIONS ===
-1. MISSING VALUES: Exactly 4% missing data was detected in 'Annual_Income' (C006) and 'Age' (C011), successfully imputed using column medians.
-2. OUTLIER DETECTION: The Annual Income box plot identifies customer C025 ($185,000) as a prominent high-income outlier beyond Q3 + 1.5*IQR.
-3. CATEGORICAL DISTRIBUTION: Bronze tier accounts for the largest proportion of customers (10/25 = 40%), while Platinum represents premium frequent shoppers (5/25 = 20%).
-4. CORRELATION INSIGHT: Visits Per Month exhibits strong positive correlation with Spending Score (> 0.85), indicating that frequent visitors generate substantially higher retail expenditure.
-5. CLUSTERING PATTERNS: The scatter plot reveals distinct customer segments where Gold and Platinum members maintain spending scores above 65 regardless of age.
-"""
-print(observations)
+# 5.2 BAR CHART
+plt.figure(figsize=(10, 6))
+bar_data = df[target_column].value_counts().sort_index()
+plt.bar(bar_data.index.astype(str), bar_data.values)
+plt.title(f"Bar Chart: Distribution of {target_column}")
+plt.xlabel(target_column)
+plt.ylabel("Number of Records")
+plt.tight_layout()
+plt.show()
+
+# 5.3 HISTOGRAM
+plt.figure(figsize=(10, 6))
+plt.hist(df[feature_column], bins=15, edgecolor="black")
+plt.title(f"Histogram of {feature_column}")
+plt.xlabel(feature_column)
+plt.ylabel("Frequency")
+plt.tight_layout()
+plt.show()
+
+# 5.4 PIE CHART
+plt.figure(figsize=(8, 8))
+pie_data = df[target_column].value_counts()
+plt.pie(pie_data.values[:8], labels=pie_data.index[:8], autopct="%1.1f%%", startangle=90)
+plt.title(f"Pie Chart of Top {target_column} Values")
+plt.tight_layout()
+plt.show()
+
+# 5.5 SCATTER PLOT
+plt.figure(figsize=(10, 6))
+plt.scatter(df[feature_column], df[target_column], alpha=0.6)
+plt.title(f"Scatter Plot: {feature_column} vs {target_column}")
+plt.xlabel(feature_column)
+plt.ylabel(target_column)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# 5.6 BOX PLOT
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=df[feature_column], y=df[target_column])
+plt.title(f"Box Plot: {target_column} by {feature_column}")
+plt.xlabel(feature_column)
+plt.ylabel(target_column)
+plt.tight_layout()
+plt.show()
+
+# 5.7 CORRELATION HEATMAP
+plt.figure(figsize=(10, 7))
+correlation_matrix = df[numeric_columns].corr()
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
+plt.title("Correlation Heatmap")
+plt.tight_layout()
+plt.show()
+
+# 5.8 PAIR PLOT
+pair_columns = numeric_columns[:6]
+if target_column not in pair_columns:
+    pair_columns.append(target_column)
+pair_columns = list(dict.fromkeys(pair_columns))
+pair_data = df[pair_columns].dropna()
+sns.pairplot(pair_data, diag_kind="hist")
+plt.suptitle("Pair Plot of Numerical Features", y=1.02)
+plt.show()
+
+# ------------------------------------------------------------
+# 6. OUTLIER DETECTION
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("6. OUTLIER ANALYSIS")
+print("=" * 70)
+
+outlier_summary = {}
+for column in numeric_columns:
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_limit = Q1 - 1.5 * IQR
+    upper_limit = Q3 + 1.5 * IQR
+    outliers = df[(df[column] < lower_limit) | (df[column] > upper_limit)]
+    outlier_count = len(outliers)
+    outlier_summary[column] = outlier_count
+    print(f"\nColumn: {column} | Q1: {Q1:.2f} | Q3: {Q3:.2f} | IQR: {IQR:.2f} | Outliers: {outlier_count}")
+
+# ------------------------------------------------------------
+# 7. CORRELATION WITH TARGET
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("7. CORRELATION WITH TARGET")
+print("=" * 70)
+
+target_correlations = df[numeric_columns].corr()[target_column].sort_values(ascending=False)
+print("\nCorrelation of numerical features with", target_column)
+print(target_correlations)
+
+# ------------------------------------------------------------
+# 8. STRONGEST POSITIVE AND NEGATIVE RELATIONSHIPS
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("8. STRONGEST CORRELATIONS")
+print("=" * 70)
+
+correlation_without_target = target_correlations.drop(target_column)
+strongest_positive = correlation_without_target.idxmax()
+strongest_negative = correlation_without_target.idxmin()
+
+print(f"\nStrongest positive relationship with {target_column}:")
+print(f"{strongest_positive}: {correlation_without_target[strongest_positive]:.3f}")
+print(f"\nStrongest negative relationship with {target_column}:")
+print(f"{strongest_negative}: {correlation_without_target[strongest_negative]:.3f}")
+
+# ------------------------------------------------------------
+# 9. GENERATE OBSERVATIONS AUTOMATICALLY
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("9. OBSERVATIONS")
+print("=" * 70)
+
+mean_target = df[target_column].mean()
+median_target = df[target_column].median()
+highest_target = df[target_column].max()
+lowest_target = df[target_column].min()
+most_common_target = df[target_column].mode()[0]
+positive_value = correlation_without_target[strongest_positive]
+negative_value = correlation_without_target[strongest_negative]
+highest_outlier_column = max(outlier_summary, key=outlier_summary.get)
+highest_outlier_count = outlier_summary[highest_outlier_column]
+
+print("\n1. The dataset contains", df.shape[0], "records and", df.shape[1], "columns.")
+print(f"\n2. The average {target_column} is {mean_target:.2f}, while the median is {median_target:.2f}.")
+print(f"\n3. The {target_column} ranges from {lowest_target:.2f} to {highest_target:.2f}.")
+print(f"\n4. The most frequently occurring {target_column} value is {most_common_target}.")
+print(f"\n5. {strongest_positive} has the strongest positive correlation with {target_column} ({positive_value:.3f}).")
+print(f"\n6. {strongest_negative} has the strongest negative correlation with {target_column} ({negative_value:.3f}).")
+print(f"\n7. The feature {highest_outlier_column} contains the highest number of detected outliers ({highest_outlier_count}).")
+print(f"\n8. The histogram of {feature_column} shows the distribution of values across observations.")
+print(f"\n9. The scatter plot between {feature_column} and {target_column} highlights the relationship between variables.")
+print("\n10. The correlation heatmap and pair plot illustrate multi-attribute relationships across all features.")
+
+# ------------------------------------------------------------
+# 10. CONCLUSION & 11. SAVE CLEANED DATASET
+# ------------------------------------------------------------
+print("\n" + "=" * 70)
+print("10. CONCLUSION & DATASET EXPORT")
+print("=" * 70)
+df.to_csv("cleaned_dataset.csv", index=False)
+print("\nCleaned dataset saved as: cleaned_dataset.csv")
+print("\n" + "=" * 70)
+print("ANALYSIS COMPLETED SUCCESSFULLY")
+print("=" * 70)
 ================================================================================

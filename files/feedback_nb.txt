@@ -1,170 +1,381 @@
 ================================================================================
 RECORD QUESTION: STUDENT FEEDBACK TEXT MULTINOMIAL NAIVE BAYES
+Multinomial Naive Bayes with Laplace Estimation Implemented From Scratch
 ================================================================================
 
 PROBLEM STATEMENT:
 A college wants to classify student feedback messages as Positive or Negative.
-Create a dataset containing 25 feedback messages and their corresponding
+Create or load datasetlaplace.csv containing feedback messages and their corresponding
 classes. Develop a Python program to implement a Multinomial Naive Bayes classifier
-with Laplace estimation.
+from scratch with Laplace estimation (CountVectorizer allowed for feature extraction).
 
 TASKS:
-  1. Create or load the feedback dataset using Pandas (25 rows CSV).
-  2. Display the first five records and class distribution.
-  3. Convert the feedback messages into numerical features using CountVectorizer.
-  4. Split the dataset into training and testing sets using an 80:20 ratio.
-  5. Train a Multinomial Naive Bayes model without Laplace smoothing (alpha ~ 0).
-  6. Train another model using Laplace smoothing with alpha = 1.
-  7. Identify words that do not occur in one of the classes.
-  8. Calculate and display the probability of an unseen word:
-       P(w | C) = (Count(w, C) + 1) / (N_C + V)
-  9. Predict the class of the test messages using both models.
- 10. Accept a new feedback message from the user and predict Positive or Negative.
- 11. Display the predicted class probabilities.
- 12. Explain how Laplace estimation prevents the zero-probability problem.
+  1. Load dataset using Pandas (datasetlaplace.csv).
+  2. Display first five records and class distribution.
+  3. Feature extraction using CountVectorizer.
+  4. 80:20 Train-Test split.
+  5. Multinomial Naive Bayes implemented manually from scratch.
+  6. Train Model 1 with very small alpha (without effective Laplace smoothing).
+  7. Train Model 2 with Laplace smoothing (alpha = 1).
+  8. Identify words absent from each class.
+  9. Demonstrate unseen word probability formula: P(w|C) = (Count(w,C) + 1) / (N_C + V).
+ 10. Predict test messages and compare accuracy.
+ 11. Output predicted class probabilities.
+ 12. Accept new feedback from user and predict class with probabilities.
+ 13. Comprehensive explanation of Laplace estimation & zero-probability problem.
 
 --------------------------------------------------------------------------------
-DATASET: 25 STUDENT FEEDBACK MESSAGES (CSV FORMAT WITH LABELS)
+DATASET: 30 STUDENT FEEDBACK RECORDS (datasetlaplace.csv)
 --------------------------------------------------------------------------------
-MessageID,Message,Class
-M01,The professor explains concepts with remarkable clarity and patience,Positive
-M02,Terrible experience lab computers are slow and constantly crashing,Negative
-M03,Excellent practical demonstrations and insightful project guidance,Positive
-M04,Extremely boring lectures with completely outdated syllabus slides,Negative
-M05,Great interactive doubt clearing sessions and friendly staff support,Positive
-M06,Rude behavior from lab assistant and useless lab manuals,Negative
-M07,Well organized course curriculum with great real world relevance,Positive
-M08,Very confusing explanations and impossible exam evaluation criteria,Negative
-M09,Thoroughly enjoyed the hands on programming exercises and feedback,Positive
-M10,Disorganized schedule and frequent last minute class cancellations,Negative
-M11,Inspiring teacher with immense knowledge and supportive guidance,Positive
-M12,Dull monotonous voice and zero practical implementation taught,Negative
-M13,Outstanding learning environment and highly encouraging faculty,Positive
-M14,Poor guidance for final semester project work and delayed marks,Negative
-M15,The assignments were challenging interesting and highly educational,Positive
-M16,Worst course structure and terribly disorganized lab instructions,Negative
-M17,Fantastic coverage of algorithms and real world applications,Positive
-M18,Frustrating grading system with biased evaluation marks,Negative
-M19,Engaging presentation skills and clear step by step tutorials,Positive
-M20,Complete waste of time reading directly from textbook without examples,Negative
-M21,Comprehensive lecture notes and prompt doubt resolution online,Positive
-M22,Unfair penalties on late submissions without any prior notice,Negative
-M23,Helpful code walkthroughs and regular interactive quizzes,Positive
-M24,Strict attendance policy with zero flexibility for medical issues,Negative
-M25,Highly motivating lectures with industry case study examples,Positive
+Feedback,Class
+"The teacher explained the topic very clearly",Positive
+"I really enjoyed this class",Positive
+"The lectures were interesting and useful",Positive
+"The professor was very helpful",Positive
+"The course content was excellent",Positive
+"I learned many new things from this course",Positive
+"The classroom environment was comfortable",Positive
+"The teacher answered all my questions",Positive
+"The assignments were helpful for learning",Positive
+"The practical sessions were excellent",Positive
+"I am very satisfied with the course",Positive
+"The teaching method was effective",Positive
+"The instructor explained everything well",Positive
+"The course was organized and informative",Positive
+"I had a great learning experience",Positive
+"The teacher did not explain the topics properly",Negative
+"The lectures were boring and confusing",Negative
+"I did not understand the course content",Negative
+"The professor was not helpful",Negative
+"The assignments were too difficult",Negative
+"The classroom environment was uncomfortable",Negative
+"The teacher ignored my questions",Negative
+"The practical sessions were poorly organized",Negative
+"I am disappointed with this course",Negative
+"The teaching method was ineffective",Negative
+"The instructor explained everything poorly",Negative
+"The course was badly organized",Negative
+"The lectures were too long and boring",Negative
+"I had a bad learning experience",Negative
+"The course content was confusing",Negative
 
 --------------------------------------------------------------------------------
-PYTHON SOLUTION (EMBEDDED 25-ROW CSV & COMPLETE NAIVE BAYES PIPELINE)
+PYTHON SOLUTION (COMPLETE CODE)
 --------------------------------------------------------------------------------
-import io
-import pandas as pd
+import os
 import numpy as np
+import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import MultinomialNB
 
-# Step 1: 25-Row Student Feedback Dataset (Embedded CSV)
-csv_data = """MessageID,Message,Class
-M01,The professor explains concepts with remarkable clarity and patience,Positive
-M02,Terrible experience lab computers are slow and constantly crashing,Negative
-M03,Excellent practical demonstrations and insightful project guidance,Positive
-M04,Extremely boring lectures with completely outdated syllabus slides,Negative
-M05,Great interactive doubt clearing sessions and friendly staff support,Positive
-M06,Rude behavior from lab assistant and useless lab manuals,Negative
-M07,Well organized course curriculum with great real world relevance,Positive
-M08,Very confusing explanations and impossible exam evaluation criteria,Negative
-M09,Thoroughly enjoyed the hands on programming exercises and feedback,Positive
-M10,Disorganized schedule and frequent last minute class cancellations,Negative
-M11,Inspiring teacher with immense knowledge and supportive guidance,Positive
-M12,Dull monotonous voice and zero practical implementation taught,Negative
-M13,Outstanding learning environment and highly encouraging faculty,Positive
-M14,Poor guidance for final semester project work and delayed marks,Negative
-M15,The assignments were challenging interesting and highly educational,Positive
-M16,Worst course structure and terribly disorganized lab instructions,Negative
-M17,Fantastic coverage of algorithms and real world applications,Positive
-M18,Frustrating grading system with biased evaluation marks,Negative
-M19,Engaging presentation skills and clear step by step tutorials,Positive
-M20,Complete waste of time reading directly from textbook without examples,Negative
-M21,Comprehensive lecture notes and prompt doubt resolution online,Positive
-M22,Unfair penalties on late submissions without any prior notice,Negative
-M23,Helpful code walkthroughs and regular interactive quizzes,Positive
-M24,Strict attendance policy with zero flexibility for medical issues,Negative
-M25,Highly motivating lectures with industry case study examples,Positive
+# Auto-create datasetlaplace.csv if missing
+csv_content = """Feedback,Class
+"The teacher explained the topic very clearly",Positive
+"I really enjoyed this class",Positive
+"The lectures were interesting and useful",Positive
+"The professor was very helpful",Positive
+"The course content was excellent",Positive
+"I learned many new things from this course",Positive
+"The classroom environment was comfortable",Positive
+"The teacher answered all my questions",Positive
+"The assignments were helpful for learning",Positive
+"The practical sessions were excellent",Positive
+"I am very satisfied with the course",Positive
+"The teaching method was effective",Positive
+"The instructor explained everything well",Positive
+"The course was organized and informative",Positive
+"I had a great learning experience",Positive
+"The teacher did not explain the topics properly",Negative
+"The lectures were boring and confusing",Negative
+"I did not understand the course content",Negative
+"The professor was not helpful",Negative
+"The assignments were too difficult",Negative
+"The classroom environment was uncomfortable",Negative
+"The teacher ignored my questions",Negative
+"The practical sessions were poorly organized",Negative
+"I am disappointed with this course",Negative
+"The teaching method was ineffective",Negative
+"The instructor explained everything poorly",Negative
+"The course was badly organized",Negative
+"The lectures were too long and boring",Negative
+"I had a bad learning experience",Negative
+"The course content was confusing",Negative
 """
+if not os.path.exists("datasetlaplace.csv"):
+    with open("datasetlaplace.csv", "w", encoding="utf-8") as f:
+        f.write(csv_content.strip())
 
-df = pd.read_csv(io.StringIO(csv_data))
-with open("feedback.csv", "w") as f:
-    f.write(csv_data.strip())
+# ============================================================
+# 1. LOAD DATASET USING PANDAS
+# ============================================================
+print("=" * 70)
+print("MULTINOMIAL NAIVE BAYES CLASSIFICATION")
+print("=" * 70)
 
-# Step 2: Inspect first 5 records & class distribution
-print("=== 1. DATASET OVERVIEW & CLASS DISTRIBUTION ===")
-print("First 5 records:\n", df.head())
-print("\nClass Distribution:\n", df["Class"].value_counts())
+df = pd.read_csv("datasetlaplace.csv")
+print("\nDataset loaded successfully.")
+print("\nDataset shape:", df.shape)
+print("\nColumn names:", df.columns.tolist())
 
-# Step 3: Vectorize text using CountVectorizer (Bag of Words)
-vectorizer = CountVectorizer(stop_words="english")
-X = vectorizer.fit_transform(df["Message"])
-y = df["Class"]
-vocab = vectorizer.get_feature_names_out()
+# ============================================================
+# 2. DISPLAY FIRST FIVE RECORDS & CLASS DISTRIBUTION
+# ============================================================
+print("\n" + "=" * 70)
+print("FIRST FIVE RECORDS")
+print("=" * 70)
+print(df.head())
 
-# Step 4: Split into 80% Train (20 messages), 20% Test (5 messages)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.20, random_state=42, stratify=y
-)
+print("\n" + "=" * 70)
+print("CLASS DISTRIBUTION")
+print("=" * 70)
+print(df["Class"].value_counts())
+print("\nClass percentages:\n", df["Class"].value_counts(normalize=True).mul(100).round(2))
 
-# Step 5: Train Model WITHOUT Laplace Smoothing (alpha = 1e-9)
-model_no_lap = MultinomialNB(alpha=1e-9)
-model_no_lap.fit(X_train, y_train)
+# CHECK MISSING VALUES
+df = df.dropna(subset=["Feedback", "Class"]).reset_index(drop=True)
 
-# Step 6: Train Model WITH Laplace Smoothing (alpha = 1.0)
-model_with_lap = MultinomialNB(alpha=1.0)
-model_with_lap.fit(X_train, y_train)
+# ============================================================
+# 3. COUNT VECTORIZER
+# ============================================================
+print("\n" + "=" * 70)
+print("COUNT VECTORIZER")
+print("=" * 70)
 
-# Step 7 & 8: Unseen Word Probability Demonstration
-# Formula: P(w | C) = (Count(w, C) + 1) / (N_C + V)
-V = len(vocab)
-classes = model_with_lap.classes_
-print("\n=== 2. UNSEEN WORD PROBABILITY FORMULA ===")
-print(f"Total Unique Vocabulary Size (V): {V} words")
+vectorizer = CountVectorizer(lowercase=True)
+X = vectorizer.fit_transform(df["Feedback"]).toarray()
+y = df["Class"].values
+vocabulary = vectorizer.get_feature_names_out()
 
-unseen_word = "quantum"
-print(f"For an unseen test word like '{unseen_word}':")
-for i, c in enumerate(classes):
-    N_c = model_with_lap.feature_count_[i].sum()
-    p_unseen = 1.0 / (N_c + V)
-    print(f"   In Class '{c}': Count=0, Total Words N_C={int(N_c)}, P('{unseen_word}'|{c}) = (0+1)/({int(N_c)}+{V}) = {p_unseen:.6f}")
+print("\nNumber of documents:", X.shape[0])
+print("Number of vocabulary words:", X.shape[1])
+print("\nVocabulary:\n", list(vocabulary))
 
-# Step 9: Compare Predictions on Test Split
-preds_no = model_no_lap.predict(X_test)
-preds_lap = model_with_lap.predict(X_test)
+document_term_matrix = pd.DataFrame(X, columns=vocabulary)
+print("\nDocument-Term Matrix:\n", document_term_matrix.head())
 
-comparison_df = pd.DataFrame({
-    "Test_Message": [df["Message"].iloc[idx] for idx in y_test.index],
-    "Actual_Class": y_test.values,
-    "No_Laplace_Prediction": preds_no,
-    "With_Laplace_Prediction": preds_lap
+# ============================================================
+# 4. TRAIN-TEST SPLIT 80:20
+# ============================================================
+print("\n" + "=" * 70)
+print("80:20 TRAIN-TEST SPLIT")
+print("=" * 70)
+
+np.random.seed(42)
+positive_indices = np.where(y == "Positive")[0]
+negative_indices = np.where(y == "Negative")[0]
+
+np.random.shuffle(positive_indices)
+np.random.shuffle(negative_indices)
+
+positive_train_count = int(len(positive_indices) * 0.80)
+negative_train_count = int(len(negative_indices) * 0.80)
+
+positive_train = positive_indices[:positive_train_count]
+positive_test = positive_indices[positive_train_count:]
+negative_train = negative_indices[:negative_train_count]
+negative_test = negative_indices[negative_train_count:]
+
+train_indices = np.concatenate([positive_train, negative_train])
+test_indices = np.concatenate([positive_test, negative_test])
+
+np.random.shuffle(train_indices)
+np.random.shuffle(test_indices)
+
+X_train, X_test = X[train_indices], X[test_indices]
+y_train, y_test = y[train_indices], y[test_indices]
+
+print("\nTotal records:", len(df))
+print("Training records:", len(X_train))
+print("Testing records:", len(X_test))
+print("\nTraining class distribution:\n", pd.Series(y_train).value_counts())
+print("\nTesting class distribution:\n", pd.Series(y_test).value_counts())
+
+# ============================================================
+# 5. MULTINOMIAL NAIVE BAYES FROM SCRATCH
+# ============================================================
+class MultinomialNaiveBayes:
+    def __init__(self, alpha):
+        self.alpha = alpha
+        self.classes = None
+        self.class_prior = {}
+        self.word_counts = {}
+        self.total_words = {}
+        self.word_probabilities = {}
+        self.vocabulary_size = 0
+
+    def fit(self, X, y):
+        self.classes = np.unique(y)
+        self.vocabulary_size = X.shape[1]
+        total_documents = len(y)
+
+        for current_class in self.classes:
+            class_documents = X[y == current_class]
+            class_document_count = len(class_documents)
+            prior = class_document_count / total_documents
+            self.class_prior[current_class] = prior
+
+            counts = np.sum(class_documents, axis=0)
+            self.word_counts[current_class] = counts
+            total_words = np.sum(counts)
+            self.total_words[current_class] = total_words
+
+            # Multinomial Naive Bayes formula with Laplace smoothing:
+            # P(w|C) = (Count(w,C) + alpha) / (N_C + alpha * V)
+            probabilities = (counts + self.alpha) / (total_words + self.alpha * self.vocabulary_size)
+            self.word_probabilities[current_class] = probabilities
+
+        return self
+
+    def predict_one(self, message_vector):
+        class_scores = {}
+        for current_class in self.classes:
+            score = np.log(self.class_prior[current_class])
+            log_word_probabilities = np.log(self.word_probabilities[current_class])
+            score += np.sum(message_vector * log_word_probabilities)
+            class_scores[current_class] = score
+        return max(class_scores, key=class_scores.get)
+
+    def predict(self, X):
+        return np.array([self.predict_one(message) for message in X])
+
+    def predict_proba(self, X):
+        all_probabilities = []
+        for message in X:
+            log_scores = []
+            for current_class in self.classes:
+                log_prior = np.log(self.class_prior[current_class])
+                log_word_probability = np.log(self.word_probabilities[current_class])
+                score = log_prior + np.sum(message * log_word_probability)
+                log_scores.append(score)
+            log_scores = np.array(log_scores)
+            max_score = np.max(log_scores)
+            exp_scores = np.exp(log_scores - max_score)
+            probabilities = exp_scores / np.sum(exp_scores)
+            all_probabilities.append(probabilities)
+        return np.array(all_probabilities)
+
+# ============================================================
+# 6 & 7. TRAIN MODELS (WITHOUT & WITH LAPLACE SMOOTHING)
+# ============================================================
+small_alpha = 0.000001
+model_without_laplace = MultinomialNaiveBayes(alpha=small_alpha).fit(X_train, y_train)
+laplace_model = MultinomialNaiveBayes(alpha=1).fit(X_train, y_train)
+
+# ============================================================
+# 8. IDENTIFY WORDS ABSENT FROM EACH CLASS
+# ============================================================
+print("\n" + "=" * 70)
+print("WORDS ABSENT FROM EACH CLASS")
+print("=" * 70)
+for current_class in laplace_model.classes:
+    counts = laplace_model.word_counts[current_class]
+    missing_words = vocabulary[counts == 0]
+    print(f"\nWords not occurring in {current_class}:\n", list(missing_words))
+
+# ============================================================
+# 9. UNSEEN WORD PROBABILITY
+# ============================================================
+print("\n" + "=" * 70)
+print("UNSEEN WORD PROBABILITY")
+print("=" * 70)
+
+positive_counts = laplace_model.word_counts["Positive"]
+positive_missing_indices = np.where(positive_counts == 0)[0]
+
+if len(positive_missing_indices) > 0:
+    word_index = positive_missing_indices[0]
+    unseen_word = vocabulary[word_index]
+    count_word = positive_counts[word_index]
+    N_C = laplace_model.total_words["Positive"]
+    V = len(vocabulary)
+    laplace_probability = (count_word + 1) / (N_C + V)
+    no_smoothing_probability = count_word / N_C
+
+    print("\nSelected unseen word:", unseen_word, "in Class: Positive")
+    print("Count(w,C):", count_word, "| N_C:", N_C, "| V:", V)
+    print(f"Without Laplace: P({unseen_word}|Positive) = {count_word}/{N_C} = {no_smoothing_probability}")
+    print(f"With Laplace:    P({unseen_word}|Positive) = (0 + 1)/({N_C} + {V}) = {laplace_probability:.6f}")
+
+# ============================================================
+# 10. PREDICT TEST MESSAGES
+# ============================================================
+print("\n" + "=" * 70)
+print("TEST SET PREDICTIONS")
+print("=" * 70)
+
+predictions_without_laplace = model_without_laplace.predict(X_test)
+predictions_laplace = laplace_model.predict(X_test)
+test_feedback = df.iloc[test_indices]["Feedback"].values
+
+results = pd.DataFrame({
+    "Feedback": test_feedback,
+    "Actual": y_test,
+    "Very_Small_Alpha": predictions_without_laplace,
+    "Laplace_Alpha_1": predictions_laplace
 })
-print("\n=== 3. TEST SET PREDICTIONS COMPARISON ===")
-print(comparison_df.to_string(index=False))
+print(results.to_string(index=False))
 
-# Step 10 & 11: Accept New Feedback & Predict with Probabilities
-new_sample = "The teacher explained difficult topics with outstanding clarity"
-new_vec = vectorizer.transform([new_sample])
+accuracy_without_laplace = np.mean(predictions_without_laplace == y_test)
+accuracy_laplace = np.mean(predictions_laplace == y_test)
 
-pred_class = model_with_lap.predict(new_vec)[0]
-probs = dict(zip(model_with_lap.classes_, model_with_lap.predict_proba(new_vec)[0].round(4)))
+print("\n" + "=" * 70)
+print("MODEL ACCURACY")
+print("=" * 70)
+print(f"Very small alpha accuracy: {accuracy_without_laplace * 100:.2f}%")
+print(f"Laplace alpha=1 accuracy:  {accuracy_laplace * 100:.2f}%")
 
-print(f"\n=== 4. PREDICTION ON NEW USER FEEDBACK ===")
-print(f"Input Message:  '{new_sample}'")
-print(f"Predicted Class: {pred_class}")
-print(f"Class Probabilities: {probs}")
+# ============================================================
+# 11. PREDICTED CLASS PROBABILITIES FOR TEST DATA
+# ============================================================
+print("\n" + "=" * 70)
+print("PREDICTED CLASS PROBABILITIES")
+print("=" * 70)
 
-# Step 12: Explanation of Zero-Probability Problem
-print("\n=== 5. HOW LAPLACE ESTIMATION PREVENTS ZERO PROBABILITIES ===")
-print("In Naive Bayes, the class score is computed as the product of conditional probabilities:")
-print("   P(Class) * P(w1|Class) * P(w2|Class) * ... * P(wn|Class)")
-print("If a single word does not appear in a training class, its count is 0, making P(wi|Class) = 0.")
-print("This single zero causes the entire multiplicative product to collapse to zero, regardless of other words.")
-print("Laplace smoothing adds alpha=1 to the numerator and V to the denominator, guaranteeing every word")
-print("has a non-zero probability and ensuring robust classification on real-world text.")
+test_probabilities = laplace_model.predict_proba(X_test)
+probability_table = pd.DataFrame(test_probabilities, columns=[f"P({c})" for c in laplace_model.classes])
+probability_table.insert(0, "Actual", y_test)
+probability_table.insert(1, "Predicted", predictions_laplace)
+print(probability_table.to_string(index=False))
+
+# ============================================================
+# 12. PREDICT SAMPLE FEEDBACK
+# ============================================================
+sample_feedback = "The teacher explained difficult topics with outstanding clarity"
+sample_vec = vectorizer.transform([sample_feedback]).toarray()
+sample_pred = laplace_model.predict(sample_vec)[0]
+sample_probs = laplace_model.predict_proba(sample_vec)[0]
+
+print("\n" + "=" * 70)
+print("SAMPLE FEEDBACK PREDICTION")
+print("=" * 70)
+print(f"Input Message:   '{sample_feedback}'")
+print(f"Predicted Class: {sample_pred}")
+for i, c in enumerate(laplace_model.classes):
+    print(f"P({c}): {sample_probs[i] * 100:.2f}%")
+
+# ============================================================
+# 13. EXPLANATION OF LAPLACE ESTIMATION
+# ============================================================
+print("\n" + "=" * 70)
+print("EXPLANATION OF LAPLACE ESTIMATION")
+print("=" * 70)
+print("""
+Multinomial Naive Bayes calculates the probability of a word given a class:
+Without smoothing: P(w|C) = Count(w,C) / N_C
+
+If a word has never appeared in a class: Count(w,C) = 0, so P(w|C) = 0.
+Because Naive Bayes multiplies word probabilities together, a single zero probability
+collapses the entire message score to zero!
+
+Laplace estimation solves this problem by adding alpha=1 to the numerator and V to denominator:
+P(w|C) = (Count(w,C) + 1) / (N_C + V)
+
+For an unseen word: Count(w,C) = 0 -> P(w|C) = 1 / (N_C + V) > 0.
+This completely prevents the zero-probability problem and allows robust classification.
+""")
+
+# SAVE RESULTS
+results.to_csv("naive_bayes_predictions.csv", index=False)
+probability_table.to_csv("naive_bayes_probabilities.csv", index=False)
+print("Results saved: naive_bayes_predictions.csv, naive_bayes_probabilities.csv")
+print("Program completed successfully.")
 ================================================================================

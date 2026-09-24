@@ -1,222 +1,430 @@
 ================================================================================
 EXPERIMENT (06-08-2026): k-NEAREST NEIGHBOUR (k-NN) CLASSIFICATION FROM SCRATCH
+Healthcare Cardiovascular Risk Prediction
 ================================================================================
 
 PROBLEM STATEMENT:
-A healthcare organization has collected medical information from patients to predict
-whether a person is at High Risk or Low Risk for cardiovascular disease. Develop a
-complete machine learning pipeline using the k-Nearest Neighbour (k-NN) algorithm
-implemented entirely from scratch (WITHOUT using sklearn's KNeighborsClassifier).
+Develop a complete machine learning pipeline using the k-Nearest Neighbour (k-NN)
+algorithm implemented entirely from scratch (WITHOUT using sklearn's KNeighborsClassifier).
 Only NumPy, Pandas, Matplotlib, and Seaborn may be used.
+Dataset file: datasetknn.csv
 
-DATASET ATTRIBUTES:
-  - PatientID: Patient identifier
-  - Age: Age of patient (years)
-  - Gender: Male / Female
-  - Height: cm
-  - Weight: kg
-  - BloodPressure: mmHg (systolic)
-  - Glucose: mg/dL
-  - Cholesterol: mg/dL
-  - Smoking: Yes / No
-  - Alcohol: Yes / No
-  - ExerciseLevel: Low / Medium / High
-  - FamilyHistory: Yes / No
-  - HeartRate: beats/min
-  - RiskClass: High Risk / Low Risk (Target)
-
-PIPELINE MODULES IMPLEMENTED FROM SCRATCH:
-  - Part A: Data Preparation (Missing value handling, Outlier removal via IQR, Encoding, Min-Max & Z-Score Scaling)
+PIPELINE MODULES:
+  - Part A: Data Preparation (Missing value handling: Mean & Median, Outlier removal via IQR, Encoding, Min-Max & Z-Score Normalization)
   - Part B: 5 Distance Functions (Euclidean, Manhattan, Minkowski, Cosine, Chebyshev)
-  - Part C: Standard Majority-Vote k-NN Classifier
-  - Part D: Distance-Weighted k-NN (Weight = 1 / (Distance + 0.0001))
-  - Part E: Evaluation across k = 1, 3, 5, 7, 9
+  - Part C: Standard Majority-Vote k-NN Classifier from scratch
+  - Part D: Distance-Weighted k-NN Classifier (Weight = 1 / (Distance + EPSILON))
+  - Part E: Evaluation across k = 1, 3, 5, 7, 9, 11, 13, 15, 17, 19
+  - Model Comparisons: Normalization, Imputation (Mean vs Median), Distance Functions
+  - Confusion Matrix, Graphs & Result CSV Exports
 
 --------------------------------------------------------------------------------
-DATASET: 25 PATIENT RECORDS (CSV FORMAT WITH REALISTIC CLINICAL ATTRIBUTES)
+DATASET: PATIENT RECORDS (datasetknn.csv)
 --------------------------------------------------------------------------------
-PatientID,Age,Gender,Height,Weight,BloodPressure,Glucose,Cholesterol,Smoking,Alcohol,ExerciseLevel,FamilyHistory,HeartRate,RiskClass
-P01,63,Male,168,82,145,140,260,Yes,Yes,Low,Yes,88,High Risk
-P02,37,Female,160,58,115,88,180,No,No,High,No,68,Low Risk
-P03,41,Female,165,64,120,92,195,No,No,Medium,No,72,Low Risk
-P04,56,Male,172,88,150,155,275,Yes,No,Low,Yes,82,High Risk
-P05,57,Female,158,74,138,125,240,No,No,Medium,Yes,76,High Risk
-P06,44,Male,175,70,122,,190,No,Yes,High,No,70,Low Risk
-P07,52,Male,170,85,142,135,250,Yes,Yes,Low,No,80,High Risk
-P08,32,Female,162,54,110,85,172,No,No,High,No,64,Low Risk
-P09,68,Male,166,79,,160,280,Yes,No,Low,Yes,86,High Risk
-P10,48,Female,164,68,128,105,210,No,No,Medium,No,74,Low Risk
-P11,59,Male,178,92,158,168,290,Yes,Yes,Low,Yes,90,High Risk
-P12,39,Male,174,73,118,90,185,No,Yes,,No,66,Low Risk
-P13,61,Female,156,76,144,142,265,No,No,Low,Yes,84,High Risk
-P14,45,Male,180,78,125,98,200,No,No,Medium,No,72,Low Risk
-P15,58,Male,169,84,148,150,270,Yes,No,Low,Yes,85,High Risk
-P16,35,Female,163,56,112,86,175,No,No,High,No,65,Low Risk
-P17,66,Female,155,72,152,148,255,No,No,Low,Yes,78,High Risk
-P18,42,Male,176,75,124,95,198,No,No,High,No,71,Low Risk
-P19,65,Male,171,90,160,172,285,Yes,Yes,Low,Yes,92,High Risk
-P20,38,Female,160,60,116,91,182,No,No,Medium,No,68,Low Risk
-P21,72,Male,167,86,168,175,295,Yes,Yes,Low,Yes,95,High Risk
-P22,29,Female,165,55,114,87,178,No,No,High,No,67,Low Risk
-P23,54,Male,173,81,136,118,225,No,Yes,Medium,No,75,Low Risk
-P24,62,Female,159,78,146,145,268,Yes,No,Low,Yes,83,High Risk
-P25,31,Male,182,76,120,94,188,No,No,High,No,69,Low Risk
+Age,Gender,Height,Weight,BMI,BloodPressure,Glucose,Cholesterol,Smoking,Alcohol,ExerciseLevel,FamilyHistory,HeartRate,RiskClass
+40,Male,146,80,37.5,121,155,165,Yes,Yes,High,No,87,High Risk
+21,Male,190,98,27.1,118,184,270,No,Yes,Low,No,76,High Risk
+26,Male,169,57,20.0,135,158,274,No,Yes,High,No,89,Low Risk
+29,Female,183,69,21.1,100,87,191,Yes,No,Low,Yes,110,High Risk
+43,Male,168,90,31.9,116,138,299,Yes,Yes,High,Yes,65,High Risk
+44,Female,188,86,24.3,97,128,228,No,No,Medium,Yes,68,Low Risk
+33,Female,170,103,35.6,108,137,155,Yes,No,High,No,92,Low Risk
+52,Female,150,51,22.7,104,109,260,No,No,High,Yes,79,Low Risk
+55,Male,188,153,56.7,177,207,210,No,No,High,No,108,High Risk
+66,Female,177,67,21.4,154,97,280,No,No,Low,No,103,High Risk
+63,Male,168,82,29.1,145,140,260,Yes,Yes,Low,Yes,88,High Risk
+37,Female,160,58,22.7,115,88,180,No,No,High,No,68,Low Risk
+41,Female,165,64,23.5,120,92,195,No,No,Medium,No,72,Low Risk
+56,Male,172,88,29.7,150,155,275,Yes,No,Low,Yes,82,High Risk
+57,Female,158,74,29.6,138,125,240,No,No,Medium,Yes,76,High Risk
+48,Female,164,68,25.3,128,105,210,No,No,Medium,No,74,Low Risk
+59,Male,178,92,29.0,158,168,290,Yes,Yes,Low,Yes,90,High Risk
+39,Male,174,73,24.1,118,90,185,No,Yes,Medium,No,66,Low Risk
+61,Female,156,76,31.2,144,142,265,No,No,Low,Yes,84,High Risk
+45,Male,180,78,24.1,125,98,200,No,No,Medium,No,72,Low Risk
+58,Male,169,84,29.4,148,150,270,Yes,No,Low,Yes,85,High Risk
+35,Female,163,56,21.1,112,86,175,No,No,High,No,65,Low Risk
+72,Male,167,86,30.8,168,175,295,Yes,Yes,Low,Yes,95,High Risk
+29,Female,165,55,20.2,114,87,178,No,No,High,No,67,Low Risk
+54,Male,173,81,27.1,136,118,225,No,Yes,Medium,No,75,Low Risk
 
 --------------------------------------------------------------------------------
 PYTHON SOLUTION (COMPLETE CODE IMPLEMENTED FROM SCRATCH)
 --------------------------------------------------------------------------------
-import io
-import math
+import os
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# ==============================================================================
-# PART A: LOAD 25-ROW CSV DATASET & DATA PREPARATION FROM SCRATCH
-# ==============================================================================
-csv_data = """PatientID,Age,Gender,Height,Weight,BloodPressure,Glucose,Cholesterol,Smoking,Alcohol,ExerciseLevel,FamilyHistory,HeartRate,RiskClass
-P01,63,Male,168,82,145,140,260,Yes,Yes,Low,Yes,88,High Risk
-P02,37,Female,160,58,115,88,180,No,No,High,No,68,Low Risk
-P03,41,Female,165,64,120,92,195,No,No,Medium,No,72,Low Risk
-P04,56,Male,172,88,150,155,275,Yes,No,Low,Yes,82,High Risk
-P05,57,Female,158,74,138,125,240,No,No,Medium,Yes,76,High Risk
-P06,44,Male,175,70,122,,190,No,Yes,High,No,70,Low Risk
-P07,52,Male,170,85,142,135,250,Yes,Yes,Low,No,80,High Risk
-P08,32,Female,162,54,110,85,172,No,No,High,No,64,Low Risk
-P09,68,Male,166,79,,160,280,Yes,No,Low,Yes,86,High Risk
-P10,48,Female,164,68,128,105,210,No,No,Medium,No,74,Low Risk
-P11,59,Male,178,92,158,168,290,Yes,Yes,Low,Yes,90,High Risk
-P12,39,Male,174,73,118,90,185,No,Yes,,No,66,Low Risk
-P13,61,Female,156,76,144,142,265,No,No,Low,Yes,84,High Risk
-P14,45,Male,180,78,125,98,200,No,No,Medium,No,72,Low Risk
-P15,58,Male,169,84,148,150,270,Yes,No,Low,Yes,85,High Risk
-P16,35,Female,163,56,112,86,175,No,No,High,No,65,Low Risk
-P17,66,Female,155,72,152,148,255,No,No,Low,Yes,78,High Risk
-P18,42,Male,176,75,124,95,198,No,No,High,No,71,Low Risk
-P19,65,Male,171,90,160,172,285,Yes,Yes,Low,Yes,92,High Risk
-P20,38,Female,160,60,116,91,182,No,No,Medium,No,68,Low Risk
-P21,72,Male,167,86,168,175,295,Yes,Yes,Low,Yes,95,High Risk
-P22,29,Female,165,55,114,87,178,No,No,High,No,67,Low Risk
-P23,54,Male,173,81,136,118,225,No,Yes,Medium,No,75,Low Risk
-P24,62,Female,159,78,146,145,268,Yes,No,Low,Yes,83,High Risk
-P25,31,Male,182,76,120,94,188,No,No,High,No,69,Low Risk
+# Auto-create datasetknn.csv if missing
+csv_content = """Age,Gender,Height,Weight,BMI,BloodPressure,Glucose,Cholesterol,Smoking,Alcohol,ExerciseLevel,FamilyHistory,HeartRate,RiskClass
+40,Male,146,80,37.5,121,155,165,Yes,Yes,High,No,87,High Risk
+21,Male,190,98,27.1,118,184,270,No,Yes,Low,No,76,High Risk
+26,Male,169,57,20.0,135,158,274,No,Yes,High,No,89,Low Risk
+29,Female,183,69,21.1,100,87,191,Yes,No,Low,Yes,110,High Risk
+43,Male,168,90,31.9,116,138,299,Yes,Yes,High,Yes,65,High Risk
+44,Female,188,86,24.3,97,128,228,No,No,Medium,Yes,68,Low Risk
+33,Female,170,103,35.6,108,137,155,Yes,No,High,No,92,Low Risk
+52,Female,150,51,22.7,104,109,260,No,No,High,Yes,79,Low Risk
+55,Male,188,153,56.7,177,207,210,No,No,High,No,108,High Risk
+66,Female,177,67,21.4,154,97,280,No,No,Low,No,103,High Risk
+63,Male,168,82,29.1,145,140,260,Yes,Yes,Low,Yes,88,High Risk
+37,Female,160,58,22.7,115,88,180,No,No,High,No,68,Low Risk
+41,Female,165,64,23.5,120,92,195,No,No,Medium,No,72,Low Risk
+56,Male,172,88,29.7,150,155,275,Yes,No,Low,Yes,82,High Risk
+57,Female,158,74,29.6,138,125,240,No,No,Medium,Yes,76,High Risk
+48,Female,164,68,25.3,128,105,210,No,No,Medium,No,74,Low Risk
+59,Male,178,92,29.0,158,168,290,Yes,Yes,Low,Yes,90,High Risk
+39,Male,174,73,24.1,118,90,185,No,Yes,Medium,No,66,Low Risk
+61,Female,156,76,31.2,144,142,265,No,No,Low,Yes,84,High Risk
+45,Male,180,78,24.1,125,98,200,No,No,Medium,No,72,Low Risk
+58,Male,169,84,29.4,148,150,270,Yes,No,Low,Yes,85,High Risk
+35,Female,163,56,21.1,112,86,175,No,No,High,No,65,Low Risk
+72,Male,167,86,30.8,168,175,295,Yes,Yes,Low,Yes,95,High Risk
+29,Female,165,55,20.2,114,87,178,No,No,High,No,67,Low Risk
+54,Male,173,81,27.1,136,118,225,No,Yes,Medium,No,75,Low Risk
 """
+if not os.path.exists("datasetknn.csv"):
+    with open("datasetknn.csv", "w", encoding="utf-8") as f:
+        f.write(csv_content.strip())
 
-df = pd.read_csv(io.StringIO(csv_data))
-with open("patients.csv", "w") as f:
-    f.write(csv_data.strip())
+# ============================================================
+# SETTINGS
+# ============================================================
+FILE_NAME = "datasetknn.csv"
+TARGET = "RiskClass"
+RANDOM_SEED = 42
+TEST_SIZE = 0.20
+EPSILON = 0.0001
+K_VALUES = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
 
-# Compute Body Mass Index (BMI = Weight / Height_m^2)
-df["BMI"] = (df["Weight"] / ((df["Height"] / 100.0) ** 2)).round(1)
+np.random.seed(RANDOM_SEED)
+sns.set_theme(style="whitegrid")
 
-# 1. Missing Value Imputation (Median for numeric, Mode for categorical)
-for num_col in ["BloodPressure", "Glucose", "Cholesterol"]:
-    df[num_col] = df[num_col].fillna(df[num_col].median())
-df["ExerciseLevel"] = df["ExerciseLevel"].fillna(df["ExerciseLevel"].mode()[0])
+# ============================================================
+# PART A - LOAD DATASET
+# ============================================================
+print("=" * 80)
+print("PART A - DATA PREPARATION")
+print("=" * 80)
 
-# 2. Outlier Detection & Handling via IQR method
-for col in ["BloodPressure", "Cholesterol"]:
-    Q1 = df[col].quantile(0.25)
-    Q3 = df[col].quantile(0.75)
-    IQR = Q3 - Q1
-    lower_bound = Q1 - 1.5 * IQR
-    upper_bound = Q3 + 1.5 * IQR
-    df = df[(df[col] >= lower_bound) & (df[col] <= upper_bound)]
+df = pd.read_csv(FILE_NAME)
+print("\nDataset loaded successfully.")
+print("\nDataset Shape:", df.shape)
+print("\nColumn Names:", df.columns.tolist())
+print("\nFirst 10 Records:\n", df.head(10))
+print("\nData Types:\n", df.dtypes)
+print("\nSummary Statistics:\n", df.describe(include="all"))
 
-df = df.reset_index(drop=True)
+# MISSING VALUES
+print("\n" + "=" * 80)
+print("MISSING VALUE ANALYSIS")
+print("=" * 80)
+print("\nMissing values in each column:\n", df.isnull().sum())
+print("\nTotal missing values:", df.isnull().sum().sum())
 
-# 3. Label Encoding from scratch
-df["Gender"] = df["Gender"].map({"Male": 1, "Female": 0})
-df["Smoking"] = df["Smoking"].map({"Yes": 1, "No": 0})
-df["Alcohol"] = df["Alcohol"].map({"Yes": 1, "No": 0})
-df["FamilyHistory"] = df["FamilyHistory"].map({"Yes": 1, "No": 0})
-df["ExerciseLevel"] = df["ExerciseLevel"].map({"Low": 0, "Medium": 1, "High": 2})
-df["Target"] = df["RiskClass"].map({"Low Risk": 0, "High Risk": 1})
+if TARGET not in df.columns:
+    raise ValueError(f"Target column '{TARGET}' was not found in datasetknn.csv")
 
-# 4. Feature Selection & Min-Max Normalization from scratch
-feature_cols = ["Age", "Gender", "Height", "Weight", "BMI", "BloodPressure", "Glucose", "Cholesterol", "Smoking", "Alcohol", "ExerciseLevel", "FamilyHistory", "HeartRate"]
-X = df[feature_cols].values
-y = df["Target"].values
+# DISPLAY CLASS DISTRIBUTION
+print("\n" + "=" * 80)
+print("CLASS DISTRIBUTION")
+print("=" * 80)
+print(df[TARGET].value_counts())
+print("\nClass percentages:\n", df[TARGET].value_counts(normalize=True) * 100)
 
-# Formula: X_norm = (X - X_min) / (X_max - X_min)
-X_norm = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0) + 1e-9)
+plt.figure(figsize=(8, 5))
+sns.countplot(data=df, x=TARGET)
+plt.title("Risk Class Distribution")
+plt.xlabel("Risk Class")
+plt.ylabel("Number of Patients")
+plt.tight_layout()
+plt.show()
 
-# Split 80% Train (20 patients), 20% Test (5 patients)
-train_size = int(0.80 * len(X_norm))
-X_train, X_test = X_norm[:train_size], X_norm[train_size:]
-y_train, y_test = y[:train_size], y[train_size:]
+# IDENTIFY NUMERICAL AND CATEGORICAL COLUMNS
+feature_columns = [column for column in df.columns if column != TARGET]
+numeric_columns = df[feature_columns].select_dtypes(include=np.number).columns.tolist()
+categorical_columns = [column for column in feature_columns if column not in numeric_columns]
 
-# ==============================================================================
-# PART B: 5 DISTANCE FUNCTIONS IMPLEMENTED FROM SCRATCH
-# ==============================================================================
+print("\n" + "=" * 80)
+print("FEATURE TYPES")
+print("=" * 80)
+print("\nNumerical columns:", numeric_columns)
+print("\nCategorical columns:", categorical_columns)
+
+def handle_missing_values(data, numeric_method="mean"):
+    result = data.copy()
+    for column in numeric_columns:
+        if result[column].isnull().sum() > 0:
+            value = result[column].mean() if numeric_method == "mean" else result[column].median()
+            result[column] = result[column].fillna(value)
+    for column in categorical_columns:
+        if result[column].isnull().sum() > 0:
+            mode_value = result[column].mode()[0]
+            result[column] = result[column].fillna(mode_value)
+    result = result.dropna(subset=[TARGET])
+    return result
+
+df_mean = handle_missing_values(df, numeric_method="mean")
+df_median = handle_missing_values(df, numeric_method="median")
+
+# OUTLIER DETECTION USING IQR
+def detect_outliers_iqr(data):
+    outlier_counts = {}
+    for column in numeric_columns:
+        Q1 = data[column].quantile(0.25)
+        Q3 = data[column].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        outliers = data[(data[column] < lower_bound) | (data[column] > upper_bound)]
+        outlier_counts[column] = len(outliers)
+    return outlier_counts
+
+print("\n" + "=" * 80)
+print("OUTLIER DETECTION USING IQR")
+print("=" * 80)
+outlier_counts = detect_outliers_iqr(df_mean)
+for column, count in outlier_counts.items():
+    print(f"{column}: {count} outliers")
+
+if len(numeric_columns) > 0:
+    number_of_plots = len(numeric_columns)
+    rows = int(np.ceil(number_of_plots / 3))
+    plt.figure(figsize=(15, rows * 4))
+    for i, column in enumerate(numeric_columns):
+        plt.subplot(rows, 3, i + 1)
+        sns.boxplot(y=df_mean[column])
+        plt.title(f"Box Plot - {column}")
+    plt.tight_layout()
+    plt.show()
+
+def remove_outliers(data):
+    result = data.copy()
+    for column in numeric_columns:
+        Q1 = result[column].quantile(0.25)
+        Q3 = result[column].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        result = result[(result[column] >= lower_bound) & (result[column] <= upper_bound)]
+    return result
+
+df_clean = remove_outliers(df_mean)
+if len(df_clean) < 10:
+    df_clean = df_mean.copy()
+
+print(f"\nOriginal records: {len(df_mean)} | Records after removing outliers: {len(df_clean)}")
+
+# CATEGORICAL ENCODING
+def encode_features(data):
+    result = data.copy()
+    mappings = {}
+    for column in categorical_columns:
+        if column == TARGET:
+            continue
+        unique_values = sorted(result[column].dropna().astype(str).unique())
+        mapping = {value: index for index, value in enumerate(unique_values)}
+        mappings[column] = mapping
+        result[column] = result[column].astype(str).map(mapping)
+    return result, mappings
+
+df_encoded, encoding_mappings = encode_features(df_clean)
+
+target_values = sorted(df_encoded[TARGET].astype(str).unique())
+target_mapping = {value: index for index, value in enumerate(target_values)}
+reverse_target_mapping = {index: value for value, index in target_mapping.items()}
+df_encoded[TARGET] = df_encoded[TARGET].astype(str).map(target_mapping)
+
+X = df_encoded[feature_columns].astype(float).values
+y = df_encoded[TARGET].astype(int).values
+
+# MANUAL TRAIN-TEST SPLIT
+def train_test_split_manual(X, y, test_size=0.2, seed=42):
+    rng = np.random.default_rng(seed)
+    indices = np.arange(len(X))
+    rng.shuffle(indices)
+    test_count = max(2, int(len(X) * test_size))
+    test_indices = indices[:test_count]
+    train_indices = indices[test_count:]
+    return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
+
+X_train, X_test, y_train, y_test = train_test_split_manual(X, y, TEST_SIZE, RANDOM_SEED)
+print("\nTraining samples:", len(X_train), "| Testing samples:", len(X_test))
+
+# NORMALIZATION
+def min_max_fit_transform(X_train, X_test):
+    minimum = X_train.min(axis=0)
+    maximum = X_train.max(axis=0)
+    denominator = maximum - minimum
+    denominator[denominator == 0] = 1
+    return (X_train - minimum) / denominator, (X_test - minimum) / denominator
+
+def standardize_fit_transform(X_train, X_test):
+    mean = X_train.mean(axis=0)
+    std = X_train.std(axis=0)
+    std[std == 0] = 1
+    return (X_train - mean) / std, (X_test - mean) / std
+
+X_train_minmax, X_test_minmax = min_max_fit_transform(X_train, X_test)
+X_train_zscore, X_test_zscore = standardize_fit_transform(X_train, X_test)
+
+# ============================================================
+# PART B - DISTANCE FUNCTIONS FROM SCRATCH
+# ============================================================
 def euclidean_distance(a, b):
-    return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
+    return np.sqrt(np.sum((a - b) ** 2))
 
 def manhattan_distance(a, b):
-    return sum(abs(x - y) for x, y in zip(a, b))
+    return np.sum(np.abs(a - b))
 
 def minkowski_distance(a, b, p=3):
-    return sum(abs(x - y) ** p for x, y in zip(a, b)) ** (1.0 / p)
-
-def chebyshev_distance(a, b):
-    return max(abs(x - y) for x, y in zip(a, b))
+    return (np.sum(np.abs(a - b) ** p)) ** (1 / p)
 
 def cosine_distance(a, b):
-    dot = sum(x * y for x, y in zip(a, b))
-    norm_a = math.sqrt(sum(x ** 2 for x in a))
-    norm_b = math.sqrt(sum(y ** 2 for y in b))
-    return 1.0 - (dot / (norm_a * norm_b)) if (norm_a * norm_b) != 0 else 1.0
+    dot = np.dot(a, b)
+    norm = np.linalg.norm(a) * np.linalg.norm(b)
+    return 1.0 - (dot / norm) if norm != 0 else 1.0
 
-# Print distance metrics from Test Patient 0 to first 3 training patients
-print("=== PART B: DISTANCE METRICS TO FIRST 3 TRAINING PATIENTS ===")
-for i in range(3):
-    d_euc = euclidean_distance(X_test[0], X_train[i])
-    d_man = manhattan_distance(X_test[0], X_train[i])
-    d_cos = cosine_distance(X_test[0], X_train[i])
-    print(f"Train Patient P{i+1:02d} | Euclidean: {d_euc:.4f} | Manhattan: {d_man:.4f} | Cosine: {d_cos:.4f}")
+def chebyshev_distance(a, b):
+    return np.max(np.abs(a - b))
 
-# ==============================================================================
-# PART C & D: STANDARD & WEIGHTED k-NN PREDICTION FROM SCRATCH
-# ==============================================================================
-def knn_predict(X_tr, y_tr, query, k=5, weighted=False, epsilon=0.0001):
-    distances = [euclidean_distance(query, pt) for pt in X_tr]
-    k_indices = np.argsort(distances)[:k]
-    k_labels = [y_tr[i] for i in k_indices]
-    
-    if not weighted:
-        # Part C: Standard Majority Vote
-        return 1 if sum(k_labels) > (k / 2.0) else 0
-    else:
-        # Part D: Distance-Weighted Vote (Weight = 1 / (Distance + epsilon))
-        k_weights = [1.0 / (distances[i] + epsilon) for i in k_indices]
-        w1 = sum(w for l, w in zip(k_labels, k_weights) if l == 1)
-        w0 = sum(w for l, w in zip(k_labels, k_weights) if l == 0)
-        return 1 if w1 >= w0 else 0
+print("\n" + "=" * 80)
+print("PART B - DISTANCE FUNCTIONS")
+print("=" * 80)
+test_sample = X_test_zscore[0]
+distance_records = []
+for i in range(min(5, len(X_train_zscore))):
+    train_sample = X_train_zscore[i]
+    distance_records.append([
+        i,
+        euclidean_distance(test_sample, train_sample),
+        manhattan_distance(test_sample, train_sample),
+        minkowski_distance(test_sample, train_sample, p=3),
+        cosine_distance(test_sample, train_sample),
+        chebyshev_distance(test_sample, train_sample),
+        y_train[i]
+    ])
 
-# ==============================================================================
-# PART E: EVALUATION ACROSS k = 1, 3, 5, 7, 9
-# ==============================================================================
-print("\n=== PART E: MODEL ACCURACY ACROSS DIFFERENT k VALUES ===")
-k_list = [1, 3, 5, 7, 9]
-best_k, best_acc = 1, 0.0
+distance_df = pd.DataFrame(distance_records, columns=["Train_Idx", "Euclidean", "Manhattan", "Minkowski", "Cosine", "Chebyshev", "Class"])
+print(distance_df.to_string(index=False))
 
-for k in k_list:
-    pred_std = [knn_predict(X_train, y_train, pt, k=k, weighted=False) for pt in X_test]
-    pred_wgt = [knn_predict(X_train, y_train, pt, k=k, weighted=True) for pt in X_test]
-    
-    acc_std = np.mean(pred_std == y_test) * 100
-    acc_wgt = np.mean(pred_wgt == y_test) * 100
-    
-    if acc_wgt > best_acc:
-        best_acc = acc_wgt
-        best_k = k
-        
-    print(f"k = {k:02d} | Standard k-NN Accuracy: {acc_std:5.1f}% | Weighted k-NN Accuracy: {acc_wgt:5.1f}%")
+# ============================================================
+# PART C & D - k-NN & WEIGHTED k-NN FROM SCRATCH
+# ============================================================
+def calculate_distance(a, b, method="euclidean"):
+    if method == "euclidean": return euclidean_distance(a, b)
+    elif method == "manhattan": return manhattan_distance(a, b)
+    elif method == "minkowski": return minkowski_distance(a, b)
+    elif method == "cosine": return cosine_distance(a, b)
+    elif method == "chebyshev": return chebyshev_distance(a, b)
+    raise ValueError("Unknown distance method")
 
-print(f"\n[+] Optimal Parameter: Best k = {best_k} with {best_acc:.1f}% accuracy.")
+def knn_predict(X_tr, y_tr, X_te, k, method="euclidean"):
+    k_actual = min(k, len(X_tr))
+    predictions = []
+    for test_pt in X_te:
+        distances = [(calculate_distance(test_pt, tr_pt, method), label) for tr_pt, label in zip(X_tr, y_tr)]
+        distances.sort(key=lambda x: x[0])
+        neighbours = distances[:k_actual]
+        labels, counts = np.unique([l for _, l in neighbours], return_counts=True)
+        predictions.append(labels[np.argmax(counts)])
+    return np.array(predictions)
 
-# Predict for a new test patient
-new_query = X_test[0]
-predicted_label = "High Risk" if knn_predict(X_train, y_train, new_query, k=best_k, weighted=True) == 1 else "Low Risk"
-actual_label = "High Risk" if y_test[0] == 1 else "Low Risk"
-print(f"[+] Prediction on Test Patient 1: Predicted = {predicted_label} | Actual = {actual_label}")
+def weighted_knn_predict(X_tr, y_tr, X_te, k, method="euclidean"):
+    k_actual = min(k, len(X_tr))
+    predictions = []
+    for test_pt in X_te:
+        distances = [(calculate_distance(test_pt, tr_pt, method), label) for tr_pt, label in zip(X_tr, y_tr)]
+        distances.sort(key=lambda x: x[0])
+        neighbours = distances[:k_actual]
+        weights = {}
+        for d, l in neighbours:
+            weights[l] = weights.get(l, 0) + (1.0 / (d + EPSILON))
+        predictions.append(max(weights, key=weights.get))
+    return np.array(predictions)
+
+def accuracy_score_manual(y_true, y_pred):
+    return np.sum(y_true == y_pred) / len(y_true)
+
+def precision_recall_f1(y_true, y_pred):
+    labels = np.unique(np.concatenate((y_true, y_pred)))
+    precisions, recalls, f1s = [], [], []
+    for label in labels:
+        TP = np.sum((y_true == label) & (y_pred == label))
+        FP = np.sum((y_true != label) & (y_pred == label))
+        FN = np.sum((y_true == label) & (y_pred != label))
+        p = TP / (TP + FP) if (TP + FP) > 0 else 0
+        r = TP / (TP + FN) if (TP + FN) > 0 else 0
+        f = (2 * p * r / (p + r)) if (p + r) > 0 else 0
+        precisions.append(p); recalls.append(r); f1s.append(f)
+    return np.mean(precisions), np.mean(recalls), np.mean(f1s)
+
+def confusion_matrix_manual(y_true, y_pred):
+    labels = np.unique(np.concatenate((y_true, y_pred)))
+    matrix = np.zeros((len(labels), len(labels)), dtype=int)
+    for actual, predicted in zip(y_true, y_pred):
+        a_idx = np.where(labels == actual)[0][0]
+        p_idx = np.where(labels == predicted)[0][0]
+        matrix[a_idx, p_idx] += 1
+    return labels, matrix
+
+# ============================================================
+# PART E - CHOOSE BEST k
+# ============================================================
+print("\n" + "=" * 80)
+print("PART E - CHOOSING THE BEST k")
+print("=" * 80)
+
+results = []
+valid_k = [k for k in K_VALUES if k <= len(X_train)]
+for k in valid_k:
+    p_norm = knn_predict(X_train_zscore, y_train, X_test_zscore, k, "euclidean")
+    p_wgt = weighted_knn_predict(X_train_zscore, y_train, X_test_zscore, k, "euclidean")
+    acc_norm = accuracy_score_manual(y_test, p_norm)
+    p1, r1, f1_norm = precision_recall_f1(y_test, p_norm)
+    acc_wgt = accuracy_score_manual(y_test, p_wgt)
+    p2, r2, f1_wgt = precision_recall_f1(y_test, p_wgt)
+    results.append([k, acc_norm, p1, r1, f1_norm, acc_wgt, p2, r2, f1_wgt])
+
+results_df = pd.DataFrame(results, columns=["K", "Normal_Acc", "Normal_Prec", "Normal_Rec", "Normal_F1", "Wgt_Acc", "Wgt_Prec", "Wgt_Rec", "Wgt_F1"])
+print(results_df.to_string(index=False))
+
+best_row = results_df.loc[results_df["Normal_Acc"].idxmax()]
+best_normal_k = int(best_row["K"])
+print(f"\nBest Normal k: {best_normal_k} | Accuracy: {best_row['Normal_Acc'] * 100:.2f}%")
+
+# DISTANCE COMPARISON
+distance_methods = ["euclidean", "manhattan", "minkowski", "cosine", "chebyshev"]
+dist_results = []
+for m in distance_methods:
+    preds = knn_predict(X_train_zscore, y_train, X_test_zscore, best_normal_k, m)
+    acc = accuracy_score_manual(y_test, preds)
+    p, r, f1 = precision_recall_f1(y_test, preds)
+    dist_results.append([m, acc, p, r, f1])
+
+distance_results_df = pd.DataFrame(dist_results, columns=["Distance", "Accuracy", "Precision", "Recall", "F1"])
+print("\nDistance Comparison:\n", distance_results_df.to_string(index=False))
+
+# CONFUSION MATRIX
+best_preds = knn_predict(X_train_zscore, y_train, X_test_zscore, best_normal_k, "euclidean")
+labels, cm = confusion_matrix_manual(y_test, best_preds)
+plt.figure(figsize=(6, 4))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
+            xticklabels=[reverse_target_mapping[x] for x in labels],
+            yticklabels=[reverse_target_mapping[x] for x in labels])
+plt.title(f"Confusion Matrix (k={best_normal_k})")
+plt.xlabel("Predicted Class")
+plt.ylabel("Actual Class")
+plt.tight_layout()
+plt.show()
+
+# SAVE RESULTS
+results_df.to_csv("knn_k_results.csv", index=False)
+distance_results_df.to_csv("knn_distance_results.csv", index=False)
+print("\nResults exported: knn_k_results.csv, knn_distance_results.csv")
+print("=" * 80)
+print("COMPLETE k-NN ANALYSIS FINISHED")
+print("=" * 80)
 ================================================================================

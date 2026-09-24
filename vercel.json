@@ -286,6 +286,18 @@
       "destination": "/files/feedback_25.csv"
     },
     {
+      "source": "/dataset.csv",
+      "destination": "/files/dataset.csv"
+    },
+    {
+      "source": "/datasetknn.csv",
+      "destination": "/files/datasetknn.csv"
+    },
+    {
+      "source": "/datasetlaplace.csv",
+      "destination": "/files/datasetlaplace.csv"
+    },
+    {
       "source": "/q",
       "destination": "/api/groq"
     },

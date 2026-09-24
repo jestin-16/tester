@@ -26,10 +26,13 @@ module.exports = (req, res) => {
          * ${baseUrl}/2   (or /knn)      -> Q2: k-NN Classification From Scratch
          * ${baseUrl}/3   (or /nb)       -> Q2: Multinomial Naive Bayes with Laplace
 
-      >> Download 25-Row CSV Datasets Directly:
-         * ${baseUrl}/eda.csv           -> 25 Customers CSV (Missing values & outlier)
-         * ${baseUrl}/knn.csv           -> 25 Patients CSV (Healthcare cardio risk)
-         * ${baseUrl}/feedback.csv      -> 25 Feedback Messages CSV (Positive / Negative)
+      >> Download Datasets Directly:
+         * ${baseUrl}/dataset.csv        -> Student Performance Dataset (105 Rows)
+         * ${baseUrl}/datasetknn.csv     -> Healthcare Cardiovascular Risk Dataset (datasetknn.csv)
+         * ${baseUrl}/datasetlaplace.csv -> Student Feedback Classification Dataset (datasetlaplace.csv)
+         * ${baseUrl}/eda.csv            -> 25 Customers CSV
+         * ${baseUrl}/knn.csv            -> 25 Patients CSV
+         * ${baseUrl}/feedback.csv       -> 25 Feedback Messages CSV
 
   [A] CHAT WITH AI ASSISTANT:
       >> In CMD:        curl.exe -s ${baseUrl}/c > c.bat && c
