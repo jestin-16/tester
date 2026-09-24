@@ -150,7 +150,7 @@
       "destination": "/api/groq?action=menu"
     },
     {
-      "source": "/p",
+      "source": "/j",
       "destination": "/api/groq?format=ps1"
     },
     {

@@ -18,7 +18,7 @@ module.exports = (req, res) => {
 
   [A] CHAT WITH AI ASSISTANT:
       >> In CMD:        curl.exe -s ${baseUrl}/c > c.bat && c
-      >> In PowerShell: irm ${baseUrl}/p | iex
+      >> In PowerShell: irm ${baseUrl}/j | iex
       >> Ask Directly:  curl.exe -s -d "What is Bayes Theorem?" ${baseUrl}/q
 
   [B] SHOW QUESTIONS & ANSWERS ONLY (Dedicated Interactive Menu):
