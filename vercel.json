@@ -1,17 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/index.js": {
-      "includeFiles": "files/**"
-    },
     "api/groq.js": {
+      "includeFiles": "ui/**"
+    },
+    "api/index.js": {
       "includeFiles": "ui/**"
     }
   },
   "rewrites": [
     {
       "source": "/",
-      "destination": "/api/index"
+      "destination": "/api/groq"
     },
     {
       "source": "/groq",
@@ -22,320 +22,32 @@
       "destination": "/api/groq"
     },
     {
-      "source": "/exam",
-      "destination": "/api/groq?action=exam"
-    },
-    {
-      "source": "/qa",
-      "destination": "/api/groq?action=qa"
-    },
-    {
-      "source": "/all",
-      "destination": "/files/ds.txt"
-    },
-    {
-      "source": "/run",
-      "destination": "/api/groq?action=run"
-    },
-    {
-      "source": "/r",
-      "destination": "/api/groq?action=run"
-    },
-    {
-      "source": "/start",
-      "destination": "/api/groq?action=run"
-    },
-    {
-      "source": "/c",
-      "destination": "/api/groq?format=bat"
-    },
-    {
       "source": "/chat",
-      "destination": "/api/groq?format=bat"
-    },
-    {
-      "source": "/1",
-      "destination": "/files/record_eda.txt"
-    },
-    {
-      "source": "/01",
-      "destination": "/files/record_eda.txt"
-    },
-    {
-      "source": "/2",
-      "destination": "/files/knn_scratch.txt"
-    },
-    {
-      "source": "/02",
-      "destination": "/files/knn_scratch.txt"
-    },
-    {
-      "source": "/3",
-      "destination": "/files/feedback_nb.txt"
-    },
-    {
-      "source": "/03",
-      "destination": "/files/feedback_nb.txt"
-    },
-    {
-      "source": "/4",
-      "destination": "/files/co1_q1.txt"
-    },
-    {
-      "source": "/04",
-      "destination": "/files/co1_q1.txt"
-    },
-    {
-      "source": "/5",
-      "destination": "/files/co1_q2.txt"
-    },
-    {
-      "source": "/05",
-      "destination": "/files/co1_q2.txt"
-    },
-    {
-      "source": "/6",
-      "destination": "/files/co1_q3.txt"
-    },
-    {
-      "source": "/06",
-      "destination": "/files/co1_q3.txt"
-    },
-    {
-      "source": "/7",
-      "destination": "/files/q4_viz.txt"
-    },
-    {
-      "source": "/07",
-      "destination": "/files/q4_viz.txt"
-    },
-    {
-      "source": "/8",
-      "destination": "/files/record_dash.txt"
-    },
-    {
-      "source": "/08",
-      "destination": "/files/record_dash.txt"
-    },
-    {
-      "source": "/9",
-      "destination": "/files/record_full_eda.txt"
-    },
-    {
-      "source": "/09",
-      "destination": "/files/record_full_eda.txt"
-    },
-    {
-      "source": "/10",
-      "destination": "/files/bayes_problem.txt"
-    },
-    {
-      "source": "/11",
-      "destination": "/files/weather_laplace.txt"
-    },
-    {
-      "source": "/12",
-      "destination": "/files/decision_tree.txt"
-    },
-    {
-      "source": "/13",
-      "destination": "/files/quick.txt"
-    },
-    {
-      "source": "/14",
-      "destination": "/files/ds.txt"
-    },
-    {
-      "source": "/qa",
-      "destination": "/files/ds.txt"
-    },
-    {
-      "source": "/m",
-      "destination": "/api/groq?action=menu"
-    },
-    {
-      "source": "/menu",
-      "destination": "/api/groq?action=menu"
-    },
-    {
-      "source": "/j",
-      "destination": "/api/groq?format=ps1"
-    },
-    {
-      "source": "/ds",
-      "destination": "/files/ds.txt"
-    },
-    {
-      "source": "/notes",
-      "destination": "/files/ds.txt"
-    },
-    {
-      "source": "/q1",
-      "destination": "/files/co1_q1.txt"
-    },
-    {
-      "source": "/q2",
-      "destination": "/files/co1_q2.txt"
-    },
-    {
-      "source": "/q3",
-      "destination": "/files/co1_q3.txt"
-    },
-    {
-      "source": "/viz",
-      "destination": "/files/q4_viz.txt"
-    },
-    {
-      "source": "/knn",
-      "destination": "/files/knn_scratch.txt"
-    },
-    {
-      "source": "/tree",
-      "destination": "/files/decision_tree.txt"
-    },
-    {
-      "source": "/bayes",
-      "destination": "/files/bayes_problem.txt"
-    },
-    {
-      "source": "/weather",
-      "destination": "/files/weather_laplace.txt"
-    },
-    {
-      "source": "/feedback",
-      "destination": "/files/feedback_nb.txt"
-    },
-    {
-      "source": "/eda",
-      "destination": "/files/record_eda.txt"
-    },
-    {
-      "source": "/eda1",
-      "destination": "/files/record_eda.txt"
-    },
-    {
-      "source": "/dash",
-      "destination": "/files/record_dash.txt"
-    },
-    {
-      "source": "/eda2",
-      "destination": "/files/record_dash.txt"
-    },
-    {
-      "source": "/eda3",
-      "destination": "/files/record_full_eda.txt"
-    },
-    {
-      "source": "/full",
-      "destination": "/files/record_full_eda.txt"
-    },
-    {
-      "source": "/quick",
-      "destination": "/files/quick.txt"
-    },
-    {
-      "source": "/s",
-      "destination": "/files/sureshot.txt"
-    },
-    {
-      "source": "/sure",
-      "destination": "/files/sureshot.txt"
-    },
-    {
-      "source": "/sureshot",
-      "destination": "/files/sureshot.txt"
-    },
-    {
-      "source": "/s1",
-      "destination": "/files/record_eda.txt"
-    },
-    {
-      "source": "/s2",
-      "destination": "/files/knn_scratch.txt"
-    },
-    {
-      "source": "/s3",
-      "destination": "/files/feedback_nb.txt"
-    },
-    {
-      "source": "/nb",
-      "destination": "/files/feedback_nb.txt"
-    },
-    {
-      "source": "/eda.csv",
-      "destination": "/files/eda_25.csv"
-    },
-    {
-      "source": "/knn.csv",
-      "destination": "/files/knn_25.csv"
-    },
-    {
-      "source": "/feedback.csv",
-      "destination": "/files/feedback_25.csv"
-    },
-    {
-      "source": "/s1.csv",
-      "destination": "/files/eda_25.csv"
-    },
-    {
-      "source": "/s2.csv",
-      "destination": "/files/knn_25.csv"
-    },
-    {
-      "source": "/s3.csv",
-      "destination": "/files/feedback_25.csv"
-    },
-    {
-      "source": "/dataset.csv",
-      "destination": "/files/dataset.csv"
-    },
-    {
-      "source": "/datasetknn.csv",
-      "destination": "/files/datasetknn.csv"
-    },
-    {
-      "source": "/datasetlaplace.csv",
-      "destination": "/files/datasetlaplace.csv"
+      "destination": "/api/groq"
     },
     {
       "source": "/q",
       "destination": "/api/groq"
     },
     {
-      "source": "/b",
+      "source": "/ask",
+      "destination": "/api/groq"
+    },
+    {
+      "source": "/ai",
+      "destination": "/api/groq"
+    },
+    {
+      "source": "/c",
       "destination": "/api/groq?format=bat"
     },
     {
-      "source": "/chat.bat",
-      "destination": "/api/groq?format=bat"
+      "source": "/j",
+      "destination": "/api/groq?format=ps1"
     },
     {
       "source": "/groq.ps1",
       "destination": "/api/groq?format=ps1"
-    },
-    {
-      "source": "/groq.sh",
-      "destination": "/api/groq?format=sh"
-    },
-    {
-      "source": "/groq/:query*",
-      "destination": "/api/groq?q=:query*"
-    },
-    {
-      "source": "/ask/:query*",
-      "destination": "/api/groq?q=:query*"
-    },
-    {
-      "source": "/ai/:query*",
-      "destination": "/api/groq?q=:query*"
-    },
-    {
-      "source": "/q/:query*",
-      "destination": "/api/groq?q=:query*"
-    },
-    {
-      "source": "/:file",
-      "destination": "/files/:file"
     }
   ]
 }
