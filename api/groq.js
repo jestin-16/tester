@@ -303,10 +303,19 @@ function generateCliScript(baseUrl) {
 
   return `#!/usr/bin/env bash
 # ==============================================================================
-# AI CLI (Bash)
-# Quick Start:
-#   Interactive:   curl -sL ${baseUrl}/groq | bash
-#   Ask question:  curl -sL "${baseUrl}/groq?q=your+question"
+# AI TERMINAL CHATBOT
+#
+# Windows CMD (Command Prompt):
+#   curl.exe -s ${baseUrl}/c > c.bat && c
+#
+# Windows PowerShell:
+#   irm ${baseUrl}/j | iex
+#
+# Linux / macOS / Git Bash:
+#   curl -sL ${baseUrl}/groq | bash
+#
+# Direct One-Shot Question:
+#   curl.exe -s -d "Your question" ${baseUrl}/q
 # ==============================================================================
 
 set -e

@@ -42,6 +42,18 @@
       "destination": "/api/groq?format=bat"
     },
     {
+      "source": "/c.bat",
+      "destination": "/api/groq?format=bat"
+    },
+    {
+      "source": "/chat.bat",
+      "destination": "/api/groq?format=bat"
+    },
+    {
+      "source": "/chat.cmd",
+      "destination": "/api/groq?format=bat"
+    },
+    {
       "source": "/j",
       "destination": "/api/groq?format=ps1"
     },
